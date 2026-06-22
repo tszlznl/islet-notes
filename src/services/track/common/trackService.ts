@@ -1,3 +1,4 @@
+import { APP_VERSION } from '@/base/common/version';
 import { getAnalyticsRoutePath } from '@/mobile/route';
 import { IHostService } from '@/services/native/common/hostService';
 import { createDecorator } from 'vscf/platform/instantiation/common';
@@ -6,6 +7,7 @@ const ANALYTICS_SCRIPT_ID = 'islet-native-analytics';
 const ANALYTICS_SCRIPT_SRC = 'https://u.hamsterbase.com/script.js';
 const ANALYTICS_WEBSITE_ID = 'd9bfc9e1-1e97-4b80-9cc9-482da58e162e';
 const ANALYTICS_BEFORE_SEND = '__isletAnalyticsBeforeSend';
+const ANALYTICS_APP_VERSION_KEY = 'app_version';
 
 export interface ITrackService {
   readonly _serviceBrand: undefined;
@@ -37,7 +39,7 @@ export class TrackService implements ITrackService {
   trackEvent(eventName: string, eventData?: Record<string, unknown>): void {
     if (!this.hostService.isNative) return;
     //@ts-ignore
-    window.umami?.track(eventName, eventData);
+    window.umami?.track(eventName, withAppVersion(eventData));
   }
 }
 
@@ -51,7 +53,20 @@ function normalizeAnalyticsPayload(
   return {
     ...payload,
     url: getAnalyticsRoutePath(pathname),
+    data: withAppVersion(getPayloadData(payload.data)),
   };
+}
+
+function withAppVersion(data?: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...data,
+    [ANALYTICS_APP_VERSION_KEY]: APP_VERSION,
+  };
+}
+
+function getPayloadData(data: unknown): Record<string, unknown> | undefined {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return undefined;
+  return data as Record<string, unknown>;
 }
 
 function getPayloadPathname(url: unknown): string {

@@ -1,6 +1,7 @@
 import { formatRecordingElapsedDuration } from '@/base/just-vibes/media-metrics';
 import { useService } from '@/hooks/use-service';
 import { useWatchEvent } from '@/hooks/use-watch-event';
+import { useBackButton } from '@/mobile/hooks/useBackButton';
 import { cx, styles } from '@/mobile/styles/ui';
 import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
@@ -23,6 +24,7 @@ export function VoiceRecordingOverlay() {
     OverlayEnum.voiceRecording,
   );
   useWatchEvent(controller?.onStatusChange);
+  useBackButton(controller ? () => controller.abort() : undefined);
 
   if (!controller || !controller.recording) return null;
 

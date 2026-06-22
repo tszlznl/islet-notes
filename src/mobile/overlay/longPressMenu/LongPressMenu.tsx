@@ -1,5 +1,6 @@
 import { useService } from '@/hooks/use-service';
 import { useWatchEvent } from '@/hooks/use-watch-event';
+import { useBackButton } from '@/mobile/hooks/useBackButton';
 import { styles } from '@/mobile/styles/ui';
 import { OverlayEnum } from '@/services/overlay/common/overlayEnum';
 import { IWorkbenchOverlayService } from '@/services/overlay/common/WorkbenchOverlayService';
@@ -21,6 +22,7 @@ export function LongPressMenu() {
     OverlayEnum.longPressMenu,
   );
   useWatchEvent(controller?.onStatusChange);
+  useBackButton(controller ? () => controller.dispose() : undefined);
 
   if (!controller || controller.actions.length === 0) return null;
 

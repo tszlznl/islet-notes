@@ -1,5 +1,6 @@
 import { useService } from '@/hooks/use-service';
 import { useWatchEvent } from '@/hooks/use-watch-event';
+import { useBackButton } from '@/mobile/hooks/useBackButton';
 import { cx, styles } from '@/mobile/styles/ui';
 import { OverlayEnum } from '@/services/overlay/common/overlayEnum';
 import { IWorkbenchOverlayService } from '@/services/overlay/common/WorkbenchOverlayService';
@@ -13,6 +14,7 @@ export function ActionSheet() {
     OverlayEnum.actionSheet,
   );
   const visible = !!controller && controller.actions.length > 0;
+  useBackButton(visible && controller ? () => controller.dispose() : undefined);
   // Mount off-screen, then flip to the entered state on the next frame so the
   // panel slides up instead of appearing instantly.
   const [entered, setEntered] = useState(false);

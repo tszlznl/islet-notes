@@ -1,5 +1,6 @@
 import { useService } from '@/hooks/use-service';
 import { useWatchEvent } from '@/hooks/use-watch-event';
+import { useBackButton } from '@/mobile/hooks/useBackButton';
 import { cx, styles } from '@/mobile/styles/ui';
 import { OverlayEnum } from '@/services/overlay/common/overlayEnum';
 import { IWorkbenchOverlayService } from '@/services/overlay/common/WorkbenchOverlayService';
@@ -10,6 +11,7 @@ export function Dialog() {
   const workbenchOverlayService = useService(IWorkbenchOverlayService);
   useWatchEvent(workbenchOverlayService.onOverlayChange);
   const controller = workbenchOverlayService.getOverlay<DialogController>(OverlayEnum.dialog);
+  useBackButton(controller ? () => controller.cancel() : undefined);
 
   if (!controller) return null;
 
