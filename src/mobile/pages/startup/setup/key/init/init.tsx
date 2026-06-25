@@ -6,6 +6,7 @@ import { useLoadingToast } from '@/mobile/overlay/loadingToast/useLoadingToast';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { CloudSync } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
+import { reloadAppRoot } from '@/mobile/utils/reloadAppRoot';
 import { localize } from '@/nls';
 import { deriveRecoveryKeyHash } from '@/base/just-vibes/attachment-encryption';
 import type { EditableUploadConfig } from '@/base/just-vibes/file-asset-object-store';
@@ -64,7 +65,7 @@ export function StartupSetupKeyInitPage() {
         recoveryKey,
         recoveryKeyHash,
       });
-      window.location.replace('/');
+      reloadAppRoot();
     } finally {
       loadingToast.dispose();
       setSaving(false);

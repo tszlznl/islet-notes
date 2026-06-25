@@ -13,6 +13,7 @@ import {
   HostGenerateThumbnailOptions,
   HostGenerateThumbnailResult,
   HostGalleryPick,
+  HostRouterType,
   HostMediaPickOptions,
   HostRequestOptions,
   HostResponse,
@@ -51,6 +52,7 @@ export class BrowserHostService implements IHostService {
   readonly _serviceBrand: undefined;
   readonly isNative = false;
   readonly onBackButton = Event.None;
+  readonly routerType: HostRouterType = 'browser';
   private readonly filesystem: BrowserHostFilesystem;
   private readonly attachmentBlobs: BrowserAttachmentBlobStore;
   private readonly videoObjectUrls = new Map<string, string>();

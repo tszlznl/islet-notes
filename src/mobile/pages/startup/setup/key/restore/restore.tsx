@@ -7,6 +7,7 @@ import { useLoadingToast } from '@/mobile/overlay/loadingToast/useLoadingToast';
 import { useTopTips } from '@/mobile/overlay/topTips/useTopTips';
 import { CloudSync } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
+import { reloadAppRoot } from '@/mobile/utils/reloadAppRoot';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import { deriveRecoveryKeyHash } from '@/base/just-vibes/attachment-encryption';
@@ -97,7 +98,7 @@ export function StartupSetupKeyRestorePage() {
         await diaryService.initializeStorageScopeFromSnapshot(scopeId, verified.snapshot);
       }
     }
-    window.location.replace('/');
+    reloadAppRoot();
   };
 
   return (
