@@ -21,11 +21,6 @@
       "vs/*": ["./src/packages/vscf/internal/*"]
     }
   },
-  "include": [
-    "vite.config.ts",
-    "chrome-extension/vite.config.ts",
-    "chrome-extension/background.ts",
-    "src/types.d.ts"
-  ],
+  "include": ["vite.config.ts", "src/types.d.ts"],
   "exclude": ["src/packages/vscf/**/*.ts"]
 }

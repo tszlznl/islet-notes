@@ -1,5 +1,3 @@
-import { reloadAppRoot } from '@/mobile/utils/reloadAppRoot';
-
 export const EXPERIENCE_MODE_KEY = 'memotymode';
 
 export function isExperienceMode(): boolean {
@@ -12,5 +10,5 @@ export function enterExperienceMode(): void {
 
 export function exitExperienceMode(): void {
   sessionStorage.removeItem(EXPERIENCE_MODE_KEY);
-  reloadAppRoot();
+  window.location.replace('/');
 }

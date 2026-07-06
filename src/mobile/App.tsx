@@ -2,10 +2,8 @@ import { OverlayHost } from '@/mobile/overlay/OverlayHost';
 import { routes } from '@/mobile/route';
 import { useAttachmentUploadCommitter } from '@/mobile/hooks/useAttachmentUploadCommitter';
 import { useNativeSystemBarIconStyle } from '@/mobile/hooks/useNativeSystemBarIconStyle';
-import { useService } from '@/hooks/use-service';
-import { IHostService } from '@/services/native/common/hostService';
 import React, { Suspense } from 'react';
-import { BrowserRouter, HashRouter, Navigate, Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { ContentNavigation } from './components/layout/ContentNavigation';
 import { HomeRedirect } from './components/layout/HomeRedirect';
 import { PageRouteElement } from './components/PageRouteElement';
@@ -13,11 +11,9 @@ import { PageRouteElement } from './components/PageRouteElement';
 export function App() {
   useNativeSystemBarIconStyle();
   useAttachmentUploadCommitter();
-  const hostService = useService(IHostService);
-  const Router = hostService.routerType === 'hash' ? HashRouter : BrowserRouter;
 
   return (
-    <Router>
+    <BrowserRouter>
       <OverlayHost />
       <Suspense fallback={null}>
         <Routes>
@@ -34,6 +30,6 @@ export function App() {
           </Route>
         </Routes>
       </Suspense>
-    </Router>
+    </BrowserRouter>
   );
 }
