@@ -4,6 +4,7 @@ import {
   CreateTextEntryOptions,
   DiaryEntryRecord,
   DiaryModelData,
+  IdentityMessagePosition,
 } from '@/core/diary/type';
 import { Event } from 'vscf/base/common/event';
 import { createDecorator } from 'vscf/platform/instantiation/common';
@@ -29,6 +30,12 @@ export interface IDiaryService {
   ): void;
   updateProfileName(name: string): void;
   updateProfileAvatar(avatarAttachmentId: string | undefined): void;
+  addIdentity(name: string): string;
+  updateIdentityName(identityId: string, name: string): void;
+  updateIdentityAvatar(identityId: string, avatarAttachmentId: string | undefined): void;
+  updateIdentityMessagePosition(identityId: string, messagePosition: IdentityMessagePosition): void;
+  archiveIdentity(identityId: string): void;
+  unarchiveIdentity(identityId: string): void;
   addTextEntry(notebookId: string, text: string): string;
   addTextEntryWithOptions(options: CreateTextEntryOptions): string;
   addTextEntriesWithOptions(optionsList: CreateTextEntryOptions[]): string[];
@@ -37,6 +44,7 @@ export interface IDiaryService {
   addAttachmentEntry(options: CreateAttachmentEntryOptions): string;
   updateAttachmentEntryText(entryId: string, text: string | undefined): void;
   moveEntryToNotebook(entryId: string, targetNotebookId: string): void;
+  updateEntryIdentity(entryId: string, identityId: string | undefined): void;
   addAttachment(attachment: AttachmentRecord): void;
   softDeleteEntry(entryId: string): void;
 }

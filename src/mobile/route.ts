@@ -123,6 +123,36 @@ export const routes: PageRoute[] = [
     component: 'MePage',
   },
   {
+    url: '/identities',
+    file: './pages/identities/identities',
+    component: 'IdentitiesPage',
+    fallback: '/me',
+  },
+  {
+    url: '/identities/new',
+    file: './pages/identities/new/new',
+    component: 'IdentitiesNewPage',
+    fallback: '/identities',
+  },
+  {
+    url: '/identities/archived',
+    file: './pages/identities/archived/archived',
+    component: 'IdentitiesArchivedPage',
+    fallback: '/identities',
+  },
+  {
+    url: '/identity/:identityId',
+    file: './pages/identity/identity',
+    component: 'IdentityPage',
+    fallback: '/identities',
+  },
+  {
+    url: '/identity/:identityId/name',
+    file: './pages/identity/name/name',
+    component: 'IdentityNamePage',
+    fallback: ({ identityId }) => (identityId ? `/identity/${identityId}` : '/identities'),
+  },
+  {
     url: '/settings',
     file: './pages/settings/settings',
     component: 'SettingsPage',

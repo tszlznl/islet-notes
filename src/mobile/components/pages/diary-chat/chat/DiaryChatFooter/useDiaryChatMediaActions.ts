@@ -10,12 +10,14 @@ import { useMemo } from 'react';
 
 interface UseDiaryChatMediaActionsOptions {
   notebookId: string;
+  identityId?: string;
   closePlusPanel: () => void;
   showError: (message: string) => void;
 }
 
 export function useDiaryChatMediaActions({
   notebookId,
+  identityId,
   closePlusPanel,
   showError,
 }: UseDiaryChatMediaActionsOptions) {
@@ -25,7 +27,7 @@ export function useDiaryChatMediaActions({
   const videoSupported = useMemo(() => hostService.caniuse('videoUpload'), [hostService]);
 
   const uploadImage = async (file: Blob) => {
-    await fileAssetService.uploadImageAttachment({ notebookId, file });
+    await fileAssetService.uploadImageAttachment({ notebookId, file, identityId });
   };
 
   const getVideoCacheScope = () => fileAssetService.getStorageScope();
@@ -102,6 +104,7 @@ export function useDiaryChatMediaActions({
       // 是否“已够小可跳过转码”由原生按真实分辨率判断；这里只传用户是否勾了原画质。
       await fileAssetService.uploadVideoAttachment({
         notebookId,
+        identityId,
         sourcePath: video.sourcePath,
         originalQuality,
         size: video.size,

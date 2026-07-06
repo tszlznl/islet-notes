@@ -37,6 +37,11 @@ export function MePage() {
         <CellListGroup
           items={[
             {
+              label: localize('identity.title', 'Identities'),
+              testId: Settings.identities,
+              onClick: () => navigationService.navigate({ path: '/identities' }),
+            },
+            {
               label: localize('settings.title', 'Settings'),
               testId: Settings.preferences,
               onClick: () => navigationService.navigate({ path: '/settings' }),

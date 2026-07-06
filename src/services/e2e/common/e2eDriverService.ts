@@ -4,6 +4,7 @@ import type {
   CreateTextEntryOptions,
   DiaryEntryRecord,
   DiaryModelData,
+  IdentityMessagePosition,
   SyncConfigRecord,
 } from '@/core/diary/type';
 import { syncStoragePath } from '@/core/spec/syncStoragePath';
@@ -32,9 +33,11 @@ export interface IE2eDriverService {
   testInjection: E2eDriverTestInjectionApi;
   getDiaryModel(): Pick<
     DiaryModelData,
-    'profile' | 'notebooks' | 'notebookOrder' | 'entries' | 'attachments'
+    'profile' | 'notebooks' | 'notebookOrder' | 'entries' | 'attachments' | 'identities'
   >;
   addNotebook(name: string): string;
+  addIdentity(options: { name: string; messagePosition?: IdentityMessagePosition }): string;
+  archiveIdentity(identityId: string): void;
   addTextEntryWithOptions(options: CreateTextEntryOptions): string;
   addEntryForTest(entry: DiaryEntryRecord): string;
   addAttachmentEntry(options: CreateAttachmentEntryOptions): string;
@@ -81,9 +84,9 @@ export class E2eDriverService implements IE2eDriverService {
 
   getDiaryModel(): Pick<
     DiaryModelData,
-    'profile' | 'notebooks' | 'notebookOrder' | 'entries' | 'attachments'
+    'profile' | 'notebooks' | 'notebookOrder' | 'entries' | 'attachments' | 'identities'
   > {
-    const { profile, notebooks, notebookOrder, entries, attachments } =
+    const { profile, notebooks, notebookOrder, entries, attachments, identities } =
       this.diaryService.modelState;
     return {
       profile,
@@ -91,11 +94,24 @@ export class E2eDriverService implements IE2eDriverService {
       notebookOrder,
       entries,
       attachments,
+      identities,
     };
   }
 
   addNotebook(name: string): string {
     return this.diaryService.addNotebook(name);
+  }
+
+  addIdentity(options: { name: string; messagePosition?: IdentityMessagePosition }): string {
+    const identityId = this.diaryService.addIdentity(options.name);
+    if (options.messagePosition) {
+      this.diaryService.updateIdentityMessagePosition(identityId, options.messagePosition);
+    }
+    return identityId;
+  }
+
+  archiveIdentity(identityId: string): void {
+    this.diaryService.archiveIdentity(identityId);
   }
 
   addTextEntryWithOptions(options: CreateTextEntryOptions): string {

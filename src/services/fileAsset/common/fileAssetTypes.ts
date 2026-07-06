@@ -34,6 +34,7 @@ export interface VideoUploadResult {
 export interface CreateImageAttachmentUploadTaskOptions {
   notebookId: string;
   file: Blob;
+  identityId?: string;
 }
 
 export interface CreateAudioAttachmentUploadTaskOptions {
@@ -41,6 +42,7 @@ export interface CreateAudioAttachmentUploadTaskOptions {
   file: Blob;
   duration: number;
   transcript?: string;
+  identityId?: string;
 }
 
 export interface CreateVideoAttachmentUploadTaskOptions {
@@ -59,6 +61,7 @@ export interface CreateVideoAttachmentUploadTaskOptions {
   durationMs?: number;
   /** 视频封面（data URL）。创建任务时用于处理中占位；转码完成后更新为处理后的封面，并用于上传重试。 */
   previewThumbnail?: string;
+  identityId?: string;
 }
 
 export interface FileUrlOptions {

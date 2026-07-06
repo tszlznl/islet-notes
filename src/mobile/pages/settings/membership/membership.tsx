@@ -69,39 +69,33 @@ export function SettingsMembershipPage() {
         </p>
       </section>
 
+      <p className={styles.Membership.AccountLabel}>
+        {localize('settings.membership.memberId', 'Account ID')}
+      </p>
       <section className={styles.Membership.Card}>
-        <p className={styles.Membership.AccountLabel}>
-          {localize('settings.membership.memberId', 'Account ID')}
-        </p>
-        <div className={styles.Membership.AccountBox}>
-          <span className={styles.Membership.AccountId} data-test-id={MembershipSettings.memberId}>
-            {status.memberId ?? localize('settings.membership.notConfigured', 'Not configured')}
-          </span>
-          <button
-            className={styles.Membership.CopyButton}
-            type='button'
-            disabled={!status.memberId}
-            aria-label={
-              copied ? localize('common.copied', 'Copied') : localize('common.copy', 'Copy')
-            }
-            title={copied ? localize('common.copied', 'Copied') : localize('common.copy', 'Copy')}
-            onClick={() => void copyMemberId()}
-          >
-            {copied ? (
-              <Check size={15} aria-hidden='true' />
-            ) : (
-              <Copy size={15} aria-hidden='true' />
-            )}
-          </button>
-        </div>
+        <span className={styles.Membership.AccountId} data-test-id={MembershipSettings.memberId}>
+          {status.memberId ?? localize('settings.membership.notConfigured', 'Not configured')}
+        </span>
+        <button
+          className={styles.Membership.CopyButton}
+          type='button'
+          disabled={!status.memberId}
+          aria-label={
+            copied ? localize('common.copied', 'Copied') : localize('common.copy', 'Copy')
+          }
+          title={copied ? localize('common.copied', 'Copied') : localize('common.copy', 'Copy')}
+          onClick={() => void copyMemberId()}
+        >
+          {copied ? <Check size={15} aria-hidden='true' /> : <Copy size={15} aria-hidden='true' />}
+        </button>
       </section>
 
+      <div className={styles.Membership.FeatureSectionTitle}>
+        {status.active
+          ? localize('settings.membership.unlockedFeatures', 'Unlocked')
+          : localize('settings.membership.features', 'Benefits')}
+      </div>
       <section className={styles.Membership.FeatureSection}>
-        <div className={styles.Membership.FeatureSectionTitle}>
-          {status.active
-            ? localize('settings.membership.unlockedFeatures', 'Unlocked')
-            : localize('settings.membership.features', 'Benefits')}
-        </div>
         <div
           className={styles.Membership.FeatureRow}
           data-test-id={MembershipSettings.featureChatBackground}
@@ -122,7 +116,7 @@ export function SettingsMembershipPage() {
               {localize('settings.membership.unlocked', 'Unlocked')}
             </span>
           ) : (
-            <Check size={18} className='flex-none text-accent' aria-hidden='true' />
+            <Check size={18} className={styles.Membership.FeatureCheck} aria-hidden='true' />
           )}
         </div>
       </section>

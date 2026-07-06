@@ -134,6 +134,14 @@ export const DiaryChat = {
   uploadDelete: 'diary-chat.upload-delete',
   uploadDeleteConfirm: 'diary-chat.upload-delete-confirm',
   uploadDeleteConfirmAction: 'diary-chat.upload-delete-confirm-action',
+  identityButton: 'diary-chat.identity-button',
+  identityTag: 'diary-chat.identity-tag',
+  identityTagRemove: 'diary-chat.identity-tag-remove',
+  identityPickerSheet: 'diary-chat.identity-picker-sheet',
+  identityPickerList: 'diary-chat.identity-picker-list',
+  identityPickerOption: 'diary-chat.identity-picker-option',
+  identityPickerCancel: 'diary-chat.identity-picker-cancel',
+  identityAvatar: 'diary-chat.identity-avatar',
 } as const;
 
 export const DiarySearch = {
@@ -158,6 +166,7 @@ export const Settings = {
   page: 'settings.page',
   content: 'settings.content',
   profile: 'settings.profile',
+  identities: 'settings.identities',
   preferences: 'settings.preferences',
   preferencesPage: 'settings.preferences-page',
   preferencesContent: 'settings.preferences-content',
@@ -252,6 +261,55 @@ export const ProfileName = {
   content: 'profile-name.content',
   nameInput: 'profile-name.name-input',
   save: 'profile-name.save',
+} as const;
+
+export const IdentityList = {
+  page: 'identity-list.page',
+  content: 'identity-list.content',
+  chatEntrySwitch: 'identity-list.chat-entry-switch',
+  list: 'identity-list.list',
+  add: 'identity-list.add',
+  item: 'identity-list.item',
+  itemName: 'identity-list.item-name',
+  viewArchived: 'identity-list.view-archived',
+  empty: 'identity-list.empty',
+} as const;
+
+export const IdentityCreate = {
+  page: 'identity-create.page',
+  content: 'identity-create.content',
+  nameInput: 'identity-create.name-input',
+  save: 'identity-create.save',
+} as const;
+
+export const IdentityEdit = {
+  page: 'identity-edit.page',
+  content: 'identity-edit.content',
+  name: 'identity-edit.name',
+  avatar: 'identity-edit.avatar',
+  positionLeft: 'identity-edit.position-left',
+  positionRight: 'identity-edit.position-right',
+  archive: 'identity-edit.archive',
+  archiveConfirm: 'identity-edit.archive-confirm',
+  archiveCancel: 'identity-edit.archive-cancel',
+  archiveConfirmAction: 'identity-edit.archive-confirm-action',
+  unarchive: 'identity-edit.unarchive',
+} as const;
+
+export const IdentityName = {
+  page: 'identity-name.page',
+  content: 'identity-name.content',
+  nameInput: 'identity-name.name-input',
+  save: 'identity-name.save',
+} as const;
+
+export const IdentityArchived = {
+  page: 'identity-archived.page',
+  content: 'identity-archived.content',
+  list: 'identity-archived.list',
+  item: 'identity-archived.item',
+  itemName: 'identity-archived.item-name',
+  empty: 'identity-archived.empty',
 } as const;
 
 export const Startup = {

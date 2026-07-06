@@ -43,17 +43,20 @@ export function useAttachmentUploadCommitter() {
           const entryId = diaryService.addAttachmentEntry({
             attachment,
             createdAt: task.createdAt,
+            identityId: task.identityId,
           });
           if (autoTranscribe) speechRecognitionService.recognize(entryId, attachment);
         } else if (task.type === 'video') {
           diaryService.addAttachmentEntry({
             attachment: videoAttachmentTaskToAttachment(task),
             createdAt: task.createdAt,
+            identityId: task.identityId,
           });
         } else {
           diaryService.addAttachmentEntry({
             attachment: imageAttachmentTaskToAttachment(task),
             createdAt: task.createdAt,
+            identityId: task.identityId,
           });
         }
         void fileAssetService.deleteAttachmentTask(task.id);

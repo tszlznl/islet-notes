@@ -1,18 +1,22 @@
 import { localize } from '@/nls';
 import { DiaryChat } from '@/mobile/test.id';
-import { styles } from '@/mobile/styles/ui';
+import { cx, styles } from '@/mobile/styles/ui';
 import { FileQuestion } from 'lucide-react';
 import React from 'react';
 
 interface UnknownAttachmentMessageProps {
   kind: 'entry' | 'attachment';
+  align?: 'left' | 'right';
 }
 
-export function UnknownAttachmentMessage({ kind }: UnknownAttachmentMessageProps) {
+export function UnknownAttachmentMessage({ kind, align }: UnknownAttachmentMessageProps) {
   const isEntry = kind === 'entry';
   return (
     <div
-      className={styles.UnknownAttachmentMessage.Root}
+      className={cx(
+        styles.UnknownAttachmentMessage.Root,
+        align === 'left' && styles.ChatMessage.BubbleTailLeft,
+      )}
       data-test-id={isEntry ? DiaryChat.unknownEntryMessage : DiaryChat.unknownAttachmentMessage}
     >
       <span className={styles.UnknownAttachmentMessage.Icon}>

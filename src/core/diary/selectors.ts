@@ -4,6 +4,7 @@ import {
   AttachmentRecord,
   DiaryEntryRecord,
   DiaryModelData,
+  IdentityRecord,
   isKnownDiaryEntryType,
   NotebookRecord,
 } from './type';
@@ -27,6 +28,30 @@ export function getAttachmentById(
 export function getProfileAvatarAttachment(model: DiaryModelData): AttachmentRecord | undefined {
   const avatarAttachmentId = model.profile.avatarAttachmentId;
   return avatarAttachmentId ? getAttachmentById(model, avatarAttachmentId) : undefined;
+}
+
+/** 不过滤归档：历史消息、日历需要解析已归档身份。 */
+export function getIdentityById(
+  model: DiaryModelData,
+  identityId: string,
+): IdentityRecord | undefined {
+  return model.identityMap.get(identityId);
+}
+
+export function getActiveIdentities(model: DiaryModelData): IdentityRecord[] {
+  return model.identities.filter((identity) => !identity.archivedAt);
+}
+
+export function getArchivedIdentities(model: DiaryModelData): IdentityRecord[] {
+  return model.identities.filter((identity) => !!identity.archivedAt);
+}
+
+export function getIdentityAvatarAttachment(
+  model: DiaryModelData,
+  identity: IdentityRecord | undefined,
+): AttachmentRecord | undefined {
+  if (!identity?.avatarAttachmentId) return undefined;
+  return getAttachmentById(model, identity.avatarAttachmentId);
 }
 
 export function getEntriesByNotebook(

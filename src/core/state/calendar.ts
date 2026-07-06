@@ -12,6 +12,8 @@ import { format } from 'date-fns';
 export interface CalendarDayRecord {
   entry: DiaryEntryRecord;
   notebookName: string;
+  /** 发送该记录时使用的身份昵称（含已归档身份），无身份为 undefined。 */
+  identityName?: string;
   image?: ImageAttachmentRecord;
   audio?: AudioAttachmentRecord;
   video?: VideoAttachmentRecord;
@@ -43,9 +45,17 @@ export function groupEntriesByDate(
     const video = attachment?.type === 'video' ? attachment : undefined;
     if (entry.type === 'attachment' && !image && !audio && !video) continue;
 
+    const identity = entry.identityId ? model.identityMap.get(entry.identityId) : undefined;
     const key = dateKey(new Date(entry.createdAt));
     const records = result.get(key) ?? [];
-    records.push({ entry, notebookName: notebook.name, image, audio, video });
+    records.push({
+      entry,
+      notebookName: notebook.name,
+      identityName: identity?.name,
+      image,
+      audio,
+      video,
+    });
     result.set(key, records);
   }
 

@@ -3,7 +3,7 @@ import { DiaryChat } from '@/mobile/test.id';
 import { cx, styles } from '@/mobile/styles/ui';
 import { HoldToTalkButton } from '@/mobile/overlay/voiceRecording/HoldToTalkButton';
 import type { VoiceRecordingResult } from '@/mobile/overlay/voiceRecording/voiceRecorderEngine';
-import { CirclePlus, Keyboard, Mic } from 'lucide-react';
+import { CirclePlus, CircleUserRound, Keyboard, Mic } from 'lucide-react';
 import React, { type RefObject } from 'react';
 
 interface ChatInputRowProps {
@@ -19,6 +19,8 @@ interface ChatInputRowProps {
   onSendText: () => void;
   onSendVoice: (result: VoiceRecordingResult) => void | Promise<void>;
   onVoiceError: (message: string) => void;
+  /** 没有可选身份时不传，身份按钮隐藏。 */
+  onOpenIdentityPicker?: () => void;
 }
 
 export function ChatInputRow({
@@ -34,6 +36,7 @@ export function ChatInputRow({
   onSendText,
   onSendVoice,
   onVoiceError,
+  onOpenIdentityPicker,
 }: ChatInputRowProps) {
   const hasText = text.trim().length > 0 && !voiceMode;
 
@@ -89,6 +92,18 @@ export function ChatInputRow({
             }}
           />
         </div>
+      )}
+      {onOpenIdentityPicker && (
+        <button
+          className={styles.DiaryChatFooter.PlusButton}
+          type='button'
+          data-test-id={DiaryChat.identityButton}
+          title={localize('identity.pickerTitle', 'Choose identity')}
+          aria-label={localize('identity.pickerTitle', 'Choose identity')}
+          onClick={onOpenIdentityPicker}
+        >
+          <CircleUserRound size={26} strokeWidth={1.6} />
+        </button>
       )}
       <button
         className={

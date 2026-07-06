@@ -18,7 +18,11 @@ interface DayRecordItemProps {
 export function DayRecordItem({ record, imagePreviewAttachments, onOpen }: DayRecordItemProps) {
   const content = (
     <>
-      <span className={styles.DayRecordItem.NotebookName}>{record.notebookName}</span>
+      <span className={styles.DayRecordItem.NotebookName}>
+        {record.identityName
+          ? `${record.notebookName} · ${record.identityName}`
+          : record.notebookName}
+      </span>
       {record.image ? (
         <CalendarRecordImage
           attachment={record.image}

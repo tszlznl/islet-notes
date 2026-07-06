@@ -11,12 +11,14 @@ import type { ResolvedChatItem } from './utils';
 export interface MessageBodyProps {
   resolved: Exclude<ResolvedChatItem, { type: 'divider' }>;
   previewAttachments: ImageAttachmentRecord[];
+  /** 气泡小尾巴方向，默认右侧；左侧身份消息传 'left'。 */
+  align?: 'left' | 'right';
 }
 
-export function MessageBody({ resolved, previewAttachments }: MessageBodyProps) {
+export function MessageBody({ resolved, previewAttachments, align }: MessageBodyProps) {
   switch (resolved.type) {
     case 'text':
-      return <TextMessage entryId={resolved.entry.id} text={resolved.text} />;
+      return <TextMessage entryId={resolved.entry.id} text={resolved.text} align={align} />;
     case 'image':
       return (
         <ImageMessage
@@ -31,13 +33,14 @@ export function MessageBody({ resolved, previewAttachments }: MessageBodyProps) 
           entryId={resolved.entry.id}
           attachment={resolved.attachment}
           transcript={resolved.entry.text}
+          align={align}
         />
       );
     case 'video':
       return <VideoMessage entryId={resolved.entry.id} attachment={resolved.attachment} />;
     case 'upload':
-      return <UploadMessage task={resolved.task} />;
+      return <UploadMessage task={resolved.task} align={align} />;
     case 'unknown':
-      return <UnknownAttachmentMessage kind={resolved.kind} />;
+      return <UnknownAttachmentMessage kind={resolved.kind} align={align} />;
   }
 }

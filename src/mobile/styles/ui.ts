@@ -614,7 +614,10 @@ export const styles = {
   },
   UploadImageMessage: {
     Root: 'flex flex-col items-end',
+    RootLeft: 'flex flex-col items-start',
+    // 失败图标放在靠屏幕中间的一侧:右侧消息在图片左边,左侧身份消息镜像到右边。
     FailedRow: 'flex items-center justify-end gap-2',
+    FailedRowLeft: 'flex items-center justify-start gap-2',
     ImageBox:
       'relative w-[min(64vw,var(--message-image-fit-width),180px)] overflow-hidden rounded-md',
     UploadingOverlay: 'absolute inset-0 grid place-items-center rounded-md bg-black/45 text-white',
@@ -656,6 +659,20 @@ export const styles = {
     ),
     Time: cx('self-start pt-1 text-right text-muted', font.Desc),
   },
+  IdentityItem: {
+    Root: 'relative flex min-h-[64px] w-full items-center gap-3 bg-surface px-4 py-2.5 text-left transition-colors after:absolute after:bottom-0 after:left-[76px] after:right-0 after:h-px after:bg-line [&:last-child::after]:hidden active:bg-soft',
+    Avatar: 'h-12 w-12 rounded-md',
+    Name: cx('min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap', font.ListTitle),
+  },
+  IdentityListPage: {
+    SwitchRow: 'flex min-h-[56px] items-center justify-between gap-3 px-4',
+    SwitchLabel: cx('min-w-0 flex-1 text-ink', font.Body),
+    ArchivedLink: cx(
+      'mx-auto mt-4 block px-4 py-2 text-center text-link transition-opacity active:opacity-60',
+      font.Body,
+    ),
+    Empty: cx('grid place-items-center px-4 py-16 text-center text-muted', font.Desc),
+  },
   StartupPage: {
     RootColumn: 'flex flex-col',
     Content: 'flex min-h-0 flex-1 flex-col px-4 pb-[calc(1.5rem+var(--sab))] pt-4',
@@ -685,9 +702,12 @@ export const styles = {
     Empty: cx('grid place-items-center h-full text-muted', font.Desc),
   },
   DiaryChatFooter: {
-    Root: 'fixed inset-x-0 bottom-0 bg-canvas pb-[calc(0.625rem+var(--sab))] pl-[calc(0.75rem+var(--sal))] pr-[calc(0.75rem+var(--sar))] pt-2 before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-line',
+    // 根容器透明:身份 tag 悬浮在聊天背景上,只有输入区(InputArea)有背景,两者视觉分离。
+    Root: 'fixed inset-x-0 bottom-0',
+    InputArea:
+      'relative bg-canvas pb-[calc(0.625rem+var(--sab))] pl-[calc(0.5rem+var(--sal))] pr-[calc(0.5rem+var(--sar))] pt-2 before:absolute before:left-0 before:right-0 before:top-0 before:h-px before:bg-line',
     InputErrorGap: 'mb-1.5 px-1',
-    InputRow: 'flex items-end gap-2',
+    InputRow: 'flex items-end gap-1',
     TextareaWrap: 'relative flex min-h-10 min-w-0 flex-1 items-end rounded bg-surface',
     Textarea: cx(
       'min-h-10 max-h-[116px] min-w-0 flex-1 bg-transparent py-[9px] px-3 text-ink',
@@ -695,20 +715,37 @@ export const styles = {
     ),
     SendSize: 'h-10 min-w-[58px] rounded',
     PlusButton:
-      'grid h-10 w-10 flex-none place-items-center text-muted transition active:opacity-60',
-    PlusPanel: 'flex flex-wrap gap-x-9 gap-y-5 pb-4 pt-7',
+      'grid h-10 w-9 flex-none place-items-center text-muted transition active:opacity-60',
+    PlusPanel: 'flex flex-wrap gap-x-9 gap-y-5 px-1 pb-4 pt-7',
     PlusAction: 'flex flex-col items-center gap-2 active:opacity-70',
     PlusTile: 'grid h-16 w-16 place-items-center rounded-2xl bg-surface text-ink',
     PlusLabel: cx(font.Footnote, 'text-muted'),
+    IdentityTagRow:
+      'mb-1.5 flex items-center pl-[calc(1rem+var(--sal))] pr-[calc(1rem+var(--sar))]',
+    IdentityTag:
+      'flex max-w-full min-w-0 items-center gap-1.5 rounded bg-surface px-2 py-1 text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
+    IdentityTagAvatar: 'rounded-full',
+    IdentityTagName: cx('min-w-0 overflow-hidden text-ellipsis whitespace-nowrap', font.Desc),
+    IdentityTagRemove:
+      'grid h-5 w-5 flex-none place-items-center rounded-full text-muted transition active:opacity-60',
   },
   ChatMessage: {
     RowRight: 'flex items-start justify-end gap-2 py-[3px]',
+    RowLeft: 'flex items-start justify-start gap-2 py-[3px]',
+    // 叠加在带右尾巴的气泡上，把小尾巴翻到左侧；用 ! 确保覆盖基类的 right 定位。
+    BubbleTailLeft: 'after:!-left-1 after:!right-auto',
   },
   TextMessage: {
     Root: cx(
       'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded bg-bubble text-onbubble text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
       font.Body,
       "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-['']",
+    ),
+    // 左侧身份消息：仿微信接收方气泡，白色底 + 左侧小尾巴。
+    RootLeft: cx(
+      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded bg-surface text-ink text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
+      font.Body,
+      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-['']",
     ),
   },
   ImageMessage: {
@@ -730,11 +767,20 @@ export const styles = {
   },
   ChatAudio: {
     AudioMessageStack: 'flex max-w-[min(72vw,340px)] flex-col items-end gap-1.5',
+    AudioMessageStackLeft: 'flex max-w-[min(72vw,340px)] flex-col items-start gap-1.5',
     AudioMessage: cx(
       'relative flex min-h-10 items-center justify-end gap-1 rounded bg-bubble px-3 py-2 text-left text-onbubble transition active:opacity-85',
       "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-['']",
     ),
-    AudioWaveIcon: 'inline-block h-5 w-5 origin-center -rotate-90',
+    // 左侧身份语音：仿微信接收方气泡，白色底 + 左侧小尾巴，内容靠左。
+    AudioMessageLeft: cx(
+      'relative flex min-h-10 items-center justify-start gap-1 rounded bg-surface px-3 py-2 text-left text-ink transition active:opacity-85',
+      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-['']",
+    ),
+    AudioWaveIcon: 'inline-block h-5 w-5 origin-center',
+    // 波纹方向与微信一致:右侧气泡喇叭口朝左,左侧气泡镜像后朝右。
+    AudioWaveIconRight: '-rotate-90',
+    AudioWaveIconLeft: 'rotate-90',
     AudioWavePlaying: 'voice-wifi-playing',
     AudioWaveFailed: 'opacity-40',
     AudioDuration: 'text-[16px] leading-6 tabular-nums',
@@ -753,11 +799,18 @@ export const styles = {
     UploadSendingSpinner:
       'h-3.5 w-3.5 flex-none animate-spin rounded-full border-[1.5px] border-line border-t-placeholder',
     UploadAudioFailedRoot: 'flex flex-col items-end',
+    UploadAudioFailedRootLeft: 'flex flex-col items-start',
     UploadFailedRow: 'flex items-center justify-end gap-2',
+    UploadFailedRowLeft: 'flex items-center justify-start gap-2',
     UploadAudioRow: 'flex items-center justify-end gap-1.5',
+    UploadAudioRowLeft: 'flex items-center justify-start gap-1.5',
     UploadAudioBubble: cx(
       'relative flex min-h-10 items-center justify-end gap-1 rounded bg-bubble px-3 py-2 text-onbubble opacity-80',
       'after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-[""]',
+    ),
+    UploadAudioBubbleLeft: cx(
+      'relative flex min-h-10 items-center justify-start gap-1 rounded bg-surface px-3 py-2 text-ink opacity-80',
+      'after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-[""]',
     ),
   },
   S3SettingsPage: {
@@ -772,31 +825,30 @@ export const styles = {
   },
   Membership: {
     PageContent: 'px-3 pt-2 pb-[calc(1.25rem+var(--sab))]',
-    HeroCard: 'rounded-[10px] bg-surface px-5 py-6 text-center',
-    HeroIcon: 'mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full [&>svg]:h-7 [&>svg]:w-7',
-    HeroIconActive: 'bg-[#E7F9EF] text-accent',
-    HeroIconPurchase: 'bg-[#FFF7E0] text-[#E6A817]',
-    HeroTitle: cx('m-0 text-ink', font.EmBody),
-    HeroDesc: cx('m-0 mt-1 text-muted', font.Caption),
-    Card: 'mt-2.5 rounded-[10px] bg-surface px-4 py-3.5',
-    AccountLabel: cx('m-0 mb-2 text-muted', font.Footnote),
-    AccountBox: 'flex items-center justify-between gap-3 rounded-lg bg-soft px-3 py-2.5',
+    HeroCard: 'rounded-[10px] bg-surface px-5 pb-8 pt-9 text-center',
+    HeroIcon: 'mx-auto mb-4 grid h-16 w-16 place-items-center rounded-full [&>svg]:h-8 [&>svg]:w-8',
+    HeroIconActive: 'bg-accent text-onaccent',
+    HeroIconPurchase: 'bg-[#e6a817] text-white',
+    HeroTitle: cx('m-0 text-ink', font.Headline),
+    HeroDesc: cx('m-0 mt-1 text-muted', font.Desc),
+    Card: 'flex min-h-12 items-center justify-between gap-3 rounded-[10px] bg-surface py-2 pl-4 pr-2',
+    AccountLabel: cx('m-0 mb-2 mt-4 px-4 text-muted', font.Desc),
     AccountId: cx('min-w-0 flex-1 [overflow-wrap:anywhere] text-ink', font.Code),
     CopyButton: cx(
       'inline-grid h-8 w-8 flex-none place-items-center rounded text-accent transition active:bg-accent/10 disabled:opacity-40',
     ),
-    FeatureSection: 'mt-2.5 overflow-hidden rounded-[10px] bg-surface',
-    FeatureSectionTitle: cx('px-4 pb-1.5 pt-3 text-muted', font.Caption),
-    FeatureRow: 'flex items-center gap-3 border-t border-line px-4 py-3',
-    FeatureIcon:
-      'grid h-9 w-9 flex-none place-items-center rounded-lg bg-[#E7F9EF] text-accent [&>svg]:h-[18px] [&>svg]:w-[18px]',
+    FeatureSection: 'overflow-hidden rounded-[10px] bg-surface',
+    FeatureSectionTitle: cx('m-0 mb-2 mt-4 px-4 text-muted', font.Desc),
+    FeatureRow: 'flex items-center gap-3 px-4 py-3',
+    FeatureIcon: 'grid h-6 w-6 flex-none place-items-center text-accent',
     FeatureBody: 'min-w-0 flex-1',
-    FeatureTitle: cx('m-0 text-ink', font.GroupTitle),
+    FeatureTitle: cx('m-0 text-ink', font.Body),
     FeatureDesc: cx('m-0 mt-0.5 text-muted', font.Footnote),
-    FeatureBadge: cx('rounded bg-[#E7F9EF] px-2 py-0.5 text-accent', font.Footnote),
+    FeatureBadge: cx('flex-none text-muted', font.Desc),
+    FeatureCheck: 'flex-none text-accent',
     PurchaseActions: 'px-0 py-5',
     PurchaseButton: cx(
-      'block h-11 w-full rounded-lg bg-accent text-center text-onaccent transition active:brightness-90 disabled:opacity-40',
+      'block h-12 w-full rounded-lg bg-accent text-center text-onaccent transition active:brightness-90 disabled:opacity-40',
       font.Button,
     ),
     StepList: 'flex flex-col gap-4 bg-surface py-4',

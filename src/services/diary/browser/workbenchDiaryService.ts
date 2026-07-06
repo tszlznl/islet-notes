@@ -5,6 +5,7 @@ import {
   CreateTextEntryOptions,
   DiaryEntryRecord,
   DiaryModelData,
+  IdentityMessagePosition,
 } from '@/core/diary/type';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
 import { IHostService } from '@/services/native/common/hostService';
@@ -160,6 +161,42 @@ export class WorkbenchDiaryService implements IDiaryService {
     this.diaryModel.updateProfileAvatar(avatarAttachmentId);
   }
 
+  addIdentity(name: string): string {
+    return this.diaryModel.addIdentity(name);
+  }
+
+  updateIdentityName(identityId: string, name: string): void {
+    this.diaryModel.updateIdentityName(identityId, name);
+  }
+
+  updateIdentityAvatar(identityId: string, avatarAttachmentId: string | undefined): void {
+    this.diaryModel.updateIdentityAvatar(identityId, avatarAttachmentId);
+  }
+
+  updateIdentityMessagePosition(
+    identityId: string,
+    messagePosition: IdentityMessagePosition,
+  ): void {
+    this.diaryModel.updateIdentityMessagePosition(identityId, messagePosition);
+  }
+
+  archiveIdentity(identityId: string): void {
+    this.diaryModel.archiveIdentity(identityId);
+    // 归档后通常立刻返回列表页，仿 softDeleteNotebook 同步刷新状态，避免读到旧数据。
+    if (this.dataModel) {
+      this.dataModel.modelData = this.diaryModel.toJSON();
+      this._onStateChange.fire();
+    }
+  }
+
+  unarchiveIdentity(identityId: string): void {
+    this.diaryModel.unarchiveIdentity(identityId);
+    if (this.dataModel) {
+      this.dataModel.modelData = this.diaryModel.toJSON();
+      this._onStateChange.fire();
+    }
+  }
+
   addTextEntry(notebookId: string, text: string): string {
     return this.diaryModel.addTextEntry({ notebookId, text });
   }
@@ -190,6 +227,10 @@ export class WorkbenchDiaryService implements IDiaryService {
 
   moveEntryToNotebook(entryId: string, targetNotebookId: string): void {
     this.diaryModel.moveEntryToNotebook(entryId, targetNotebookId);
+  }
+
+  updateEntryIdentity(entryId: string, identityId: string | undefined): void {
+    this.diaryModel.updateEntryIdentity(entryId, identityId);
   }
 
   addAttachment(attachment: AttachmentRecord): void {

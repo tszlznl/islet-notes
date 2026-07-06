@@ -368,6 +368,98 @@
     "content": "已删除",
     "defaultMessage": "Deleted"
   },
+  "identity.add": {
+    "defaultMessage": "New identity",
+    "content": "添加身份"
+  },
+  "identity.archive": {
+    "defaultMessage": "Archive",
+    "content": "归档"
+  },
+  "identity.archiveConfirm": {
+    "defaultMessage": "Archive this identity? It can no longer be selected in chat; existing entries are unaffected.",
+    "content": "归档后无法在聊天中选择该身份，已有消息不受影响。"
+  },
+  "identity.archivedEmpty": {
+    "defaultMessage": "No archived identities",
+    "content": "没有已归档的身份"
+  },
+  "identity.archivedTitle": {
+    "defaultMessage": "Archived identities",
+    "content": "已归档身份"
+  },
+  "identity.avatar": {
+    "defaultMessage": "Avatar",
+    "content": "头像"
+  },
+  "identity.chatEntry": {
+    "defaultMessage": "Use identities in chat",
+    "content": "在聊天中使用身份"
+  },
+  "identity.create": {
+    "defaultMessage": "New identity",
+    "content": "新建身份"
+  },
+  "identity.editTitle": {
+    "defaultMessage": "Identity details",
+    "content": "身份详情"
+  },
+  "identity.empty": {
+    "defaultMessage": "No identities yet. Tap + to add one.",
+    "content": "还没有身份，点右上角添加"
+  },
+  "identity.messagePosition": {
+    "defaultMessage": "Message position",
+    "content": "消息位置"
+  },
+  "identity.messagePositionLeft": {
+    "defaultMessage": "Left",
+    "content": "左侧"
+  },
+  "identity.messagePositionRight": {
+    "defaultMessage": "Right",
+    "content": "右侧"
+  },
+  "identity.name": {
+    "defaultMessage": "Nickname",
+    "content": "昵称"
+  },
+  "identity.namePlaceholder": {
+    "defaultMessage": "Enter a nickname",
+    "content": "输入昵称"
+  },
+  "identity.pickerTitle": {
+    "defaultMessage": "Choose identity",
+    "content": "选择身份"
+  },
+  "identity.switchAction": {
+    "defaultMessage": "Identity",
+    "content": "切换身份"
+  },
+  "identity.switchTitle": {
+    "defaultMessage": "Switch identity",
+    "content": "切换身份"
+  },
+  "identity.switchToSelf": {
+    "defaultMessage": "Me",
+    "content": "我自己"
+  },
+  "identity.tagRemove": {
+    "defaultMessage": "Clear selected identity",
+    "content": "取消选择身份"
+  },
+  "identity.title": {
+    "defaultMessage": "Identities",
+    "content": "身份"
+  },
+  "identity.unarchive": {
+    "defaultMessage": "Unarchive",
+    "content": "取消归档"
+  },
+  "identity.viewArchived": {
+    "defaultMessage": "View archived",
+    "content": "查看已归档"
+  },
   "me.entriesRecorded": {
     "content": "已记录 {0} 条日记",
     "defaultMessage": "{0} entries recorded"

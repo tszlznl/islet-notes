@@ -1,5 +1,21 @@
 export const PROFILE_ATTACHMENT_NOTEBOOK_ID = 'profile';
 
+export const IDENTITY_ATTACHMENT_NOTEBOOK_ID = 'identity';
+
+export type IdentityMessagePosition = 'left' | 'right';
+
+export interface IdentityRecord {
+  id: string;
+  name: string;
+  avatarAttachmentId?: string;
+  /** 聊天消息的显示位置；读取时缺失或非法值一律按 'right' 容错。 */
+  messagePosition: IdentityMessagePosition;
+  createdAt: number;
+  updatedAt: number;
+  /** 归档时间。身份只能归档不能删除，与软删除 deletedAt 区分。 */
+  archivedAt?: number;
+}
+
 export interface NotebookRecord {
   id: string;
   name: string;
@@ -29,6 +45,7 @@ export interface DiaryEntryRecord {
   type: DiaryEntryType;
   text?: string;
   attachmentId?: string;
+  identityId?: string;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number;
@@ -117,12 +134,15 @@ export interface DiaryModelData {
   entryMap: Map<string, DiaryEntryRecord>;
   attachments: AttachmentRecord[];
   attachmentMap: Map<string, AttachmentRecord>;
+  identities: IdentityRecord[];
+  identityMap: Map<string, IdentityRecord>;
 }
 
 export interface CreateTextEntryOptions {
   notebookId: string;
   text: string;
   createdAt?: number;
+  identityId?: string;
   externalSource?: string;
   externalId?: string;
 }
@@ -131,6 +151,7 @@ export interface CreateAttachmentEntryOptions {
   attachment: AttachmentRecord;
   createdAt: number;
   text?: string;
+  identityId?: string;
   externalSource?: string;
   externalId?: string;
 }

@@ -3,6 +3,7 @@ import { ActionSheet } from './actionSheet/ActionSheet';
 import { Dialog } from './dialog/Dialog';
 import { ImagePreview } from './imagePreview/ImagePreview';
 import { LoadingToast } from './loadingToast/LoadingToast';
+import { IdentityPicker } from './identityPicker/IdentityPicker';
 import { LongPressMenu } from './longPressMenu/LongPressMenu';
 import { NotebookPicker } from './notebookPicker/NotebookPicker';
 import { SuccessToast } from './successToast/SuccessToast';
@@ -21,6 +22,7 @@ export function OverlayHost() {
       <Dialog />
       <TextInputDialog />
       <NotebookPicker />
+      <IdentityPicker />
       <ActionSheet />
       <LongPressMenu />
       <VoiceRecordingOverlay />

@@ -10,9 +10,10 @@ import React from 'react';
 interface TextMessageProps {
   entryId: string;
   text: string | undefined;
+  align?: 'left' | 'right';
 }
 
-export function TextMessage({ entryId, text }: TextMessageProps) {
+export function TextMessage({ entryId, text, align }: TextMessageProps) {
   const diaryService = useService(IDiaryService);
   const content = text ?? '';
   const highlighted = useIsEntryHighlighted(entryId);
@@ -33,7 +34,7 @@ export function TextMessage({ entryId, text }: TextMessageProps) {
   return (
     <div
       ref={anchorRef}
-      className={styles.TextMessage.Root}
+      className={align === 'left' ? styles.TextMessage.RootLeft : styles.TextMessage.Root}
       data-test-id={DiaryChat.textMessage}
       {...longPressEvents}
     >

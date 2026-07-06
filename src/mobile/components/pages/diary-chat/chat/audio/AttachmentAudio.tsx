@@ -25,9 +25,15 @@ export interface AttachmentAudioProps {
   entryId: string;
   attachment: AudioAttachmentRecord;
   hasTranscript: boolean;
+  align?: 'left' | 'right';
 }
 
-export function AttachmentAudio({ entryId, attachment, hasTranscript }: AttachmentAudioProps) {
+export function AttachmentAudio({
+  entryId,
+  attachment,
+  hasTranscript,
+  align,
+}: AttachmentAudioProps) {
   const speechRecognitionService = useService(ISpeechRecognitionService);
   const hostService = useService(IHostService);
   const { data: speechRecognitionConfig } = useSWR(SPEECH_RECOGNITION_CONFIG_SWR_KEY, async () =>
@@ -52,10 +58,27 @@ export function AttachmentAudio({ entryId, attachment, hasTranscript }: Attachme
     extraActions: recognizeAction ? [recognizeAction] : undefined,
   });
 
+  // 与微信一致:右侧气泡是时长在前、波纹贴右缘;左侧气泡镜像为波纹贴左缘、时长在后。
+  const alignLeft = align === 'left';
+  const durationLabel = (
+    <span className={styles.ChatAudio.AudioDuration}>
+      {formatAudioDuration(attachment.duration)}
+    </span>
+  );
+  const waveIndicator = loading ? (
+    <span className={styles.ChatAudio.AudioLoadingSpinner} aria-hidden='true' />
+  ) : (
+    <AudioWaveIcon
+      playing={playing}
+      align={align}
+      className={failed ? styles.ChatAudio.AudioWaveFailed : undefined}
+    />
+  );
+
   return (
     <button
       ref={anchorRef}
-      className={styles.ChatAudio.AudioMessage}
+      className={alignLeft ? styles.ChatAudio.AudioMessageLeft : styles.ChatAudio.AudioMessage}
       type='button'
       data-test-id={DiaryChat.audioMessage}
       style={{ width: `${getAudioBubbleWidth(attachment.duration)}px` }}
@@ -63,17 +86,8 @@ export function AttachmentAudio({ entryId, attachment, hasTranscript }: Attachme
       onClick={() => void togglePlay()}
       {...longPressEvents}
     >
-      <span className={styles.ChatAudio.AudioDuration}>
-        {formatAudioDuration(attachment.duration)}
-      </span>
-      {loading ? (
-        <span className={styles.ChatAudio.AudioLoadingSpinner} aria-hidden='true' />
-      ) : (
-        <AudioWaveIcon
-          playing={playing}
-          className={failed ? styles.ChatAudio.AudioWaveFailed : undefined}
-        />
-      )}
+      {alignLeft ? waveIndicator : durationLabel}
+      {alignLeft ? durationLabel : waveIndicator}
       <EntryHighlightOverlay active={highlighted} tail />
     </button>
   );

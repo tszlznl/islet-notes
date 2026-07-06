@@ -25,6 +25,8 @@ interface AttachmentUploadTaskRecordBase {
   duration?: number;
   transcript?: string;
   previewThumbnail?: string;
+  /** 发送该附件消息时选中的身份，落库为 entry.identityId。 */
+  identityId?: string;
   status: AttachmentUploadStatus;
   queueSeq: number;
   createdAt: number;

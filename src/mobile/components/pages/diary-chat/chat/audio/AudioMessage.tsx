@@ -12,16 +12,28 @@ export interface AudioMessageProps {
   entryId: string;
   attachment: AudioAttachmentRecord;
   transcript?: string;
+  align?: 'left' | 'right';
 }
 
-export function AudioMessage({ entryId, attachment, transcript }: AudioMessageProps) {
+export function AudioMessage({ entryId, attachment, transcript, align }: AudioMessageProps) {
   const speechRecognitionService = useService(ISpeechRecognitionService);
   useWatchEvent(speechRecognitionService.onDidChangeTranscribing);
   const transcribing = speechRecognitionService.isTranscribing(entryId);
   const text = transcript?.trim();
   return (
-    <div className={styles.ChatAudio.AudioMessageStack}>
-      <AttachmentAudio entryId={entryId} attachment={attachment} hasTranscript={!!text} />
+    <div
+      className={
+        align === 'left'
+          ? styles.ChatAudio.AudioMessageStackLeft
+          : styles.ChatAudio.AudioMessageStack
+      }
+    >
+      <AttachmentAudio
+        entryId={entryId}
+        attachment={attachment}
+        hasTranscript={!!text}
+        align={align}
+      />
       {transcribing ? (
         <AudioTranscribingBar entryId={entryId} />
       ) : text ? (

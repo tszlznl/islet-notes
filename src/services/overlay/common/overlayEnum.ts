@@ -6,6 +6,7 @@ export enum OverlayEnum {
   textInputDialog = 'textInputDialog',
   actionSheet = 'actionSheet',
   notebookPicker = 'notebookPicker',
+  identityPicker = 'identityPicker',
   imagePreview = 'imagePreview',
   videoPreview = 'videoPreview',
   videoPlayer = 'videoPlayer',

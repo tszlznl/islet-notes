@@ -8,6 +8,8 @@ import {
   CreateTextEntryOptions,
   DiaryEntryRecord,
   DiaryModelData,
+  IdentityMessagePosition,
+  IdentityRecord,
   NotebookRecord,
   ProfileRecord,
 } from './type';
@@ -17,6 +19,7 @@ const NOTEBOOK_ORDER = 'notebookOrder';
 const NOTEBOOKS = 'notebooks';
 const ENTRIES = 'entries';
 const ATTACHMENTS = 'attachments';
+const IDENTITIES = 'identities';
 
 export class DiaryModel {
   private readonly _onModelChange = new Emitter<void>();
@@ -116,6 +119,74 @@ export class DiaryModel {
     this.doc.commit();
   }
 
+  addIdentity(name: string, createdAt = Date.now()): string {
+    const id = nanoid();
+    const record: IdentityRecord = {
+      id,
+      name,
+      messagePosition: 'right',
+      createdAt,
+      updatedAt: createdAt,
+    };
+    this.identitiesMap.set(id, record);
+    this.doc.commit();
+    return id;
+  }
+
+  updateIdentityName(identityId: string, name: string) {
+    const existing = this.getIdentity(identityId);
+    if (!existing) return;
+    this.identitiesMap.set(identityId, {
+      ...existing,
+      name,
+      updatedAt: Date.now(),
+    });
+    this.doc.commit();
+  }
+
+  updateIdentityAvatar(identityId: string, avatarAttachmentId: string | undefined) {
+    const existing = this.getIdentity(identityId);
+    if (!existing) return;
+    this.identitiesMap.set(identityId, {
+      ...existing,
+      avatarAttachmentId,
+      updatedAt: Date.now(),
+    });
+    this.doc.commit();
+  }
+
+  updateIdentityMessagePosition(identityId: string, messagePosition: IdentityMessagePosition) {
+    const existing = this.getIdentity(identityId);
+    if (!existing) return;
+    this.identitiesMap.set(identityId, {
+      ...existing,
+      messagePosition,
+      updatedAt: Date.now(),
+    });
+    this.doc.commit();
+  }
+
+  archiveIdentity(identityId: string) {
+    const existing = this.getIdentity(identityId);
+    if (!existing || existing.archivedAt) return;
+    this.identitiesMap.set(identityId, {
+      ...existing,
+      archivedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+    this.doc.commit();
+  }
+
+  unarchiveIdentity(identityId: string) {
+    const existing = this.getIdentity(identityId);
+    if (!existing || !existing.archivedAt) return;
+    // 直接写 undefined 会被序列化为 null，这里整体删掉 archivedAt 字段。
+    const record: IdentityRecord = { ...existing, updatedAt: Date.now() };
+    delete record.archivedAt;
+    this.identitiesMap.set(identityId, record);
+    this.doc.commit();
+  }
+
   softDeleteNotebook(notebookId: string) {
     const existing = this.getNotebook(notebookId);
     if (!existing || existing.deletedAt) return;
@@ -136,6 +207,7 @@ export class DiaryModel {
       notebookId: options.notebookId,
       type: 'text',
       text: options.text,
+      identityId: options.identityId,
       createdAt: now,
       updatedAt: now,
       externalSource: options.externalSource,
@@ -159,6 +231,7 @@ export class DiaryModel {
         notebookId: options.notebookId,
         type: 'text',
         text: options.text,
+        identityId: options.identityId,
         createdAt: now,
         updatedAt: now,
         externalSource: options.externalSource,
@@ -205,6 +278,7 @@ export class DiaryModel {
       type: 'attachment',
       text: options.text,
       attachmentId: options.attachment.id,
+      identityId: options.identityId,
       createdAt: options.createdAt,
       updatedAt: options.createdAt,
       externalSource: options.externalSource,
@@ -224,6 +298,23 @@ export class DiaryModel {
     this.entriesMap.set(entryId, {
       ...existing,
       text: nextText,
+      updatedAt: Date.now(),
+    });
+    this.doc.commit();
+  }
+
+  /** 切换记录归属身份;传 undefined 表示恢复为本人消息。目标身份必须存在且未归档。 */
+  updateEntryIdentity(entryId: string, identityId: string | undefined) {
+    const existing = this.getEntry(entryId);
+    if (!existing || existing.deletedAt) return;
+    if ((existing.identityId ?? undefined) === identityId) return;
+    if (identityId) {
+      const identity = this.getIdentity(identityId);
+      if (!identity || identity.archivedAt) return;
+    }
+    this.entriesMap.set(entryId, {
+      ...existing,
+      identityId,
       updatedAt: Date.now(),
     });
     this.doc.commit();
@@ -301,6 +392,7 @@ export class DiaryModel {
     const entries = Object.values(entriesRecord);
     const attachments = Object.values(attachmentsRecord);
     const profile = this.readProfile();
+    const { identities, identityMap } = this.readIdentities();
     return {
       version: this.getVersion(),
       profile,
@@ -311,6 +403,8 @@ export class DiaryModel {
       entryMap: new Map(Object.entries(entriesRecord)),
       attachments,
       attachmentMap: new Map(Object.entries(attachmentsRecord)),
+      identities,
+      identityMap,
     };
   }
 
@@ -350,6 +444,43 @@ export class DiaryModel {
     });
   }
 
+  private getIdentity(identityId: string): IdentityRecord | undefined {
+    return this.identitiesMap.get(identityId) as IdentityRecord | undefined;
+  }
+
+  /** 归一化身份记录：跳过缺 id/name 的脏数据，非法 messagePosition 按 'right' 容错。 */
+  private readIdentities(): {
+    identities: IdentityRecord[];
+    identityMap: Map<string, IdentityRecord>;
+  } {
+    const raw = this.identitiesMap.toJSON() as Record<string, Partial<IdentityRecord>>;
+    const identities: IdentityRecord[] = [];
+    for (const value of Object.values(raw)) {
+      if (typeof value?.id !== 'string' || typeof value.name !== 'string') continue;
+      const record: IdentityRecord = {
+        id: value.id,
+        name: value.name,
+        messagePosition: value.messagePosition === 'left' ? 'left' : 'right',
+        createdAt: typeof value.createdAt === 'number' ? value.createdAt : 0,
+        updatedAt: typeof value.updatedAt === 'number' ? value.updatedAt : 0,
+      };
+      if (typeof value.avatarAttachmentId === 'string' && value.avatarAttachmentId) {
+        record.avatarAttachmentId = value.avatarAttachmentId;
+      }
+      if (typeof value.archivedAt === 'number') {
+        record.archivedAt = value.archivedAt;
+      }
+      identities.push(record);
+    }
+    identities.sort((a, b) =>
+      a.createdAt !== b.createdAt ? a.createdAt - b.createdAt : a.id.localeCompare(b.id),
+    );
+    return {
+      identities,
+      identityMap: new Map(identities.map((identity) => [identity.id, identity])),
+    };
+  }
+
   private readProfile(): ProfileRecord {
     const raw = this.profileMap.toJSON() as Partial<ProfileRecord>;
     const profile: ProfileRecord = {};
@@ -383,5 +514,9 @@ export class DiaryModel {
 
   private get attachmentsMap(): LoroMap<Record<string, unknown>> {
     return this.doc.getMap(ATTACHMENTS) as LoroMap<Record<string, unknown>>;
+  }
+
+  private get identitiesMap(): LoroMap<Record<string, unknown>> {
+    return this.doc.getMap(IDENTITIES) as LoroMap<Record<string, unknown>>;
   }
 }

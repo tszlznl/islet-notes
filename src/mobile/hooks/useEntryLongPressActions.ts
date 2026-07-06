@@ -1,7 +1,14 @@
-import { getAttachmentById, getSortedNotebooks } from '@/core/diary/selectors';
+import {
+  getActiveIdentities,
+  getAttachmentById,
+  getIdentityAvatarAttachment,
+  getProfileAvatarAttachment,
+  getSortedNotebooks,
+} from '@/core/diary/selectors';
 import { useService } from '@/hooks/use-service';
 import { useLongPress } from '@/mobile/hooks/useLongPress';
 import { useDialog } from '@/mobile/overlay/dialog/useDialog';
+import { useIdentityPicker } from '@/mobile/overlay/identityPicker/useIdentityPicker';
 import type { LongPressMenuAction } from '@/mobile/overlay/longPressMenu/LongPressMenuController';
 import { useLongPressMenu } from '@/mobile/overlay/longPressMenu/useLongPressMenu';
 import { useNotebookPicker } from '@/mobile/overlay/notebookPicker/useNotebookPicker';
@@ -10,9 +17,18 @@ import { useTextInputDialog } from '@/mobile/overlay/textInputDialog/useTextInpu
 import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
+import {
+  IDENTITY_CONFIG_KEY,
+  IDENTITY_CONFIG_SWR_KEY,
+  IdentityConfigSchema,
+} from '@/services/diary/common/identityConfig';
 import { IHostService } from '@/services/native/common/hostService';
-import { Copy, Edit3, MoveRight, Trash2 } from 'lucide-react';
+import { CircleUserRound, Copy, Edit3, MoveRight, Trash2 } from 'lucide-react';
 import { useRef } from 'react';
+import useSWR from 'swr';
+
+/** 身份选择器里“恢复为本人”选项的哨兵 id,不会与 nanoid 生成的身份 id 冲突。 */
+const SWITCH_TO_SELF_OPTION_ID = '__self__';
 
 interface EntryEditTextOptions {
   title: string;
@@ -48,6 +64,12 @@ export function useEntryLongPressActions<T extends HTMLElement>(
   const showLongPressMenu = useLongPressMenu();
   const showNotebookPicker = useNotebookPicker();
   const showTextInputDialog = useTextInputDialog();
+  const showIdentityPicker = useIdentityPicker();
+  // 身份开关(身份管理页顶部)关闭时,长按菜单也不提供切换身份入口。
+  const { data: identityConfig } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
+    hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
+  );
+  const identityEntryEnabled = identityConfig?.chatEntryEnabled ?? true;
   const anchorRef = useRef<T>(null);
   const content = text ?? '';
 
@@ -126,6 +148,46 @@ export function useEntryLongPressActions<T extends HTMLElement>(
     });
   };
 
+  const openIdentitySwitcher = () => {
+    const model = diaryService.modelState;
+    const entry = model.entryMap.get(entryId);
+    if (!entry || entry.deletedAt) return;
+    // 列出除当前身份外的活跃身份;已带身份的消息额外提供“恢复为本人”。
+    const options = getActiveIdentities(model)
+      .filter((identity) => identity.id !== entry.identityId)
+      .map((identity) => {
+        const avatarCandidate = getIdentityAvatarAttachment(model, identity);
+        return {
+          id: identity.id,
+          name: identity.name,
+          avatarAttachment: avatarCandidate?.type === 'image' ? avatarCandidate : undefined,
+        };
+      });
+    if (entry.identityId) {
+      const profileAvatar = getProfileAvatarAttachment(model);
+      options.push({
+        id: SWITCH_TO_SELF_OPTION_ID,
+        name: model.profile.name?.trim() || localize('identity.switchToSelf', 'Me'),
+        avatarAttachment: profileAvatar?.type === 'image' ? profileAvatar : undefined,
+      });
+    }
+    if (options.length === 0) return;
+    showIdentityPicker({
+      title: localize('identity.switchTitle', 'Switch identity'),
+      identities: options,
+      rootTestId: DiaryChat.identityPickerSheet,
+      listTestId: DiaryChat.identityPickerList,
+      optionTestId: DiaryChat.identityPickerOption,
+      closeTestId: DiaryChat.identityPickerCancel,
+      onSelect: (selected) => {
+        diaryService.updateEntryIdentity(
+          entryId,
+          selected === SWITCH_TO_SELF_OPTION_ID ? undefined : selected,
+        );
+      },
+    });
+  };
+
   const openMenu = () => {
     const root = anchorRef.current;
     if (!root) return;
@@ -135,6 +197,12 @@ export function useEntryLongPressActions<T extends HTMLElement>(
     const movable = entry
       ? getSortedNotebooks(model).some((notebook) => notebook.id !== entry.notebookId)
       : false;
+    // 有可切换目标才显示:其他活跃身份,或已带身份时可恢复为本人。
+    const identitySwitchable =
+      identityEntryEnabled &&
+      !!entry &&
+      (!!entry.identityId ||
+        getActiveIdentities(model).some((identity) => identity.id !== entry.identityId));
     if (content) {
       actions.push({
         id: 'copy',
@@ -158,6 +226,14 @@ export function useEntryLongPressActions<T extends HTMLElement>(
         label: localize('diary.moveEntry.action', 'Move'),
         icon: MoveRight,
         run: openMoveNotebookPicker,
+      });
+    }
+    if (identitySwitchable) {
+      actions.push({
+        id: 'switch-identity',
+        label: localize('identity.switchAction', 'Identity'),
+        icon: CircleUserRound,
+        run: openIdentitySwitcher,
       });
     }
     actions.push({

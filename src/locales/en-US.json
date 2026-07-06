@@ -368,6 +368,98 @@
     "defaultMessage": "Deleted",
     "content": "Deleted"
   },
+  "identity.add": {
+    "defaultMessage": "New identity",
+    "content": "New identity"
+  },
+  "identity.archive": {
+    "defaultMessage": "Archive",
+    "content": "Archive"
+  },
+  "identity.archiveConfirm": {
+    "defaultMessage": "Archive this identity? It can no longer be selected in chat; existing entries are unaffected.",
+    "content": "Archive this identity? It can no longer be selected in chat; existing entries are unaffected."
+  },
+  "identity.archivedEmpty": {
+    "defaultMessage": "No archived identities",
+    "content": "No archived identities"
+  },
+  "identity.archivedTitle": {
+    "defaultMessage": "Archived identities",
+    "content": "Archived identities"
+  },
+  "identity.avatar": {
+    "defaultMessage": "Avatar",
+    "content": "Avatar"
+  },
+  "identity.chatEntry": {
+    "defaultMessage": "Use identities in chat",
+    "content": "Use identities in chat"
+  },
+  "identity.create": {
+    "defaultMessage": "New identity",
+    "content": "New identity"
+  },
+  "identity.editTitle": {
+    "defaultMessage": "Identity details",
+    "content": "Identity details"
+  },
+  "identity.empty": {
+    "defaultMessage": "No identities yet. Tap + to add one.",
+    "content": "No identities yet. Tap + to add one."
+  },
+  "identity.messagePosition": {
+    "defaultMessage": "Message position",
+    "content": "Message position"
+  },
+  "identity.messagePositionLeft": {
+    "defaultMessage": "Left",
+    "content": "Left"
+  },
+  "identity.messagePositionRight": {
+    "defaultMessage": "Right",
+    "content": "Right"
+  },
+  "identity.name": {
+    "defaultMessage": "Nickname",
+    "content": "Nickname"
+  },
+  "identity.namePlaceholder": {
+    "defaultMessage": "Enter a nickname",
+    "content": "Enter a nickname"
+  },
+  "identity.pickerTitle": {
+    "defaultMessage": "Choose identity",
+    "content": "Choose identity"
+  },
+  "identity.switchAction": {
+    "defaultMessage": "Identity",
+    "content": "Identity"
+  },
+  "identity.switchTitle": {
+    "defaultMessage": "Switch identity",
+    "content": "Switch identity"
+  },
+  "identity.switchToSelf": {
+    "defaultMessage": "Me",
+    "content": "Me"
+  },
+  "identity.tagRemove": {
+    "defaultMessage": "Clear selected identity",
+    "content": "Clear selected identity"
+  },
+  "identity.title": {
+    "defaultMessage": "Identities",
+    "content": "Identities"
+  },
+  "identity.unarchive": {
+    "defaultMessage": "Unarchive",
+    "content": "Unarchive"
+  },
+  "identity.viewArchived": {
+    "defaultMessage": "View archived",
+    "content": "View archived"
+  },
   "me.entriesRecorded": {
     "defaultMessage": "{0} entries recorded",
     "content": "{0} entries recorded"
