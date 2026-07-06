@@ -13,6 +13,7 @@ import {
 import { IHostService } from '@/services/native/common/hostService';
 import { CapacitorNativeService } from '@/services/native/capacitor/capacitorNativeService';
 import { BrowserHostService } from '@/services/native/browser/browserHostService';
+import { ExtensionHostService } from '@/services/native/extension/extensionHostService';
 import {
   IWorkbenchOverlayService,
   WorkbenchOverlayService,
@@ -95,6 +96,9 @@ function getDefaultStorageMode(): StorageMode {
 function createHostService(mode: StorageMode, testInjectionService: TestInjectionService) {
   if (CapacitorNativeService.isNative()) {
     return new CapacitorNativeService(mode === 'memory', testInjectionService);
+  }
+  if (ExtensionHostService.isExtension()) {
+    return new ExtensionHostService(mode === 'memory', testInjectionService);
   }
   return new BrowserHostService(mode === 'memory', testInjectionService);
 }

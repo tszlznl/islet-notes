@@ -6,6 +6,8 @@ export interface IHostService {
   readonly _serviceBrand: undefined;
   readonly isNative: boolean;
   readonly onBackButton: Event<void>;
+  /** 当前平台使用的路由模式：扩展用 hash 路由，其余用 path 路由。 */
+  readonly routerType: HostRouterType;
 
   caniuse(feature: HostFeature): boolean;
 
@@ -53,6 +55,8 @@ export interface IHostService {
 }
 
 export const IHostService = createDecorator<IHostService>('IHostService');
+
+export type HostRouterType = 'hash' | 'browser';
 
 export type HostFeature =
   | 'generateThumbnail'

@@ -38,6 +38,7 @@ import {
   HostVideoPrepareResult,
   ImagePickSource,
   IHostService,
+  HostRouterType,
   HostWriteAttachmentFileOptions,
 } from '../common/hostService';
 import {
@@ -61,6 +62,7 @@ export class CapacitorNativeService implements IHostService {
   }
 
   readonly _serviceBrand: undefined;
+  readonly routerType: HostRouterType = 'browser';
   private readonly _onBackButton = new Emitter<void>();
   public readonly onBackButton = this._onBackButton.event;
   private readonly memoryFilesystem: BrowserHostFilesystem = createMemoryHostFilesystem();

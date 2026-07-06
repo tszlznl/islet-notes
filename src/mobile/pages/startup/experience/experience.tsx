@@ -1,5 +1,6 @@
 import { useService } from '@/hooks/use-service';
 import { enterExperienceMode } from '@/mobile/utils/experienceMode';
+import { reloadAppRoot } from '@/mobile/utils/reloadAppRoot';
 import { FormPage } from '@/mobile/components/layout/FormPage';
 import { HeaderLayoutPage } from '@/mobile/components/layout/HeaderLayoutPage';
 import { styles } from '@/mobile/styles/ui';
@@ -31,7 +32,7 @@ export function StartupExperiencePage() {
             testId: Startup.experienceConfirmAction,
             onClick: () => {
               enterExperienceMode();
-              window.location.replace('/');
+              reloadAppRoot();
             },
           },
           {
