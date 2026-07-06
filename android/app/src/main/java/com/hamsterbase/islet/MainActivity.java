@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.Window;
 import android.webkit.WebView;
 import androidx.core.graphics.Insets;
+import androidx.core.splashscreen.SplashScreen;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -21,6 +22,7 @@ public class MainActivity extends BridgeActivity {
     registerPlugin(AttachmentFileCachePlugin.class);
     registerPlugin(WebDavHttpPlugin.class);
     registerPlugin(VideoToolsPlugin.class);
+    SplashScreen.installSplashScreen(this);
     super.onCreate(savedInstanceState);
     configureWebViewDebugging();
     configureEdgeToEdge();
