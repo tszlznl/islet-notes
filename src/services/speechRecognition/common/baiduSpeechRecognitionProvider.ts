@@ -1,3 +1,4 @@
+import { base64ToBytes, bytesToArrayBuffer, bytesToBase64 } from '@/base/just-vibes/binary-codec';
 import { IHostService } from '@/services/native/common/hostService';
 import type { SpeechRecognitionCredentials } from '@/services/speechRecognition/common/speechRecognitionConfig';
 import { Capacitor } from '@capacitor/core';
@@ -119,29 +120,6 @@ async function baiduRequest(
   const bytes = base64ToBytes(result.body);
   const empty = bytes.byteLength === 0 || result.status === 204 || result.status === 304;
   return new Response(empty ? null : bytesToArrayBuffer(bytes), { status: result.status });
-}
-
-function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  const buffer = new ArrayBuffer(bytes.byteLength);
-  new Uint8Array(buffer).set(bytes);
-  return buffer;
-}
-
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = '';
-  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-    binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
-  }
-  return btoa(binary);
-}
-
-function base64ToBytes(base64: string): Uint8Array {
-  const binary = atob(base64 || '');
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
 }
 
 async function prepareBaiduAudio(blob: Blob): Promise<BaiduAudioPayload> {

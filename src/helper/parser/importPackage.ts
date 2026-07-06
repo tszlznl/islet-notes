@@ -1,3 +1,4 @@
+import { bytesToArrayBuffer } from '@/base/just-vibes/binary-codec';
 import { getNotebookById } from '@/core/diary/selectors';
 import type { AttachmentRecord, CreateTextEntryOptions } from '@/core/diary/type';
 import { localize } from '@/nls';
@@ -161,10 +162,4 @@ function collectExternalEntries(diaryService: IDiaryService): Set<string> {
 
 function getExternalEntryKey(source: string, id: string): string {
   return `${source}\n${id}`;
-}
-
-function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  const copy = new Uint8Array(bytes.byteLength);
-  copy.set(bytes);
-  return copy.buffer;
 }

@@ -27,9 +27,10 @@ import {
   IHostService,
 } from '@/services/native/common/hostService';
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
+import { blobToDataUrl } from '@/base/just-vibes/binary-codec';
+import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
 import {
   assertSupportedImage,
-  blobToDataUrl,
   isPickCancellation,
 } from '@/services/fileAsset/common/imageHandlers';
 import {
@@ -90,20 +91,7 @@ export class BrowserHostService implements IHostService {
   }
 
   async writeToClipboard(text: string): Promise<void> {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return;
-    }
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    const ok = document.execCommand('copy');
-    textarea.remove();
-    if (!ok) throw new Error('Copy command failed.');
+    await writeBrowserClipboardText(text);
   }
 
   async setBarStyle(_theme: HostSystemBarStyle): Promise<void> {}

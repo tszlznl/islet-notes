@@ -1,7 +1,7 @@
+import { base64ToBlob, blobToBase64 } from '@/base/just-vibes/binary-codec';
+import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
 import {
   assertSupportedImage,
-  base64ToBlob,
-  blobToBase64,
   isPickCancellation,
 } from '@/services/fileAsset/common/imageHandlers';
 import { VIDEO_TARGET_HEIGHT, VIDEO_TARGET_VIDEO_BITRATE } from '@/base/just-vibes/media-metrics';
@@ -466,21 +466,4 @@ function getPickedImageMimeType(photo: ImagePickResult): string | undefined {
 function fillMissingBlobType(blob: Blob, mimeType: string | undefined): Blob {
   if (blob.type || !mimeType) return blob;
   return new Blob([blob], { type: mimeType });
-}
-
-async function writeBrowserClipboardText(text: string): Promise<void> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
-  }
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.left = '-9999px';
-  document.body.appendChild(textarea);
-  textarea.focus();
-  textarea.select();
-  const ok = document.execCommand('copy');
-  textarea.remove();
-  if (!ok) throw new Error('Copy command failed.');
 }

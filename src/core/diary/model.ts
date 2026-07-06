@@ -90,6 +90,18 @@ export class DiaryModel {
     this.doc.commit();
   }
 
+  updateNotebookChatBackground(notebookId: string, chatBackgroundAttachmentId: string | undefined) {
+    const existing = this.getNotebook(notebookId);
+    if (!existing) return;
+    this.notebooksMap.set(notebookId, {
+      ...existing,
+      chatBackgroundAttachmentId,
+      updatedAt: Date.now(),
+    });
+
+    this.doc.commit();
+  }
+
   updateProfileName(name: string) {
     const trimmedName = name.trim();
     if (!trimmedName) return;

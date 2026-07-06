@@ -1,5 +1,7 @@
 // @islet-import-scope same-dir
 
+import { base64ToBytes, bytesToArrayBuffer, bytesToBase64 } from '@/base/just-vibes/binary-codec';
+
 const ENCRYPTED_DATABASE_TYPE = 'chat-diary-db';
 const ENCRYPTED_DATABASE_VERSION = 1;
 const ENCRYPTED_ATTACHMENT_TYPE = 'chat-diary-attachment';
@@ -326,35 +328,12 @@ function bytesToHex(bytes: Uint8Array): string {
   return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = '';
-  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-    binary += String.fromCharCode(...bytes.slice(offset, offset + 0x8000));
-  }
-  return btoa(binary);
-}
-
-function base64ToBytes(value: string): Uint8Array {
-  const binary = atob(value);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
-}
-
 function startsWith(value: Uint8Array, prefix: Uint8Array): boolean {
   if (value.byteLength < prefix.byteLength) return false;
   for (let index = 0; index < prefix.byteLength; index += 1) {
     if (value[index] !== prefix[index]) return false;
   }
   return true;
-}
-
-function bytesToArrayBuffer(bytes: Uint8Array): ArrayBuffer {
-  const copy = new Uint8Array(bytes.byteLength);
-  copy.set(bytes);
-  return copy.buffer;
 }
 
 function writeUint32(target: Uint8Array, offset: number, value: number): void {

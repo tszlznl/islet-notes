@@ -4,6 +4,7 @@ export interface NotebookRecord {
   id: string;
   name: string;
   avatarAttachmentId?: string;
+  chatBackgroundAttachmentId?: string;
   createdAt: number;
   updatedAt: number;
   deletedAt?: number;

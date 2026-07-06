@@ -124,6 +124,18 @@
     "defaultMessage": "No entries yet",
     "content": "No entries yet"
   },
+  "diary.chatBackground": {
+    "defaultMessage": "Chat background",
+    "content": "Chat background"
+  },
+  "diary.chatBackground.clear": {
+    "defaultMessage": "Clear background",
+    "content": "Clear background"
+  },
+  "diary.chatBackground.selectFromAlbum": {
+    "defaultMessage": "Choose from album",
+    "content": "Choose from album"
+  },
   "diary.cover": {
     "defaultMessage": "Notebook cover",
     "content": "Notebook cover"
@@ -172,6 +184,14 @@
     "defaultMessage": "Write something...",
     "content": "Write something..."
   },
+  "diary.media": {
+    "defaultMessage": "Images and videos",
+    "content": "Images and videos"
+  },
+  "diary.media.empty": {
+    "defaultMessage": "No images or videos yet",
+    "content": "No images or videos yet"
+  },
   "diary.moveEntry.action": {
     "defaultMessage": "Move",
     "content": "Move"
@@ -203,6 +223,18 @@
   "diary.recordVideo": {
     "defaultMessage": "Record video",
     "content": "Record video"
+  },
+  "diary.search": {
+    "defaultMessage": "Find diary content",
+    "content": "Find diary content"
+  },
+  "diary.search.byDate": {
+    "defaultMessage": "Date",
+    "content": "Date"
+  },
+  "diary.search.hint": {
+    "defaultMessage": "Quickly find diary content",
+    "content": "Quickly find diary content"
   },
   "diary.settings": {
     "defaultMessage": "Notebook settings",
@@ -491,6 +523,98 @@
   "settings.language": {
     "defaultMessage": "Language",
     "content": "Language"
+  },
+  "settings.membership": {
+    "defaultMessage": "Membership",
+    "content": "Membership"
+  },
+  "settings.membership.activated": {
+    "defaultMessage": "Membership activated",
+    "content": "Membership activated"
+  },
+  "settings.membership.activatedDesc": {
+    "defaultMessage": "Benefits are active.",
+    "content": "Benefits are active."
+  },
+  "settings.membership.center": {
+    "defaultMessage": "Membership",
+    "content": "Membership"
+  },
+  "settings.membership.feature.chatBackground": {
+    "defaultMessage": "Chat background",
+    "content": "Chat background"
+  },
+  "settings.membership.feature.chatBackgroundDesc": {
+    "defaultMessage": "Set a chat background.",
+    "content": "Set a chat background."
+  },
+  "settings.membership.features": {
+    "defaultMessage": "Benefits",
+    "content": "Benefits"
+  },
+  "settings.membership.goPurchase": {
+    "defaultMessage": "Purchase",
+    "content": "Purchase"
+  },
+  "settings.membership.mbdOrderId": {
+    "defaultMessage": "Order ID",
+    "content": "Order ID"
+  },
+  "settings.membership.mbdOrderIdPlaceholder": {
+    "defaultMessage": "Enter order ID",
+    "content": "Enter order ID"
+  },
+  "settings.membership.mbdRedeemStep": {
+    "defaultMessage": "Enter order ID to redeem.",
+    "content": "Enter order ID to redeem."
+  },
+  "settings.membership.memberId": {
+    "defaultMessage": "Account ID",
+    "content": "Account ID"
+  },
+  "settings.membership.notConfigured": {
+    "defaultMessage": "Not configured",
+    "content": "Not configured"
+  },
+  "settings.membership.open": {
+    "defaultMessage": "Get membership",
+    "content": "Get membership"
+  },
+  "settings.membership.processing": {
+    "defaultMessage": "Processing...",
+    "content": "Processing..."
+  },
+  "settings.membership.purchase": {
+    "defaultMessage": "Purchase",
+    "content": "Purchase"
+  },
+  "settings.membership.purchaseDesc": {
+    "defaultMessage": "One-time, lifetime access.",
+    "content": "One-time, lifetime access."
+  },
+  "settings.membership.purchaseMbd": {
+    "defaultMessage": "Purchase on MBD",
+    "content": "Purchase on MBD"
+  },
+  "settings.membership.redeemMbd": {
+    "defaultMessage": "Redeem",
+    "content": "Redeem"
+  },
+  "settings.membership.redeemMbdChannel": {
+    "defaultMessage": "Redeem MBD",
+    "content": "Redeem MBD"
+  },
+  "settings.membership.redeemOrder": {
+    "defaultMessage": "Redeem order",
+    "content": "Redeem order"
+  },
+  "settings.membership.unlocked": {
+    "defaultMessage": "Unlocked",
+    "content": "Unlocked"
+  },
+  "settings.membership.unlockedFeatures": {
+    "defaultMessage": "Unlocked",
+    "content": "Unlocked"
   },
   "settings.myNotebook": {
     "defaultMessage": "My notebook",

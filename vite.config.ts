@@ -76,6 +76,11 @@ export default defineConfig(async () => ({
         changeOrigin: true,
         rewrite: (requestPath: string) => requestPath.replace(/^\/api\/baidu\/vop/, ''),
       },
+      '/jianguoyun': {
+        target: 'https://dav.jianguoyun.com',
+        changeOrigin: true,
+        rewrite: (requestPath: string) => requestPath.replace(/^\/jianguoyun/, '/dav'),
+      },
     },
   },
   build: {

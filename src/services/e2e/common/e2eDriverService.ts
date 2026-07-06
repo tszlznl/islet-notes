@@ -6,13 +6,17 @@ import type {
   DiaryModelData,
   SyncConfigRecord,
 } from '@/core/diary/type';
+import { syncStoragePath } from '@/core/spec/syncStoragePath';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import {
   ITestInjectionService,
   type TestInjectionRule,
 } from '@/services/e2e/common/testInjectionService';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
+import { base64ToBlob } from '@/base/just-vibes/binary-codec';
+import { readImageDimensions } from '@/base/just-vibes/browser-image-processing';
 import { IHostService } from '@/services/native/common/hostService';
+import { nanoid } from 'nanoid';
 import { createDecorator } from 'vscf/platform/instantiation/common';
 
 export interface E2eDriverTestInjectionApi {
@@ -35,6 +39,11 @@ export interface IE2eDriverService {
   addEntryForTest(entry: DiaryEntryRecord): string;
   addAttachmentEntry(options: CreateAttachmentEntryOptions): string;
   addAttachment(attachment: AttachmentRecord): void;
+  setNotebookChatBackgroundForTest(
+    notebookId: string,
+    base64Image: string,
+    mimeType: string,
+  ): Promise<void>;
   saveSyncConfig(
     config: Omit<SyncConfigRecord, 'updatedAt'> | SyncConfigRecord,
   ): Promise<SyncConfigRecord | undefined>;
@@ -103,6 +112,35 @@ export class E2eDriverService implements IE2eDriverService {
 
   addAttachment(attachment: AttachmentRecord): void {
     this.diaryService.addAttachment(attachment);
+  }
+
+  async setNotebookChatBackgroundForTest(
+    notebookId: string,
+    base64Image: string,
+    mimeType: string,
+  ): Promise<void> {
+    const blob = base64ToBlob(base64Image, mimeType);
+    const dimensions = await readImageDimensions(blob);
+    const id = nanoid();
+    const { s3Key } = syncStoragePath.image(id, mimeType);
+    await this.hostService.writeAttachmentFile({
+      scope: this.fileAssetService.getStorageScope(),
+      key: s3Key,
+      blob,
+    });
+    const attachment: AttachmentRecord = {
+      id,
+      notebookId,
+      type: 'image',
+      s3Key,
+      mimeType,
+      size: blob.size,
+      width: dimensions.width,
+      height: dimensions.height,
+      createdAt: Date.now(),
+    };
+    this.diaryService.addAttachment(attachment);
+    this.diaryService.updateNotebookChatBackground(notebookId, attachment.id);
   }
 
   saveSyncConfig(

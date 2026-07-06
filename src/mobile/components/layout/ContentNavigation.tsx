@@ -17,7 +17,7 @@ export function ContentNavigation() {
         navigate(-1);
         return;
       }
-      const fallbackPath = getBackFallbackPath(location.pathname);
+      const fallbackPath = getBackFallbackPath(location.pathname, location.search);
       if (fallbackPath) {
         navigate(fallbackPath, { replace: true });
         return;
@@ -25,7 +25,7 @@ export function ContentNavigation() {
       if (hostService.isNative) hostService.exitApp();
     });
     return () => listener.dispose();
-  }, [location.pathname, hostService, navigate, navigationService]);
+  }, [location.pathname, location.search, hostService, navigate, navigationService]);
 
   useEffect(() => {
     const navigateListener = navigationService.onNavigate((event) => {

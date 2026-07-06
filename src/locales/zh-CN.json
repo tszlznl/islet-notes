@@ -124,6 +124,18 @@
     "content": "还没有日记",
     "defaultMessage": "No entries yet"
   },
+  "diary.chatBackground": {
+    "content": "聊天背景",
+    "defaultMessage": "Chat background"
+  },
+  "diary.chatBackground.clear": {
+    "content": "清除背景",
+    "defaultMessage": "Clear background"
+  },
+  "diary.chatBackground.selectFromAlbum": {
+    "content": "从相册中选择",
+    "defaultMessage": "Choose from album"
+  },
   "diary.cover": {
     "content": "日记本封面",
     "defaultMessage": "Notebook cover"
@@ -172,6 +184,14 @@
     "content": "写点什么…",
     "defaultMessage": "Write something..."
   },
+  "diary.media": {
+    "defaultMessage": "Images and videos",
+    "content": "图片与视频"
+  },
+  "diary.media.empty": {
+    "defaultMessage": "No images or videos yet",
+    "content": "还没有图片或视频"
+  },
   "diary.moveEntry.action": {
     "defaultMessage": "Move",
     "content": "移动"
@@ -203,6 +223,18 @@
   "diary.recordVideo": {
     "defaultMessage": "Record video",
     "content": "拍视频"
+  },
+  "diary.search": {
+    "defaultMessage": "Find diary content",
+    "content": "查找日记内容"
+  },
+  "diary.search.byDate": {
+    "defaultMessage": "Date",
+    "content": "日期"
+  },
+  "diary.search.hint": {
+    "defaultMessage": "Quickly find diary content",
+    "content": "快速查找日记内容"
   },
   "diary.settings": {
     "content": "日记本设置",
@@ -491,6 +523,98 @@
   "settings.language": {
     "content": "语言",
     "defaultMessage": "Language"
+  },
+  "settings.membership": {
+    "content": "会员",
+    "defaultMessage": "Membership"
+  },
+  "settings.membership.activated": {
+    "content": "会员已激活",
+    "defaultMessage": "Membership activated"
+  },
+  "settings.membership.activatedDesc": {
+    "defaultMessage": "Benefits are active.",
+    "content": "权益已生效"
+  },
+  "settings.membership.center": {
+    "defaultMessage": "Membership",
+    "content": "会员"
+  },
+  "settings.membership.feature.chatBackground": {
+    "content": "聊天背景",
+    "defaultMessage": "Chat background"
+  },
+  "settings.membership.feature.chatBackgroundDesc": {
+    "defaultMessage": "Set a chat background.",
+    "content": "设置聊天背景"
+  },
+  "settings.membership.features": {
+    "defaultMessage": "Benefits",
+    "content": "权益"
+  },
+  "settings.membership.goPurchase": {
+    "defaultMessage": "Purchase",
+    "content": "购买"
+  },
+  "settings.membership.mbdOrderId": {
+    "content": "订单号",
+    "defaultMessage": "Order ID"
+  },
+  "settings.membership.mbdOrderIdPlaceholder": {
+    "content": "输入订单号",
+    "defaultMessage": "Enter order ID"
+  },
+  "settings.membership.mbdRedeemStep": {
+    "defaultMessage": "Enter order ID to redeem.",
+    "content": "输入订单号兑换"
+  },
+  "settings.membership.memberId": {
+    "defaultMessage": "Account ID",
+    "content": "账户 ID"
+  },
+  "settings.membership.notConfigured": {
+    "content": "未配置",
+    "defaultMessage": "Not configured"
+  },
+  "settings.membership.open": {
+    "defaultMessage": "Get membership",
+    "content": "开通会员"
+  },
+  "settings.membership.processing": {
+    "content": "处理中...",
+    "defaultMessage": "Processing..."
+  },
+  "settings.membership.purchase": {
+    "defaultMessage": "Purchase",
+    "content": "购买"
+  },
+  "settings.membership.purchaseDesc": {
+    "defaultMessage": "One-time, lifetime access.",
+    "content": "一次购买，永久使用"
+  },
+  "settings.membership.purchaseMbd": {
+    "content": "面包多购买",
+    "defaultMessage": "Purchase on MBD"
+  },
+  "settings.membership.redeemMbd": {
+    "defaultMessage": "Redeem",
+    "content": "兑换"
+  },
+  "settings.membership.redeemMbdChannel": {
+    "defaultMessage": "Redeem MBD",
+    "content": "面包多兑换"
+  },
+  "settings.membership.redeemOrder": {
+    "content": "订单兑换",
+    "defaultMessage": "Redeem order"
+  },
+  "settings.membership.unlocked": {
+    "defaultMessage": "Unlocked",
+    "content": "已解锁"
+  },
+  "settings.membership.unlockedFeatures": {
+    "defaultMessage": "Unlocked",
+    "content": "已解锁"
   },
   "settings.myNotebook": {
     "content": "我的日记本",

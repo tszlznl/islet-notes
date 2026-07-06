@@ -145,6 +145,13 @@ export class WorkbenchDiaryService implements IDiaryService {
     this.diaryModel.updateNotebookAvatar(notebookId, avatarAttachmentId);
   }
 
+  updateNotebookChatBackground(
+    notebookId: string,
+    chatBackgroundAttachmentId: string | undefined,
+  ): void {
+    this.diaryModel.updateNotebookChatBackground(notebookId, chatBackgroundAttachmentId);
+  }
+
   updateProfileName(name: string): void {
     this.diaryModel.updateProfileName(name);
   }

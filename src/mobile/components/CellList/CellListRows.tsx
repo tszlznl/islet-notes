@@ -20,6 +20,7 @@ export function CellListRows({ items }: { items: CellListItem[] }) {
               type='button'
               data-test-id={item.testId}
               onClick={item.onClick}
+              disabled={item.disabled}
             >
               <span className={styles.Cell.RowLabel}>{item.label}</span>
               {item.selected && (
@@ -36,6 +37,7 @@ export function CellListRows({ items }: { items: CellListItem[] }) {
               type='button'
               data-test-id={item.testId}
               onClick={item.onClick}
+              disabled={item.disabled}
             >
               {item.label}
             </button>
@@ -62,6 +64,7 @@ export function CellListRows({ items }: { items: CellListItem[] }) {
             type='button'
             data-test-id={item.testId}
             onClick={item.onClick}
+            disabled={item.disabled}
           >
             {content}
             <ChevronRight size={18} className={styles.CellList.Chevron} strokeWidth={1.9} />

@@ -21,11 +21,15 @@ export function dateKey(date: Date): string {
   return format(date, 'yyyy-MM-dd');
 }
 
-export function groupEntriesByDate(model: DiaryModelData): Map<string, CalendarDayRecord[]> {
+export function groupEntriesByDate(
+  model: DiaryModelData,
+  notebookId?: string,
+): Map<string, CalendarDayRecord[]> {
   const result = new Map<string, CalendarDayRecord[]>();
 
   for (const entry of model.entries) {
     if (entry.deletedAt) continue;
+    if (notebookId && entry.notebookId !== notebookId) continue;
     if (!isKnownDiaryEntryType(entry.type)) continue;
     const notebook = getNotebookById(model, entry.notebookId);
     if (!notebook) continue;

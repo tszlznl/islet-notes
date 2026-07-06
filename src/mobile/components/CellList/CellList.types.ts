@@ -22,6 +22,7 @@ interface CellItem {
   testId?: string;
   /** 有则渲染 chevron 与按压态;无则为纯展示行 */
   onClick?: () => void;
+  disabled?: boolean;
 }
 
 interface OptionItem {
@@ -33,6 +34,7 @@ interface OptionItem {
   selected?: boolean;
   testId?: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface ActionItem {
@@ -44,6 +46,7 @@ interface ActionItem {
   danger?: boolean;
   testId?: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 export type CellListItem = CellItem | OptionItem | ActionItem;

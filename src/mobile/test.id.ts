@@ -54,6 +54,12 @@ export const DiarySettings = {
   content: 'diary-settings.content',
   name: 'diary-settings.name',
   avatar: 'diary-settings.avatar',
+  search: 'diary-settings.search',
+  chatBackground: 'diary-settings.chat-background',
+  chatBackgroundPage: 'diary-settings.chat-background-page',
+  chatBackgroundContent: 'diary-settings.chat-background-content',
+  chatBackgroundSelectAlbum: 'diary-settings.chat-background-select-album',
+  chatBackgroundClear: 'diary-settings.chat-background-clear',
   deleteNotebook: 'diary-settings.delete-notebook',
   deleteConfirm: 'diary-settings.delete-confirm',
   deleteCancel: 'diary-settings.delete-cancel',
@@ -69,6 +75,7 @@ export const DiaryName = {
 
 export const DiaryChat = {
   page: 'diary-chat.page',
+  background: 'diary-chat.background',
   list: 'diary-chat.list',
   empty: 'diary-chat.empty',
   row: 'diary-chat.row',
@@ -92,7 +99,6 @@ export const DiaryChat = {
   imagePreview: 'diary-chat.image-preview',
   settings: 'diary-chat.settings',
   inputWrap: 'diary-chat.input-wrap',
-  inputError: 'diary-chat.input-error',
   input: 'diary-chat.input',
   voiceToggle: 'diary-chat.voice-toggle',
   holdToTalk: 'diary-chat.hold-to-talk',
@@ -130,6 +136,24 @@ export const DiaryChat = {
   uploadDeleteConfirmAction: 'diary-chat.upload-delete-confirm-action',
 } as const;
 
+export const DiarySearch = {
+  page: 'diary-search.page',
+  content: 'diary-search.content',
+  byDate: 'diary-search.by-date',
+  byMedia: 'diary-search.by-media',
+} as const;
+
+export const DiaryMedia = {
+  page: 'diary-media.page',
+  content: 'diary-media.content',
+  empty: 'diary-media.empty',
+  month: 'diary-media.month',
+  imageButton: 'diary-media.image-button',
+  image: 'diary-media.image',
+  videoButton: 'diary-media.video-button',
+  videoThumbnail: 'diary-media.video-thumbnail',
+} as const;
+
 export const Settings = {
   page: 'settings.page',
   content: 'settings.content',
@@ -141,6 +165,7 @@ export const Settings = {
   totalEntries: 'settings.total-entries',
   notebooks: 'settings.notebooks',
   s3: 'settings.s3',
+  membership: 'settings.membership',
   ai: 'settings.ai',
   speechRecognition: 'settings.speech-recognition',
   import: 'settings.import',
@@ -152,6 +177,23 @@ export const Settings = {
   exitExperienceDialog: 'settings.exit-experience-dialog',
   exitExperienceConfirm: 'settings.exit-experience-confirm',
   exitExperienceCancel: 'settings.exit-experience-cancel',
+} as const;
+
+export const MembershipSettings = {
+  page: 'membership-settings.page',
+  content: 'membership-settings.content',
+  purchasePage: 'membership-settings.purchase-page',
+  purchaseContent: 'membership-settings.purchase-content',
+  mbdPage: 'membership-settings.mbd-page',
+  mbdContent: 'membership-settings.mbd-content',
+  memberId: 'membership-settings.member-id',
+  status: 'membership-settings.status',
+  featureChatBackground: 'membership-settings.feature-chat-background',
+  purchaseEntry: 'membership-settings.purchase-entry',
+  mbdChannel: 'membership-settings.mbd-channel',
+  mbdPurchaseLink: 'membership-settings.mbd-purchase-link',
+  mbdOrderId: 'membership-settings.mbd-order-id',
+  redeemMbd: 'membership-settings.redeem-mbd',
 } as const;
 
 export const AISettings = {

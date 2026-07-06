@@ -1,6 +1,8 @@
 import { matchPath } from 'react-router';
 
-type FallbackPath = string | ((params: Record<string, string | undefined>) => string | undefined);
+type FallbackPath =
+  | string
+  | ((params: Record<string, string | undefined>, search: URLSearchParams) => string | undefined);
 
 export interface PageRoute {
   url: string;
@@ -66,6 +68,12 @@ export const routes: PageRoute[] = [
     url: '/calendar',
     file: './pages/calendar/calendar',
     component: 'CalendarPage',
+    // 带 notebookId 的作用域日历隐藏了底部标签栏并显示返回,直接打开/刷新时回到该日记本的查找页;
+    // 普通日历标签页(无 notebookId)不提供回退,保持根标签页原有行为。
+    fallback: (_params, search) => {
+      const notebookId = search.get('notebookId');
+      return notebookId ? `/diary/${notebookId}/search` : undefined;
+    },
   },
   {
     url: '/diaries/new',
@@ -92,6 +100,24 @@ export const routes: PageRoute[] = [
     fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/settings` : '/diaries'),
   },
   {
+    url: '/diary/:notebookId/chat-background',
+    file: './pages/diary/chat/background/background',
+    component: 'DiaryChatBackgroundPage',
+    fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/settings` : '/diaries'),
+  },
+  {
+    url: '/diary/:notebookId/search',
+    file: './pages/diary/chat/search/search',
+    component: 'DiaryChatSearchPage',
+    fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/settings` : '/diaries'),
+  },
+  {
+    url: '/diary/:notebookId/media',
+    file: './pages/diary/chat/media/media',
+    component: 'DiaryChatMediaPage',
+    fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/search` : '/diaries'),
+  },
+  {
     url: '/me',
     file: './pages/me/me',
     component: 'MePage',
@@ -107,6 +133,24 @@ export const routes: PageRoute[] = [
     file: './pages/settings/profile/profile',
     component: 'SettingsProfilePage',
     fallback: '/me',
+  },
+  {
+    url: '/settings/membership',
+    file: './pages/settings/membership/membership',
+    component: 'SettingsMembershipPage',
+    fallback: '/settings',
+  },
+  {
+    url: '/settings/membership/purchase',
+    file: './pages/settings/membership/purchase',
+    component: 'SettingsMembershipPurchasePage',
+    fallback: '/settings/membership',
+  },
+  {
+    url: '/settings/membership/purchase/mianbaoduo',
+    file: './pages/settings/membership/mianbaoduo',
+    component: 'SettingsMembershipMianbaoduoPage',
+    fallback: '/settings/membership/purchase',
   },
   {
     url: '/settings/name',
@@ -182,12 +226,15 @@ export const routes: PageRoute[] = [
   },
 ];
 
-export function getBackFallbackPath(pathname: string): string | undefined {
+export function getBackFallbackPath(pathname: string, search = ''): string | undefined {
+  const searchParams = new URLSearchParams(search);
   for (const route of routes) {
     if (!route.fallback) continue;
     const match = matchPath({ path: route.url, end: true }, pathname);
     if (!match) continue;
-    return typeof route.fallback === 'function' ? route.fallback(match.params) : route.fallback;
+    return typeof route.fallback === 'function'
+      ? route.fallback(match.params, searchParams)
+      : route.fallback;
   }
   return undefined;
 }

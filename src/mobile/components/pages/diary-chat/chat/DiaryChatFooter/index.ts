@@ -1,0 +1,1 @@
+export { DiaryChatFooter } from './DiaryChatFooter';

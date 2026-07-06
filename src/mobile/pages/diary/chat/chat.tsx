@@ -1,4 +1,5 @@
 import { useEntryHighlight } from '@/base/just-vibes/entry-highlight';
+import { getAttachmentById } from '@/core/diary/selectors';
 import { getDiaryChatState } from '@/core/state/chatItems';
 import { useService } from '@/hooks/use-service';
 import { useWatchEvent } from '@/hooks/use-watch-event';
@@ -8,6 +9,7 @@ import {
   ChatMessage,
   EntryHighlightProvider,
 } from '@/mobile/components/pages/diary-chat/chat/main';
+import { useAttachmentFileUrl } from '@/mobile/hooks/useAttachmentFileUrl';
 import { useDiaryChatChromeHeight } from '@/mobile/hooks/pages/diary-chat/useDiaryChatChromeHeight';
 import { useDiaryChatVirtualList } from '@/mobile/hooks/pages/diary-chat/useDiaryChatVirtualList';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
@@ -18,7 +20,7 @@ import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
 import { ISpeechRecognitionService } from '@/services/speechRecognition/common/speechRecognitionService';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router';
 import { VariableSizeList } from 'react-window';
 
@@ -56,6 +58,19 @@ export function DiaryChatPage() {
     () => getDiaryChatState(model, notebookId, tasks),
     [model, notebookId, tasks],
   );
+  const backgroundCandidate = notebook?.chatBackgroundAttachmentId
+    ? getAttachmentById(model, notebook.chatBackgroundAttachmentId)
+    : undefined;
+  const backgroundAttachment =
+    backgroundCandidate?.type === 'image' ? backgroundCandidate : undefined;
+  const backgroundUrl = useAttachmentFileUrl(backgroundAttachment?.s3Key, { role: 'large' });
+  const backgroundFrameStyle = useMemo<CSSProperties>(
+    () =>
+      backgroundUrl
+        ? { ...getStableBackgroundFrameStyle(), backgroundImage: `url(${backgroundUrl})` }
+        : {},
+    [backgroundUrl],
+  );
 
   // 定位到目标消息后将其点亮一次;状态会在动画结束后自动清除,可重复触发。
   const { highlightedEntryId, triggerHighlight } = useEntryHighlight();
@@ -80,35 +95,51 @@ export function DiaryChatPage() {
       className={cx(styles.Page.Root, styles.DiaryChatPage.RootChat)}
       data-test-id={DiaryChat.page}
     >
-      <div ref={headerRef}>
-        <PageHeader title={notebook.name} showBack right={headerProps} />
+      {backgroundUrl && (
+        <div
+          className={styles.DiaryChatPage.Background}
+          data-test-id={DiaryChat.background}
+          style={backgroundFrameStyle}
+          aria-hidden='true'
+        />
+      )}
+      <div className={styles.DiaryChatPage.Content}>
+        <div ref={headerRef}>
+          <PageHeader title={notebook.name} showBack right={headerProps} />
+        </div>
+        <main
+          className={styles.DiaryChatPage.Main}
+          data-test-id={DiaryChat.list}
+          style={{ height: listHeight }}
+        >
+          {chatItems.length === 0 ? (
+            <div className={styles.DiaryChatPage.Empty} data-test-id={DiaryChat.empty}>
+              {localize('diary.chat.empty', 'No entries yet')}
+            </div>
+          ) : (
+            <EntryHighlightProvider highlightedEntryId={highlightedEntryId}>
+              <VariableSizeList
+                ref={listRef}
+                height={listHeight}
+                width='100%'
+                itemCount={chatItems.length}
+                itemSize={itemSize}
+                itemKey={itemKey}
+                itemData={{ items: chatItems, model, previewAttachments }}
+              >
+                {ChatMessage}
+              </VariableSizeList>
+            </EntryHighlightProvider>
+          )}
+        </main>
+        <DiaryChatFooter ref={footerRef} notebookId={notebookId} />
       </div>
-      <main
-        className={styles.DiaryChatPage.Main}
-        data-test-id={DiaryChat.list}
-        style={{ height: listHeight }}
-      >
-        {chatItems.length === 0 ? (
-          <div className={styles.DiaryChatPage.Empty} data-test-id={DiaryChat.empty}>
-            {localize('diary.chat.empty', 'No entries yet')}
-          </div>
-        ) : (
-          <EntryHighlightProvider highlightedEntryId={highlightedEntryId}>
-            <VariableSizeList
-              ref={listRef}
-              height={listHeight}
-              width='100%'
-              itemCount={chatItems.length}
-              itemSize={itemSize}
-              itemKey={itemKey}
-              itemData={{ items: chatItems, model, previewAttachments }}
-            >
-              {ChatMessage}
-            </VariableSizeList>
-          </EntryHighlightProvider>
-        )}
-      </main>
-      <DiaryChatFooter ref={footerRef} notebookId={notebookId} />
     </div>
   );
+}
+
+function getStableBackgroundFrameStyle(): CSSProperties {
+  const width = Math.max(window.innerWidth, window.screen?.width ?? 0);
+  const height = Math.max(window.innerHeight, window.screen?.height ?? 0);
+  return { width, height };
 }

@@ -18,7 +18,7 @@ export type { PageHeaderIconItem, PageHeaderRight, PageHeaderRightItem } from '.
 export function PageHeader({ title = '', showBack, left, right, tone = 'nav' }: PageHeaderProps) {
   const navigationService = useService(INavigationService);
   const location = useLocation();
-  const fallbackPath = getBackFallbackPath(location.pathname);
+  const fallbackPath = getBackFallbackPath(location.pathname, location.search);
   return (
     <header
       className={cx(

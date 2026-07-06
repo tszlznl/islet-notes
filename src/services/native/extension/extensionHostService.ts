@@ -6,6 +6,7 @@ import type {
   HostRouterType,
 } from '@/services/native/common/hostService';
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
+import { base64ToBytes, bytesToBase64 } from '@/base/just-vibes/binary-codec';
 
 declare global {
   interface Window {
@@ -74,21 +75,4 @@ async function requestOptionalHostPermission(url: string): Promise<void> {
 function toOriginPattern(url: string): string {
   const parsed = new URL(url);
   return `${parsed.protocol}//${parsed.hostname}/*`;
-}
-
-function base64ToBytes(value: string): Uint8Array {
-  const binary = atob(value);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
-}
-
-function bytesToBase64(bytes: Uint8Array): string {
-  let binary = '';
-  for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-    binary += String.fromCharCode(...bytes.slice(offset, offset + 0x8000));
-  }
-  return btoa(binary);
 }

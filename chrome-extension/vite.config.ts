@@ -73,6 +73,9 @@ function chromeExtensionManifestPlugin(): Plugin {
             },
             permissions: ['sidePanel'],
             optional_permissions: ['unlimitedStorage'],
+            // 屿声自有后端（会员等接口）安装即授权，无需运行时申请；
+            // 用户自配的 S3/WebDAV 端点仍走可选主机权限，按需申请。
+            host_permissions: ['https://cloud.hamsterbase.com/*'],
             optional_host_permissions: ['https://*/*', 'http://*/*'],
           },
           null,

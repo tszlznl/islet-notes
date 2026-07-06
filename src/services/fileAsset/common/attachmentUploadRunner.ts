@@ -1,7 +1,8 @@
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
 import type { IHostService } from '@/services/native/common/hostService';
+import { blobToDataUrl } from '@/base/just-vibes/binary-codec';
 import { ensureBlobType } from '@/base/just-vibes/media-mime';
-import { blobToDataUrl, generateImageThumbnail } from './imageHandlers';
+import { generateImageThumbnail } from './imageHandlers';
 import type { AttachmentLocalCache } from './attachmentLocalCache';
 import { requireMimeFromKey } from './attachmentLocalCache';
 import type { FileAssetObjectStoreController } from './fileAssetObjectStoreController';

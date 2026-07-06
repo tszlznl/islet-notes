@@ -15,6 +15,10 @@ import { CapacitorNativeService } from '@/services/native/capacitor/capacitorNat
 import { BrowserHostService } from '@/services/native/browser/browserHostService';
 import { ExtensionHostService } from '@/services/native/extension/extensionHostService';
 import {
+  IMembershipService,
+  MembershipService,
+} from '@/services/membership/common/membershipService';
+import {
   IWorkbenchOverlayService,
   WorkbenchOverlayService,
 } from '@/services/overlay/common/WorkbenchOverlayService';
@@ -56,6 +60,7 @@ export async function initServices(): Promise<InitServicesResult> {
   serviceCollection.set(IWorkbenchOverlayService, new SyncDescriptor(WorkbenchOverlayService));
   serviceCollection.set(ITrackService, new SyncDescriptor(TrackService));
   serviceCollection.set(ISpeechRecognitionService, new SyncDescriptor(SpeechRecognitionService));
+  serviceCollection.set(IMembershipService, new SyncDescriptor(MembershipService));
   serviceCollection.set(ITestInjectionService, testInjectionService);
   serviceCollection.set(IDiaryService, new SyncDescriptor(WorkbenchDiaryService));
   serviceCollection.set(
@@ -71,6 +76,7 @@ export async function initServices(): Promise<InitServicesResult> {
       fileAssetService: accessor.get(IFileAssetService),
       speechRecognitionService: accessor.get(ISpeechRecognitionService),
       trackService: accessor.get(ITrackService),
+      membershipService: accessor.get(IMembershipService),
       hostService: accessor.get(IHostService),
       e2eDriverService: accessor.get(IE2eDriverService),
     };

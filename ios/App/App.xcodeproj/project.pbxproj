@@ -381,6 +381,7 @@
 				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = "$(MARKETING_VERSION)";
@@ -413,6 +414,7 @@
 				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
 				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				INFOPLIST_FILE = App/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MARKETING_VERSION = "$(MARKETING_VERSION)";

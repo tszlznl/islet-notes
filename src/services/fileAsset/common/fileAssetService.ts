@@ -2,8 +2,9 @@ import type { SyncConfigRecord } from '@/core/diary/type';
 import { syncStoragePath } from '@/core/spec/syncStoragePath';
 import { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
 import { IHostService } from '@/services/native/common/hostService';
+import { readImageDimensions } from '@/base/just-vibes/browser-image-processing';
 import { ensureBlobType } from '@/base/just-vibes/media-mime';
-import { generateImageThumbnail, readImageDimensions } from './imageHandlers';
+import { generateImageThumbnail } from './imageHandlers';
 import {
   AttachmentUploadTaskRecord,
   BaseAttachmentUploadStore,

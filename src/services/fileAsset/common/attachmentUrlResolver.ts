@@ -7,7 +7,7 @@ import {
   getPresignedGetSigningDate,
   IMMUTABLE_ATTACHMENT_CACHE_CONTROL,
   PRESIGNED_GET_EXPIRES_IN,
-} from './presignedUrl';
+} from '@/base/just-vibes/object-storage-presigned-url-policy';
 import type { AttachmentLocalCache } from './attachmentLocalCache';
 import type { FileAssetObjectStoreController } from './fileAssetObjectStoreController';
 import type { FileUrlOptions } from './fileAssetTypes';

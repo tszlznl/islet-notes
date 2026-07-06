@@ -432,6 +432,28 @@ export const styles = {
     SizeBadge: 'min-w-0 overflow-hidden text-ellipsis whitespace-nowrap drop-shadow',
     DurationBadge: 'flex-none tabular-nums drop-shadow',
   },
+  // 「查找日记内容」入口:居中提示 + 快捷入口(日期 / 图片与视频)
+  DiarySearchPage: {
+    Root: 'flex min-h-[55dvh] flex-col items-center justify-center gap-7 px-8 text-center',
+    Hint: 'text-[15px] leading-5 text-placeholder',
+    Grid: 'flex items-center justify-center gap-4',
+    Option: cx('text-link transition active:opacity-60', font.Body),
+    Divider: cx('select-none text-line', font.Body),
+  },
+  // 「图片与视频」相册:按月分组,每行 4 个 1:1 方图
+  DiaryMediaPage: {
+    Content: 'pb-[calc(1.5rem+var(--sab))]',
+    Section: 'mb-1',
+    MonthTitle: 'px-3 pb-1.5 pt-3 text-[13px] leading-5 text-muted',
+    Grid: 'grid grid-cols-4 gap-0.5 px-0.5',
+    Cell: 'relative block aspect-square w-full overflow-hidden bg-soft transition active:opacity-85',
+    Image: 'h-full w-full object-cover',
+    Placeholder: 'h-full w-full bg-soft',
+    VideoPlayBadge:
+      'pointer-events-none absolute left-1/2 top-1/2 grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-black/45 text-white',
+    VideoPlayIcon: 'ml-0.5',
+    Empty: 'px-8 py-16 text-center text-[15px] leading-6 text-placeholder',
+  },
   ImageLoading: {
     PlaceholderBase: 'grid place-items-center overflow-hidden bg-soft',
     FailedBase: cx('grid place-items-center overflow-hidden bg-soft text-center', font.Caption),
@@ -538,7 +560,7 @@ export const styles = {
     GroupDividers:
       '[&>*+*]:relative [&>*+*]:before:absolute [&>*+*]:before:left-4 [&>*+*]:before:right-0 [&>*+*]:before:top-0 [&>*+*]:before:h-px [&>*+*]:before:bg-line',
     Row: 'flex min-h-[56px] w-full items-center gap-3 bg-surface px-4 text-left',
-    RowPressable: 'transition-colors active:bg-soft',
+    RowPressable: 'transition-colors active:bg-soft disabled:opacity-60 disabled:active:bg-surface',
     Icon: 'grid h-6 w-6 flex-none place-items-center text-muted',
     Chevron: 'flex-none text-muted',
     RightImage: 'h-8 w-8 flex-none rounded-md bg-soft object-cover',
@@ -549,7 +571,7 @@ export const styles = {
       font.CoverInitialSm,
     ),
     Action: cx(
-      'flex min-h-[56px] w-full items-center justify-center bg-surface px-4 text-center transition-colors active:bg-soft',
+      'flex min-h-[56px] w-full items-center justify-center bg-surface px-4 text-center transition-colors active:bg-soft disabled:opacity-60 disabled:active:bg-surface',
       font.Body,
     ),
     ActionDanger: '!text-danger',
@@ -656,7 +678,9 @@ export const styles = {
     ),
   },
   DiaryChatPage: {
-    RootChat: 'overflow-hidden bg-chat',
+    RootChat: 'relative overflow-hidden bg-chat',
+    Background: 'fixed left-0 top-0 z-0 bg-chat bg-cover bg-center',
+    Content: 'relative z-[1] min-h-[100dvh]',
     Main: 'pl-[calc(0.75rem+var(--sal))] pr-[calc(0.75rem+var(--sar))]',
     Empty: cx('grid place-items-center h-full text-muted', font.Desc),
   },
@@ -745,6 +769,49 @@ export const styles = {
     StatusDanger: 'text-danger',
     StatusText: 'min-w-0 text-left',
     Group: 'mt-5 first:mt-0',
+  },
+  Membership: {
+    PageContent: 'px-3 pt-2 pb-[calc(1.25rem+var(--sab))]',
+    HeroCard: 'rounded-[10px] bg-surface px-5 py-6 text-center',
+    HeroIcon: 'mx-auto mb-3 grid h-14 w-14 place-items-center rounded-full [&>svg]:h-7 [&>svg]:w-7',
+    HeroIconActive: 'bg-[#E7F9EF] text-accent',
+    HeroIconPurchase: 'bg-[#FFF7E0] text-[#E6A817]',
+    HeroTitle: cx('m-0 text-ink', font.EmBody),
+    HeroDesc: cx('m-0 mt-1 text-muted', font.Caption),
+    Card: 'mt-2.5 rounded-[10px] bg-surface px-4 py-3.5',
+    AccountLabel: cx('m-0 mb-2 text-muted', font.Footnote),
+    AccountBox: 'flex items-center justify-between gap-3 rounded-lg bg-soft px-3 py-2.5',
+    AccountId: cx('min-w-0 flex-1 [overflow-wrap:anywhere] text-ink', font.Code),
+    CopyButton: cx(
+      'inline-grid h-8 w-8 flex-none place-items-center rounded text-accent transition active:bg-accent/10 disabled:opacity-40',
+    ),
+    FeatureSection: 'mt-2.5 overflow-hidden rounded-[10px] bg-surface',
+    FeatureSectionTitle: cx('px-4 pb-1.5 pt-3 text-muted', font.Caption),
+    FeatureRow: 'flex items-center gap-3 border-t border-line px-4 py-3',
+    FeatureIcon:
+      'grid h-9 w-9 flex-none place-items-center rounded-lg bg-[#E7F9EF] text-accent [&>svg]:h-[18px] [&>svg]:w-[18px]',
+    FeatureBody: 'min-w-0 flex-1',
+    FeatureTitle: cx('m-0 text-ink', font.GroupTitle),
+    FeatureDesc: cx('m-0 mt-0.5 text-muted', font.Footnote),
+    FeatureBadge: cx('rounded bg-[#E7F9EF] px-2 py-0.5 text-accent', font.Footnote),
+    PurchaseActions: 'px-0 py-5',
+    PurchaseButton: cx(
+      'block h-11 w-full rounded-lg bg-accent text-center text-onaccent transition active:brightness-90 disabled:opacity-40',
+      font.Button,
+    ),
+    StepList: 'flex flex-col gap-4 bg-surface py-4',
+    StepItem: 'grid grid-cols-[28px_minmax(0,1fr)] gap-3',
+    StepNumber: cx(
+      'grid h-7 w-7 place-items-center rounded-full bg-soft text-muted',
+      font.Footnote,
+    ),
+    StepBody: 'min-w-0',
+    StepTitle: cx('text-ink', font.Body),
+    StepDesc: cx('mt-1 text-muted', font.Desc),
+    PurchaseLink: cx(
+      'mt-3 inline-flex min-h-9 items-center gap-1.5 rounded bg-accent px-3 text-onaccent transition active:brightness-90',
+      font.ButtonSmall,
+    ),
   },
   StepDots: {
     Root: 'flex gap-1.5 items-center pr-2',
