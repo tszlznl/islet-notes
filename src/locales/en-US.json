@@ -528,6 +528,10 @@
     "defaultMessage": "Voice to text is ready to use.",
     "content": "Voice to text is ready to use."
   },
+  "settings.speechRecognition.consentRequired": {
+    "defaultMessage": "Allow sending voice audio to Baidu AI Cloud before saving.",
+    "content": "Allow sending voice audio to Baidu AI Cloud before saving."
+  },
   "settings.speechRecognition.consoleHint": {
     "defaultMessage": "Create an app in the Baidu AI Cloud console and enable Short Speech Recognition Pro to get the API Key and Secret Key. These credentials are used for automatic transcription after sending voice messages and manual transcription from a voice message.",
     "content": "Create an app in the Baidu AI Cloud console and enable Short Speech Recognition Pro to get the API Key and Secret Key. These credentials are used for automatic transcription after sending voice messages and manual transcription from a voice message."
@@ -535,6 +539,22 @@
   "settings.speechRecognition.current": {
     "defaultMessage": "Current service",
     "content": "Current service"
+  },
+  "settings.speechRecognition.dataSharing": {
+    "defaultMessage": "Data sharing",
+    "content": "Data sharing"
+  },
+  "settings.speechRecognition.dataSharingConsent": {
+    "defaultMessage": "I allow Islet to send voice message audio to Baidu AI Cloud for voice-to-text transcription.",
+    "content": "I allow Islet to send voice message audio to Baidu AI Cloud for voice-to-text transcription."
+  },
+  "settings.speechRecognition.dataSharingDesc": {
+    "defaultMessage": "When voice to text runs, Islet sends the selected voice message audio to Baidu AI Cloud Short Speech Recognition Pro and saves the returned text in the same diary entry. For example, after you send a voice message, that audio may be sent to Baidu AI Cloud to generate its transcript.",
+    "content": "When voice to text runs, Islet sends the selected voice message audio to Baidu AI Cloud Short Speech Recognition Pro and saves the returned text in the same diary entry. For example, after you send a voice message, that audio may be sent to Baidu AI Cloud to generate its transcript."
+  },
+  "settings.speechRecognition.dataSharingSummary": {
+    "defaultMessage": "Voice audio is sent to Baidu AI Cloud for transcription.",
+    "content": "Voice audio is sent to Baidu AI Cloud for transcription."
   },
   "settings.speechRecognition.delete": {
     "defaultMessage": "Delete configuration",

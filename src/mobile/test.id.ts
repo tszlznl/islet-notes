@@ -165,6 +165,7 @@ export const SpeechRecognitionSettings = {
   content: 'speech-recognition-settings.content',
   add: 'speech-recognition-settings.add',
   autoTranscribe: 'speech-recognition-settings.auto-transcribe',
+  dataSharingConsent: 'speech-recognition-settings.data-sharing-consent',
   apiKey: 'speech-recognition-settings.api-key',
   secretKey: 'speech-recognition-settings.secret-key',
   test: 'speech-recognition-settings.test',

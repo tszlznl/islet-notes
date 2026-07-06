@@ -28,13 +28,13 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>用于拍摄日记图片和视频。</string>
+	<string>Islet Journal uses the camera to add photos or videos to your diary. For example, you can take a photo for today's entry or record a short video and save it with the entry.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>用于录制视频声音。</string>
+	<string>Islet Journal uses the microphone to record audio when you capture a video in the app. For example, a video added to a diary entry can include its original sound.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>用于保存拍摄的视频。</string>
+	<string>Islet Journal saves videos you record in the app to your photo library. For example, a diary video can also be kept in the system Photos app.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>用于从相册选择图片和视频。</string>
+	<string>Islet Journal reads only the photos or videos you choose and adds them to your diary. For example, you can select a photo for a diary entry or choose a video to save with today's record.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

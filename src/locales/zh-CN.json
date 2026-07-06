@@ -528,6 +528,10 @@
     "content": "已可将语音消息转为文字。",
     "defaultMessage": "Voice to text is ready to use."
   },
+  "settings.speechRecognition.consentRequired": {
+    "content": "请先允许将语音音频发送到百度智能云。",
+    "defaultMessage": "Allow sending voice audio to Baidu AI Cloud before saving."
+  },
   "settings.speechRecognition.consoleHint": {
     "content": "在百度智能云控制台创建应用，开通「短语音识别极速版」，获取 API Key 和 Secret Key。凭据会用于发送后的自动转写，以及在语音消息上手动转文字。",
     "defaultMessage": "Create an app in the Baidu AI Cloud console and enable Short Speech Recognition Pro to get the API Key and Secret Key. These credentials are used for automatic transcription after sending voice messages and manual transcription from a voice message."
@@ -535,6 +539,22 @@
   "settings.speechRecognition.current": {
     "content": "当前服务",
     "defaultMessage": "Current service"
+  },
+  "settings.speechRecognition.dataSharing": {
+    "content": "数据共享",
+    "defaultMessage": "Data sharing"
+  },
+  "settings.speechRecognition.dataSharingConsent": {
+    "content": "我允许屿声将语音消息音频发送到百度智能云，用于语音转文字。",
+    "defaultMessage": "I allow Islet to send voice message audio to Baidu AI Cloud for voice-to-text transcription."
+  },
+  "settings.speechRecognition.dataSharingDesc": {
+    "content": "语音转文字运行时，屿声会将所选语音消息的音频发送到百度智能云「短语音识别极速版」，并把返回的文字保存到同一条日记。例如，发送一条语音消息后，这段音频可能会发送到百度智能云生成转写文本。",
+    "defaultMessage": "When voice to text runs, Islet sends the selected voice message audio to Baidu AI Cloud Short Speech Recognition Pro and saves the returned text in the same diary entry. For example, after you send a voice message, that audio may be sent to Baidu AI Cloud to generate its transcript."
+  },
+  "settings.speechRecognition.dataSharingSummary": {
+    "content": "语音音频会发送到百度智能云进行转写。",
+    "defaultMessage": "Voice audio is sent to Baidu AI Cloud for transcription."
   },
   "settings.speechRecognition.delete": {
     "content": "删除配置",

@@ -24,6 +24,7 @@ type SpeechRecognitionFormValues = {
   apiKey: string;
   secretKey: string;
   autoTranscribe: boolean;
+  dataSharingConsent: boolean;
 };
 
 export function SettingsSpeechRecognitionAddPage() {
@@ -37,6 +38,7 @@ export function SettingsSpeechRecognitionAddPage() {
   const form = useForm<SpeechRecognitionFormValues>({
     initialValues: {
       autoTranscribe: true,
+      dataSharingConsent: false,
     },
     requiredMessage: (field) =>
       localize('settings.speechRecognition.required', '{0} is required.', field.label),
@@ -66,6 +68,15 @@ export function SettingsSpeechRecognitionAddPage() {
 
   const save = async () => {
     if (saving || !form.verify()) return;
+    if (!form.values.dataSharingConsent) {
+      showTopTips({
+        message: localize(
+          'settings.speechRecognition.consentRequired',
+          'Allow sending voice audio to Baidu AI Cloud before saving.',
+        ),
+      });
+      return;
+    }
     const config = {
       apiKey: form.values.apiKey,
       secretKey: form.values.secretKey,
@@ -117,6 +128,15 @@ export function SettingsSpeechRecognitionAddPage() {
           'settings.speechRecognition.addFormDesc',
           'Turn voice messages into text, up to 59 seconds.',
         )}
+        check={{
+          label: localize(
+            'settings.speechRecognition.dataSharingConsent',
+            'I allow Islet to send voice message audio to Baidu AI Cloud for voice-to-text transcription.',
+          ),
+          checked: Boolean(form.values.dataSharingConsent),
+          testId: SpeechRecognitionSettings.dataSharingConsent,
+          onChange: (checked) => form.setValue('dataSharingConsent', checked),
+        }}
         actions={[
           {
             label: localize('common.save', 'Save'),
@@ -134,6 +154,12 @@ export function SettingsSpeechRecognitionAddPage() {
           {localize(
             'settings.speechRecognition.consoleHint',
             'Create an app in the Baidu AI Cloud console and enable Short Speech Recognition Pro to get the API Key and Secret Key. These credentials are used for automatic transcription after sending voice messages and manual transcription from a voice message.',
+          )}
+        </p>
+        <p className={styles.WeuiForm.Description}>
+          {localize(
+            'settings.speechRecognition.dataSharingDesc',
+            'When voice to text runs, Islet sends the selected voice message audio to Baidu AI Cloud Short Speech Recognition Pro and saves the returned text in the same diary entry. For example, after you send a voice message, that audio may be sent to Baidu AI Cloud to generate its transcript.',
           )}
         </p>
       </FormPage>

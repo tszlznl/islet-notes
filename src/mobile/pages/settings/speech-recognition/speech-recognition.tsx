@@ -67,6 +67,13 @@ export function SettingsSpeechRecognitionPage() {
           value: maskApiKey(config.secretKey),
         },
         {
+          label: localize('settings.speechRecognition.dataSharing', 'Data sharing'),
+          value: localize(
+            'settings.speechRecognition.dataSharingSummary',
+            'Voice audio is sent to Baidu AI Cloud for transcription.',
+          ),
+        },
+        {
           name: 'autoTranscribe',
           label: localize('settings.speechRecognition.autoTranscribe', 'Auto-transcribe voice'),
           type: 'checkbox',
