@@ -1,9 +1,14 @@
-import type { SyncConfigRecord } from '@/core/diary/type';
+import type {
+  ImageAttachmentRecord,
+  LivePhotoAttachmentRecord,
+  SyncConfigRecord,
+} from '@/core/diary/type';
 import { syncStoragePath } from '@/core/spec/syncStoragePath';
 import { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
 import { IHostService } from '@/services/native/common/hostService';
 import { readImageDimensions } from '@/base/just-vibes/browser-image-processing';
-import { ensureBlobType } from '@/base/just-vibes/media-mime';
+import { ensureBlobType, normalizeMime } from '@/base/just-vibes/media-mime';
+import { detectLivePhoto, extractLivePhotoVideo } from '@/base/just-vibes/live-photo';
 import { generateImageThumbnail } from './imageHandlers';
 import {
   AttachmentUploadTaskRecord,
@@ -91,6 +96,7 @@ export interface IFileAssetService {
   putDatabaseSnapshot(key: string, snapshot: Uint8Array): Promise<void>;
   getDatabaseSnapshot(key: string): Promise<Uint8Array | undefined>;
   getFileUrl(key: string, options: FileUrlOptions): Promise<string | undefined>;
+  getLivePhotoVideoUrl(attachment: ImageAttachmentRecord): Promise<string | undefined>;
 }
 
 export const IFileAssetService = createDecorator<IFileAssetService>('IFileAssetService');
@@ -109,6 +115,7 @@ export class FileAssetService implements IFileAssetService {
   private readonly databaseSync: DatabaseSnapshotSync;
   private readonly urlResolver: AttachmentUrlResolver;
   private readonly uploadRunner: AttachmentUploadRunner;
+  private readonly livePhotoVideoUrls = new Map<string, string>();
   private storageScope = 'local';
 
   constructor(
@@ -195,6 +202,7 @@ export class FileAssetService implements IFileAssetService {
     const id = nanoid();
     const { s3Key, thumbS3Key } = await this.buildImageUploadKeys(id, file.type, true);
     await this.localCache.write(s3Key, file);
+    const livePhoto = await this.buildLivePhotoRecord(id, s3Key, file, options);
     const task: AttachmentUploadTaskRecord = {
       id,
       notebookId,
@@ -206,6 +214,7 @@ export class FileAssetService implements IFileAssetService {
       size: file.size,
       width: dimensions.width,
       height: dimensions.height,
+      livePhoto,
       identityId: options.identityId,
       status: 'pending',
       queueSeq: await this.uploadStore.getNextQueueSeq(),
@@ -411,6 +420,31 @@ export class FileAssetService implements IFileAssetService {
     return this.urlResolver.getFileUrl(key, options);
   }
 
+  async getLivePhotoVideoUrl(attachment: ImageAttachmentRecord): Promise<string | undefined> {
+    const livePhoto = attachment.livePhoto;
+    if (!livePhoto) return undefined;
+    const cacheKey = [
+      livePhoto.kind,
+      livePhoto.stillS3Key,
+      livePhoto.videoS3Key ?? '',
+      this.storageScope,
+    ].join('\n');
+    const cachedUrl = this.livePhotoVideoUrls.get(cacheKey);
+    if (cachedUrl) return cachedUrl;
+
+    const videoBlob = await this.readLivePhotoVideoBlob(livePhoto);
+    if (!videoBlob) return undefined;
+    const url = await this.hostService.prepareLivePhotoVideoPreview({
+      blob: videoBlob,
+      sourceMimeType: livePhoto.videoMimeType || videoBlob.type,
+      cacheKey: cacheKeyToSafeSegment(cacheKey),
+      cacheScope: this.storageScope,
+    });
+    if (!url) return undefined;
+    this.livePhotoVideoUrls.set(cacheKey, url);
+    return url;
+  }
+
   private async refreshTasks(): Promise<void> {
     this.tasks = await this.listAttachmentTasks();
     this._onDidChangeTasks.fire();
@@ -422,6 +456,50 @@ export class FileAssetService implements IFileAssetService {
     await this.objectStoreController
       .getObjectStore()
       .putAttachment(key, ensureBlobType(blob, mimeType));
+  }
+
+  private async buildLivePhotoRecord(
+    id: string,
+    s3Key: string,
+    file: Blob,
+    options: CreateImageAttachmentUploadTaskOptions,
+  ): Promise<LivePhotoAttachmentRecord | undefined> {
+    if (options.livePhotoOriginal) {
+      const original = options.livePhotoOriginal;
+      const keys = syncStoragePath.livePhotoOriginals(id, {
+        stillMimeType: original.stillMimeType,
+        videoMimeType: original.videoMimeType,
+      });
+      await this.localCache.write(keys.stillS3Key, original.still);
+      await this.localCache.write(keys.videoS3Key, original.video);
+      return {
+        kind: 'ios-paired-files',
+        stillS3Key: keys.stillS3Key,
+        stillMimeType: original.stillMimeType,
+        videoS3Key: keys.videoS3Key,
+        videoMimeType: original.videoMimeType,
+      };
+    }
+
+    if (normalizeMime(file.type) === 'image/jpeg' && (await detectLivePhoto(file))) {
+      return {
+        kind: 'motion-jpeg',
+        stillS3Key: s3Key,
+        stillMimeType: 'image/jpeg',
+      };
+    }
+    return undefined;
+  }
+
+  private async readLivePhotoVideoBlob(
+    livePhoto: LivePhotoAttachmentRecord,
+  ): Promise<Blob | undefined> {
+    if (livePhoto.kind === 'motion-jpeg') {
+      const source = await this.urlResolver.getFileBlob(livePhoto.stillS3Key);
+      return source ? extractLivePhotoVideo(source) : undefined;
+    }
+    if (!livePhoto.videoS3Key) return undefined;
+    return this.urlResolver.getFileBlob(livePhoto.videoS3Key);
   }
 
   private async buildImageUploadKeys(
@@ -436,4 +514,8 @@ export class FileAssetService implements IFileAssetService {
       thumbS3Key: keys.thumbS3Key,
     };
   }
+}
+
+function cacheKeyToSafeSegment(key: string): string {
+  return key.replace(/[^a-zA-Z0-9._-]/g, '_');
 }

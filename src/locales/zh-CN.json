@@ -184,6 +184,10 @@
     "content": "写点什么…",
     "defaultMessage": "Write something..."
   },
+  "diary.livePhoto.play": {
+    "defaultMessage": "Play Live Photo",
+    "content": "播放实况照片"
+  },
   "diary.media": {
     "defaultMessage": "Images and videos",
     "content": "图片与视频"

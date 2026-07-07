@@ -1,4 +1,5 @@
 import type { IHostService } from '@/services/native/common/hostService';
+import type { LivePhotoAttachmentRecord } from '@/core/diary/type';
 import { Emitter, Event } from 'vscf/base/common/event';
 
 export type AttachmentUploadStatus = 'pending' | 'uploading' | 'failed' | 'done';
@@ -27,6 +28,7 @@ interface AttachmentUploadTaskRecordBase {
   previewThumbnail?: string;
   /** 发送该附件消息时选中的身份，落库为 entry.identityId。 */
   identityId?: string;
+  livePhoto?: LivePhotoAttachmentRecord;
   status: AttachmentUploadStatus;
   queueSeq: number;
   createdAt: number;
@@ -216,7 +218,8 @@ function shouldPersistTaskUpdate(
     previous.width !== next.width ||
     previous.height !== next.height ||
     previous.duration !== next.duration ||
-    previous.size !== next.size
+    previous.size !== next.size ||
+    JSON.stringify(previous.livePhoto) !== JSON.stringify(next.livePhoto)
   );
 }
 
@@ -243,9 +246,24 @@ function isAttachmentUploadTaskRecord(value: unknown): value is AttachmentUpload
     typeof record.queueSeq === 'number' &&
     typeof record.createdAt === 'number' &&
     typeof record.updatedAt === 'number' &&
+    (record.livePhoto === undefined || isLivePhotoAttachmentRecord(record.livePhoto)) &&
     (record.type === 'video'
       ? typeof record.sourcePath === 'string' && typeof record.originalQuality === 'boolean'
       : true)
+  );
+}
+
+function isLivePhotoAttachmentRecord(value: unknown): value is LivePhotoAttachmentRecord {
+  if (typeof value !== 'object' || value === null) return false;
+  const record = value as Partial<LivePhotoAttachmentRecord>;
+  if (record.kind !== 'motion-jpeg' && record.kind !== 'ios-paired-files') {
+    return false;
+  }
+  return (
+    typeof record.stillS3Key === 'string' &&
+    typeof record.stillMimeType === 'string' &&
+    (record.videoS3Key === undefined || typeof record.videoS3Key === 'string') &&
+    (record.videoMimeType === undefined || typeof record.videoMimeType === 'string')
   );
 }
 

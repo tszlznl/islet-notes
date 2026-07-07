@@ -4,10 +4,13 @@ import { ImageLoadFailedPlaceholder } from '@/mobile/components/image/ImageLoadF
 import { ImageLoadingPlaceholder } from '@/mobile/components/image/ImageLoadingPlaceholder';
 import { useEntryLongPressActions } from '@/mobile/hooks/useEntryLongPressActions';
 import { useImagePreview } from '@/mobile/overlay/imagePreview/useImagePreview';
+import { useVideoPlayer } from '@/mobile/overlay/videoPlayer/useVideoPlayer';
 import { styles } from '@/mobile/styles/ui';
 import { DiaryChat } from '@/mobile/test.id';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
 import { loadImageUrl } from '@/mobile/utils/imageLoad';
+import { localize } from '@/nls';
+import { CircleDotDashed } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { getImageMessageStyle } from './utils';
 import type { ImageMessageProps } from './types';
@@ -15,6 +18,7 @@ import type { ImageMessageProps } from './types';
 export function AttachmentImage({ entryId, attachment, previewAttachments }: ImageMessageProps) {
   const fileAssetService = useService(IFileAssetService);
   const showImagePreview = useImagePreview();
+  const showVideoPlayer = useVideoPlayer();
   const highlighted = useIsEntryHighlighted(entryId);
   const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLButtonElement>(entryId);
   const [thumbUrl, setThumbUrl] = useState<string>();
@@ -23,6 +27,7 @@ export function AttachmentImage({ entryId, attachment, previewAttachments }: Ima
   const thumbnailRefreshAttempted = useRef(false);
   const imageStyle = getImageMessageStyle(attachment.width, attachment.height);
   const thumbnailKey = attachment.thumbS3Key ?? attachment.s3Key;
+  const livePhoto = attachment.livePhoto;
 
   useEffect(() => {
     let disposed = false;
@@ -119,6 +124,31 @@ export function AttachmentImage({ entryId, attachment, previewAttachments }: Ima
             style={imageStyle}
           />
         )
+      )}
+      {livePhoto && (
+        <span
+          className={styles.AttachmentImage.LivePhotoBadge}
+          data-test-id={DiaryChat.livePhotoBadge}
+          role='button'
+          tabIndex={0}
+          aria-label={localize('diary.livePhoto.play', 'Play Live Photo')}
+          onClick={(event) => {
+            event.stopPropagation();
+            showVideoPlayer({
+              loadUrl: () => fileAssetService.getLivePhotoVideoUrl(attachment),
+            });
+          }}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            event.stopPropagation();
+            showVideoPlayer({
+              loadUrl: () => fileAssetService.getLivePhotoVideoUrl(attachment),
+            });
+          }}
+        >
+          <CircleDotDashed size={18} />
+        </span>
       )}
       <EntryHighlightOverlay active={highlighted} />
     </button>

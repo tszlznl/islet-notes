@@ -1,4 +1,5 @@
 import { base64ToBlob, blobToBase64 } from '@/base/just-vibes/binary-codec';
+import { livePhotoVideoExt } from '@/base/just-vibes/media-mime';
 import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
 import {
   assertSupportedImage,
@@ -6,7 +7,7 @@ import {
 } from '@/services/fileAsset/common/imageHandlers';
 import { VIDEO_TARGET_HEIGHT, VIDEO_TARGET_VIDEO_BITRATE } from '@/base/just-vibes/media-metrics';
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
-import { Camera, MediaType, MediaTypeSelection, type MediaResult } from '@capacitor/camera';
+import { Camera, type MediaResult } from '@capacitor/camera';
 import { Clipboard } from '@capacitor/clipboard';
 import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
@@ -40,6 +41,7 @@ import {
   IHostService,
   HostRouterType,
   HostWriteAttachmentFileOptions,
+  HostLivePhotoVideoPreviewOptions,
 } from '../common/hostService';
 import {
   createMemoryHostFilesystem,
@@ -51,6 +53,7 @@ import {
 } from '@/base/just-vibes/browser-attachment-blob-store';
 import { NativeImageTools } from './plugins/imageTools';
 import { NativeAttachmentFileCache } from './plugins/attachmentFileCache';
+import { NativeMediaPicker, type NativeMediaPickerPickResult } from './plugins/mediaPicker';
 import { NativeVideoTools } from './plugins/videoTools';
 import { NativeWebDavHttp } from './plugins/webDavHttp';
 
@@ -68,6 +71,7 @@ export class CapacitorNativeService implements IHostService {
   private readonly memoryFilesystem: BrowserHostFilesystem = createMemoryHostFilesystem();
   private readonly memoryAttachmentFiles: BrowserAttachmentBlobStore =
     createBrowserAttachmentBlobStore(true);
+  private readonly livePhotoVideoObjectUrls = new Map<string, string>();
 
   constructor(
     private readonly useMemoryFilesystem = false,
@@ -135,22 +139,13 @@ export class CapacitorNativeService implements IHostService {
       throw new Error('Gallery media picking is not supported on this platform.');
     }
     try {
-      const result = await Camera.chooseFromGallery({
-        mediaType: MediaTypeSelection.All,
-        allowMultipleSelection: false,
-        includeMetadata: true,
-        quality: 100,
-        editable: 'no',
-      });
-      const picked = result.results[0];
-      if (!picked) return undefined;
-      if (picked.type === MediaType.Video) {
-        const video = await toHostVideoPick(picked, options?.cacheScope);
-        return { kind: 'video', video };
-      }
-      const blob = await readPickedImageBlob(picked);
-      assertSupportedImage(blob);
-      return { kind: 'image', blob };
+      return this.nativeGalleryPickToHostPick(
+        await NativeMediaPicker.pick({
+          mediaTypes: 'images-and-videos',
+          cacheScope: options?.cacheScope,
+        }),
+        options?.cacheScope,
+      );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (isPickCancellation(message)) {
@@ -213,6 +208,37 @@ export class CapacitorNativeService implements IHostService {
         await NativeVideoTools.cleanRecord({ path: result.outputPath }).catch(() => undefined);
       }
     }
+  }
+
+  async prepareLivePhotoVideoPreview(
+    options: HostLivePhotoVideoPreviewOptions,
+  ): Promise<string | undefined> {
+    const existing = this.livePhotoVideoObjectUrls.get(options.cacheKey);
+    if (existing) return existing;
+    if (!this.caniuse('videoTranscode') || this.useMemoryFilesystem) {
+      return this.createLivePhotoObjectUrl(options.cacheKey, options.blob);
+    }
+
+    const scope = options.cacheScope || 'local';
+    const sourceKey = `live-photo-preview-source/${options.cacheKey}.${livePhotoVideoExt(options.sourceMimeType || options.blob.type)}`;
+    const outputKey = `live-photo-preview/${options.cacheKey}.mp4`;
+    const written = await NativeAttachmentFileCache.writeFile({
+      scope,
+      key: sourceKey,
+      data: await blobToBase64(options.blob),
+    });
+    if (!written.path) return undefined;
+    const prepared = await NativeVideoTools.prepareUpload({
+      sourcePath: written.path,
+      originalQuality: false,
+      targetHeight: VIDEO_TARGET_HEIGHT,
+      videoBitrate: VIDEO_TARGET_VIDEO_BITRATE,
+      cacheKey: outputKey,
+      cacheScope: scope,
+    });
+    const url = toNativeFileSrc(prepared.outputPath);
+    this.livePhotoVideoObjectUrls.set(options.cacheKey, url);
+    return url;
   }
 
   async cleanVideoRecord(options: HostCleanVideoRecordOptions): Promise<void> {
@@ -358,26 +384,61 @@ export class CapacitorNativeService implements IHostService {
   }
 
   private async pickImageBlobFromNative(source: ImagePickSource): Promise<Blob | undefined> {
-    const photo = await this.pickImage(source);
-    return photo ? readPickedImageBlob(photo) : undefined;
-  }
-
-  private async pickImage(source: ImagePickSource): Promise<ImagePickResult | undefined> {
     if (source === ImagePickSource.Camera) {
-      return Camera.takePhoto({
+      const photo = await Camera.takePhoto({
         quality: 100,
         editable: 'no',
         includeMetadata: true,
       });
+      return readPickedImageBlob(photo);
     }
-    const result = await Camera.chooseFromGallery({
-      mediaType: MediaTypeSelection.Photo,
-      allowMultipleSelection: false,
-      quality: 100,
-      editable: 'no',
-      includeMetadata: true,
-    });
-    return result.results[0];
+    const result = await NativeMediaPicker.pick({ mediaTypes: 'images' });
+    if (result.kind !== 'image') return undefined;
+    return fillMissingBlobType(
+      await readNativeFileBlob(result.photoPath),
+      result.mimeType || 'image/jpeg',
+    );
+  }
+
+  private createLivePhotoObjectUrl(cacheKey: string, blob: Blob): string | undefined {
+    const existing = this.livePhotoVideoObjectUrls.get(cacheKey);
+    if (existing) return existing;
+    if (typeof URL.createObjectURL !== 'function') return undefined;
+    const url = URL.createObjectURL(blob);
+    this.livePhotoVideoObjectUrls.set(cacheKey, url);
+    return url;
+  }
+
+  private async nativeGalleryPickToHostPick(
+    result: NativeMediaPickerPickResult,
+    cacheScope: string | undefined,
+  ): Promise<HostGalleryPick> {
+    if (result.kind === 'video') {
+      return {
+        kind: 'video',
+        video: await toHostVideoPick({ uri: result.uri } as MediaResult, cacheScope),
+      };
+    }
+    const blob = fillMissingBlobType(
+      await readNativeFileBlob(result.photoPath),
+      result.mimeType || 'image/jpeg',
+    );
+    assertSupportedImage(blob);
+    const livePhoto = result.livePhoto
+      ? {
+          still: fillMissingBlobType(
+            await readNativeFileBlob(result.livePhoto.stillPath),
+            result.livePhoto.stillMimeType || 'image/heic',
+          ),
+          stillMimeType: result.livePhoto.stillMimeType || 'image/heic',
+          video: fillMissingBlobType(
+            await readNativeFileBlob(result.livePhoto.videoPath),
+            result.livePhoto.videoMimeType || 'video/quicktime',
+          ),
+          videoMimeType: result.livePhoto.videoMimeType || 'video/quicktime',
+        }
+      : undefined;
+    return { kind: 'image', blob, livePhoto };
   }
 }
 

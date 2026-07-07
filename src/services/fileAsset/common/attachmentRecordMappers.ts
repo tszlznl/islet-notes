@@ -56,6 +56,7 @@ export function imageAttachmentTaskToAttachment(
     thumbS3Key: task.thumbS3Key,
     width: task.width,
     height: task.height,
+    livePhoto: task.livePhoto,
     createdAt: task.createdAt,
   };
 }

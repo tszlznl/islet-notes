@@ -26,8 +26,18 @@ export function useDiaryChatMediaActions({
   const showVideoPreview = useVideoPreview();
   const videoSupported = useMemo(() => hostService.caniuse('videoUpload'), [hostService]);
 
-  const uploadImage = async (file: Blob) => {
-    await fileAssetService.uploadImageAttachment({ notebookId, file, identityId });
+  const uploadImage = async (
+    file: Blob,
+    livePhotoOriginal?: Parameters<
+      typeof fileAssetService.uploadImageAttachment
+    >[0]['livePhotoOriginal'],
+  ) => {
+    await fileAssetService.uploadImageAttachment({
+      notebookId,
+      file,
+      livePhotoOriginal,
+      identityId,
+    });
   };
 
   const getVideoCacheScope = () => fileAssetService.getStorageScope();
@@ -55,7 +65,7 @@ export function useDiaryChatMediaActions({
       const media = await hostService.pickMediaFromGallery({ cacheScope: getVideoCacheScope() });
       if (!media) return;
       if (media.kind === 'image') {
-        await uploadImage(media.blob);
+        await uploadImage(media.blob, media.livePhoto);
         return;
       }
       openVideoPreview(media.video);

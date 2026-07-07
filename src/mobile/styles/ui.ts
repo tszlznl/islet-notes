@@ -261,6 +261,8 @@ export const styles = {
       'block w-full select-none rounded bg-soft object-cover aspect-[var(--message-image-aspect-ratio)]',
     PlaceholderFull: 'w-full rounded aspect-[var(--message-image-aspect-ratio)]',
     PlaceholderOverThumb: 'absolute inset-0 rounded',
+    LivePhotoBadge:
+      'absolute right-2 top-2 z-[1] grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition active:bg-black/70',
   },
   ImagePreview: {
     Portal: 'fixed inset-0',
@@ -412,9 +414,12 @@ export const styles = {
     WaveIcon: 'inline-block h-5 w-5 origin-center rotate-90',
   },
   CalendarRecordImage: {
-    Button: 'pointer-events-auto block h-[120px] w-[120px] overflow-hidden rounded-[10px] bg-soft',
+    Button:
+      'pointer-events-auto relative block h-[120px] w-[120px] overflow-hidden rounded-[10px] bg-soft',
     Image: 'h-[120px] w-[120px] rounded-[10px] bg-soft object-cover',
     Placeholder: 'block h-[120px] w-[120px] rounded-[10px] bg-soft',
+    LivePhotoBadge:
+      'absolute right-1.5 top-1.5 z-[1] grid h-7 w-7 place-items-center rounded-full bg-black/50 text-white backdrop-blur-sm transition active:bg-black/70',
   },
   CalendarRecordVideo: {
     Root: 'min-w-0',

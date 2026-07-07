@@ -186,7 +186,7 @@ class WebDAVObjectStorage implements ObjectStorage {
 }
 
 function isMissingCollectionStatus(status: number): boolean {
-  return status === 404 || status === 409;
+  return status === 404 || status === 409 || status === 403;
 }
 
 function buildBasicAuth(config: WebDAVConnectionConfig): string | undefined {

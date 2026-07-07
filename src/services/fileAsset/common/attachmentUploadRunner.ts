@@ -34,8 +34,8 @@ export class AttachmentUploadRunner {
     for (const task of await this.uploadStore.listTasks()) {
       // 视频源由原生侧 app 私有文件管理，缺失会在 prepareVideoUpload 阶段标记。
       if (task.type === 'video') continue;
-      const file = await this.localCache.read(task.s3Key);
-      if (!file) {
+      const missing = await this.findMissingLocalFile(task);
+      if (missing) {
         await this.markTaskFailed(task, 'Local file is missing.', LOCAL_FILE_MISSING_ERROR_CODE);
       }
     }
@@ -101,6 +101,7 @@ export class AttachmentUploadRunner {
       const thumbnailBlob = await generateImageThumbnail(originalBlob, this.hostService);
       await this.putAttachmentObject(currentTask.thumbS3Key, thumbnailBlob);
       await this.putAttachmentObject(currentTask.s3Key, originalBlob);
+      await this.uploadLivePhotoOriginals(currentTask);
       await this.localCache.write(currentTask.thumbS3Key, thumbnailBlob);
       await this.uploadStore.updateTask({
         ...currentTask,
@@ -175,6 +176,35 @@ export class AttachmentUploadRunner {
     await this.objectStoreController
       .getObjectStore()
       .putAttachment(key, ensureBlobType(blob, mimeType));
+  }
+
+  private async findMissingLocalFile(
+    task: AttachmentUploadTaskRecord,
+  ): Promise<string | undefined> {
+    for (const key of this.localFileKeys(task)) {
+      const file = await this.localCache.read(key);
+      if (!file) return key;
+    }
+    return undefined;
+  }
+
+  private async uploadLivePhotoOriginals(task: AttachmentUploadTaskRecord): Promise<void> {
+    if (task.type !== 'image' || task.livePhoto?.kind !== 'ios-paired-files') return;
+    for (const key of [task.livePhoto.stillS3Key, task.livePhoto.videoS3Key]) {
+      if (!key || key === task.s3Key || key === task.thumbS3Key) continue;
+      const blob = await this.localCache.read(key);
+      if (!blob) throw new Error('Local file is missing.');
+      await this.putAttachmentObject(key, blob);
+    }
+  }
+
+  private localFileKeys(task: AttachmentUploadTaskRecord): string[] {
+    const keys = [task.s3Key];
+    if (task.type === 'image' && task.livePhoto?.kind === 'ios-paired-files') {
+      keys.push(task.livePhoto.stillS3Key);
+      if (task.livePhoto.videoS3Key) keys.push(task.livePhoto.videoS3Key);
+    }
+    return [...new Set(keys)];
   }
 }
 

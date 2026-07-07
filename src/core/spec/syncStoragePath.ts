@@ -1,4 +1,4 @@
-import { mimeToExt } from '@/base/just-vibes/media-mime';
+import { livePhotoVideoExt, mimeToExt, normalizeMime } from '@/base/just-vibes/media-mime';
 import type { SyncConfigRecord } from '@/core/diary/type';
 import {
   attachmentShard,
@@ -14,6 +14,16 @@ type RemotePathConfig = Pick<SyncConfigRecord, 'prefix' | 'recoveryKeyHash'>;
 interface AttachmentUploadKeys {
   s3Key: string;
   thumbS3Key: string;
+}
+
+interface LivePhotoOriginalKeys {
+  stillS3Key: string;
+  videoS3Key: string;
+}
+
+interface LivePhotoOriginalPathOptions {
+  stillMimeType?: string;
+  videoMimeType?: string;
 }
 
 export const syncStoragePath = {
@@ -35,6 +45,17 @@ export const syncStoragePath = {
     return {
       s3Key: `/attachments/${shard}/${attachmentId}.mp4`,
       thumbS3Key: `/attachments/${shard}/${attachmentId}.thumb.jpg`,
+    };
+  },
+
+  livePhotoOriginals(
+    attachmentId: string,
+    options: LivePhotoOriginalPathOptions,
+  ): LivePhotoOriginalKeys {
+    const shard = attachmentShard(attachmentId);
+    return {
+      stillS3Key: `/attachments/${shard}/${attachmentId}.live-still.${livePhotoStillExt(options.stillMimeType)}`,
+      videoS3Key: `/attachments/${shard}/${attachmentId}.live-video.${livePhotoVideoExt(options.videoMimeType)}`,
     };
   },
 
@@ -71,6 +92,22 @@ export const syncStoragePath = {
     },
   },
 } as const;
+
+function livePhotoStillExt(mimeType: string | undefined): string {
+  switch (normalizeMime(mimeType)) {
+    case 'image/heif':
+      return 'heif';
+    case 'image/jpeg':
+      return 'jpg';
+    case 'image/png':
+      return 'png';
+    case 'image/webp':
+      return 'webp';
+    case 'image/heic':
+    default:
+      return 'heic';
+  }
+}
 
 function buildRemoteObjectKey(config: RemotePathConfig, normalizedRef: string): string {
   const prefix = normalizeUploadPathPrefix(config.prefix);

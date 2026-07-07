@@ -27,8 +27,13 @@ const FALLBACK_EXTENSION: Record<MediaKind, string> = {
 };
 
 const MIME_BY_EXTENSION = buildMimeByExtension();
+const EXTRA_MIME_BY_EXTENSION: Record<string, string> = {
+  heic: 'image/heic',
+  heif: 'image/heif',
+  mov: 'video/quicktime',
+};
 
-function normalize(mimeType: string | undefined): string {
+export function normalizeMime(mimeType: string | undefined): string {
   return mimeType?.split(';')[0].trim().toLowerCase() ?? '';
 }
 
@@ -51,7 +56,7 @@ function buildMimeByExtension(): Record<string, string> {
  * 不在范围内直接抛错。仅用于文件入口。
  */
 export function normalizeAndCheckMime(kind: MediaKind, mimeType: string | undefined): string {
-  const normalized = normalize(mimeType);
+  const normalized = normalizeMime(mimeType);
   if (!Object.prototype.hasOwnProperty.call(SUPPORTED_MIME_EXTENSIONS[kind], normalized)) {
     throw new Error(`Unsupported ${kind} mime type: ${normalized || '(empty)'}`);
   }
@@ -60,7 +65,12 @@ export function normalizeAndCheckMime(kind: MediaKind, mimeType: string | undefi
 
 /** 把 MIME 映射为落库扩展名；未知类型回退到该类型的默认扩展名。 */
 export function mimeToExt(kind: MediaKind, mimeType: string | undefined): string {
-  return SUPPORTED_MIME_EXTENSIONS[kind][normalize(mimeType)] ?? FALLBACK_EXTENSION[kind];
+  return SUPPORTED_MIME_EXTENSIONS[kind][normalizeMime(mimeType)] ?? FALLBACK_EXTENSION[kind];
+}
+
+/** Live Photo 原始视频素材扩展名；MOV 只用于原始素材或预览阶段临时源文件。 */
+export function livePhotoVideoExt(mimeType: string | undefined): string {
+  return normalizeMime(mimeType) === 'video/mp4' ? 'mp4' : 'mov';
 }
 
 /** 从附件 key 的扩展名反推 MIME；未知后缀不猜测。 */
@@ -69,7 +79,8 @@ export function mimeFromKey(key: string): string | undefined {
   const filename = cleanKey.split('/').filter(Boolean).pop() ?? cleanKey;
   const dot = filename.lastIndexOf('.');
   if (dot < 0 || dot >= filename.length - 1) return undefined;
-  return MIME_BY_EXTENSION[filename.slice(dot + 1).toLowerCase()];
+  const extension = filename.slice(dot + 1).toLowerCase();
+  return MIME_BY_EXTENSION[extension] ?? EXTRA_MIME_BY_EXTENSION[extension];
 }
 
 /** 确保 Blob 带上指定 MIME；已是该类型或未指定 MIME 时原样返回。 */

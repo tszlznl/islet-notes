@@ -4,8 +4,10 @@
 // 读取链路用 mimeFromKey 从附件 key 反推 MIME，用 ensureBlobType 给 Blob 补上正确 MIME。
 export {
   ensureBlobType,
+  livePhotoVideoExt,
   mimeFromKey,
   mimeToExt,
+  normalizeMime,
   normalizeAndCheckMime,
   type MediaKind,
 } from './impl';

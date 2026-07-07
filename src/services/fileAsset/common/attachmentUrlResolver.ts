@@ -23,18 +23,22 @@ export class AttachmentUrlResolver {
   ) {}
 
   async getFileUrl(key: string, options: FileUrlOptions): Promise<string | undefined> {
+    const cached = await this.getFileBlob(key);
+    return cached ? this.acquire(key, cached, options) : undefined;
+  }
+
+  async getFileBlob(key: string): Promise<Blob | undefined> {
     if (!mimeFromKey(key)) return undefined;
     const cached = await this.localCache.read(key);
     if (cached) {
-      return this.acquire(key, cached, options);
+      return cached;
     }
 
     const loadKey = key;
     const existingLoad = this.fileUrlLoads.get(loadKey);
     if (existingLoad) {
       await existingLoad;
-      const loaded = await this.localCache.read(key);
-      return loaded ? this.acquire(key, loaded, options) : undefined;
+      return this.localCache.read(key);
     }
 
     const load = this.loadRemoteFileToCache(key).finally(() => {
@@ -42,8 +46,7 @@ export class AttachmentUrlResolver {
     });
     this.fileUrlLoads.set(loadKey, load);
     await load;
-    const loaded = await this.localCache.read(key);
-    return loaded ? this.acquire(key, loaded, options) : undefined;
+    return this.localCache.read(key);
   }
 
   private acquire(key: string, blob: Blob, options: FileUrlOptions): string {

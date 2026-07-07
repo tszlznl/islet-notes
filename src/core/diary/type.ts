@@ -64,10 +64,23 @@ export interface AttachmentRecordBase {
   deletedAt?: number;
 }
 
+export type LivePhotoStorageKind = 'motion-jpeg' | 'ios-paired-files';
+
+export interface LivePhotoAttachmentRecord {
+  kind: LivePhotoStorageKind;
+  /** 原始静态图 key；Motion Photo JPEG 与 s3Key 相同，iOS 通常是 HEIC 原件。 */
+  stillS3Key: string;
+  stillMimeType: string;
+  /** 原始视频 key；iOS 通常是 MOV。Motion Photo JPEG 不单独存视频。 */
+  videoS3Key?: string;
+  videoMimeType?: string;
+}
+
 export interface ImageAttachmentRecord extends AttachmentRecordBase {
   type: 'image';
   width: number;
   height: number;
+  livePhoto?: LivePhotoAttachmentRecord;
 }
 
 export interface AudioAttachmentRecord extends AttachmentRecordBase {

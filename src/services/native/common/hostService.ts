@@ -29,6 +29,10 @@ export interface IHostService {
    * originalQuality 为 true 时跳过重编码、按原片处理。
    */
   prepareVideoUpload(options: HostPrepareVideoUploadOptions): Promise<HostVideoPrepareResult>;
+  /** Live Photo 预览阶段按需派生可播放视频；派生产物只作为本地缓存使用。 */
+  prepareLivePhotoVideoPreview(
+    options: HostLivePhotoVideoPreviewOptions,
+  ): Promise<string | undefined>;
   /** 原生端：清理 app 私有视频源。 */
   cleanVideoRecord(options: HostCleanVideoRecordOptions): Promise<void>;
   /** 附件明文文件存储：固定写入应用数据目录，写入必须保证原子替换。 */
@@ -83,8 +87,16 @@ export interface HostVideoPick {
 }
 
 export type HostGalleryPick =
-  | { kind: 'image'; blob: Blob }
+  | { kind: 'image'; blob: Blob; livePhoto?: HostLivePhotoPick }
   | { kind: 'video'; video: HostVideoPick };
+
+/** iOS 自研 picker 返回的 Live Photo 原始素材。 */
+export interface HostLivePhotoPick {
+  still: Blob;
+  stillMimeType: string;
+  video: Blob;
+  videoMimeType: string;
+}
 
 export interface HostMediaPickOptions {
   /** 视频源缓存 scope，调用方必须传当前本地数据 scope。 */
@@ -118,6 +130,13 @@ export interface HostVideoPrepareResult {
   /** 时长，单位秒。 */
   duration: number;
   size: number;
+}
+
+export interface HostLivePhotoVideoPreviewOptions {
+  blob: Blob;
+  sourceMimeType?: string;
+  cacheKey: string;
+  cacheScope?: string;
 }
 
 export type HostSystemBarStyle = 'light' | 'dark';

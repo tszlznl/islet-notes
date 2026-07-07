@@ -23,6 +23,7 @@ import {
   HostVideoPrepareResult,
   HostVideoRecordOptions,
   HostWriteAttachmentFileOptions,
+  HostLivePhotoVideoPreviewOptions,
   ImagePickSource,
   IHostService,
 } from '@/services/native/common/hostService';
@@ -57,6 +58,7 @@ export class BrowserHostService implements IHostService {
   private readonly filesystem: BrowserHostFilesystem;
   private readonly attachmentBlobs: BrowserAttachmentBlobStore;
   private readonly videoObjectUrls = new Map<string, string>();
+  private readonly livePhotoVideoObjectUrls = new Map<string, string>();
 
   constructor(
     useMemoryFilesystem = false,
@@ -181,6 +183,17 @@ export class BrowserHostService implements IHostService {
       duration: info.duration,
       size: source.size,
     };
+  }
+
+  async prepareLivePhotoVideoPreview(
+    options: HostLivePhotoVideoPreviewOptions,
+  ): Promise<string | undefined> {
+    const existing = this.livePhotoVideoObjectUrls.get(options.cacheKey);
+    if (existing) return existing;
+    if (typeof URL.createObjectURL !== 'function') return undefined;
+    const url = URL.createObjectURL(options.blob);
+    this.livePhotoVideoObjectUrls.set(options.cacheKey, url);
+    return url;
   }
 
   async cleanVideoRecord(options: HostCleanVideoRecordOptions): Promise<void> {

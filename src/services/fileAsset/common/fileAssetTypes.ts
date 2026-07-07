@@ -34,6 +34,13 @@ export interface VideoUploadResult {
 export interface CreateImageAttachmentUploadTaskOptions {
   notebookId: string;
   file: Blob;
+  /** iOS Live Photo 原始素材；不传时对 JPEG 自动做 Motion Photo 检测。 */
+  livePhotoOriginal?: {
+    still: Blob;
+    stillMimeType: string;
+    video: Blob;
+    videoMimeType: string;
+  };
   identityId?: string;
 }
 

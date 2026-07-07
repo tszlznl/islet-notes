@@ -184,6 +184,10 @@
     "defaultMessage": "Write something...",
     "content": "Write something..."
   },
+  "diary.livePhoto.play": {
+    "defaultMessage": "Play Live Photo",
+    "content": "Play Live Photo"
+  },
   "diary.media": {
     "defaultMessage": "Images and videos",
     "content": "Images and videos"
