@@ -2,25 +2,58 @@ import { useService } from '@/hooks/use-service';
 import { CellListGroup } from '@/mobile/components/CellList';
 import { HeaderLayoutPage } from '@/mobile/components/layout/HeaderLayoutPage';
 import { useMembershipStatus } from '@/mobile/hooks/useMembershipStatus';
+import { useLoadingToast } from '@/mobile/overlay/loadingToast/useLoadingToast';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { useTopTips } from '@/mobile/overlay/topTips/useTopTips';
 import { MembershipSettings } from '@/mobile/test.id';
 import { cx, styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
+import {
+  IMembershipService,
+  MEMBERSHIP_STATUS_SWR_KEY,
+  type AppStoreMembershipActionResult,
+  type AppStoreProduct,
+} from '@/services/membership/common/membershipService';
 import { IHostService } from '@/services/native/common/hostService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
 import { BadgeCheck, Check, Copy, Crown, Hourglass, Image } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { mutate } from 'swr';
 
 export function SettingsMembershipPage() {
   const hostService = useService(IHostService);
+  const membershipService = useService(IMembershipService);
   const navigationService = useService(INavigationService);
+  const showLoadingToast = useLoadingToast();
   const showSuccessToast = useSuccessToast();
   const showTopTips = useTopTips();
   const [copied, setCopied] = useState(false);
+  const [appStoreProduct, setAppStoreProduct] = useState<AppStoreProduct>();
+  const [appStoreProductLoading, setAppStoreProductLoading] = useState(false);
+  const [appStoreBusy, setAppStoreBusy] = useState<'purchase' | 'restore'>();
   const { status, isLoading } = useMembershipStatus({
     onError: (error) => showError(showTopTips, error),
   });
+  const isIos = hostService.platform === 'ios';
+
+  useEffect(() => {
+    if (!isIos || status.active || !status.configured) return;
+
+    let disposed = false;
+    setAppStoreProductLoading(true);
+    void membershipService
+      .getAppStoreProduct()
+      .then((product) => {
+        if (!disposed) setAppStoreProduct(product);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!disposed) setAppStoreProductLoading(false);
+      });
+    return () => {
+      disposed = true;
+    };
+  }, [isIos, membershipService, status.active, status.configured]);
 
   const copyMemberId = async () => {
     if (!status.memberId) return;
@@ -36,6 +69,77 @@ export function SettingsMembershipPage() {
       showError(showTopTips, error);
     }
   };
+
+  const reloadAppStoreProduct = async () => {
+    if (appStoreProductLoading || appStoreBusy) return;
+    setAppStoreProductLoading(true);
+    try {
+      setAppStoreProduct(await membershipService.getAppStoreProduct());
+    } catch (error) {
+      showTopTips({ message: appStoreErrorMessage(error) });
+    } finally {
+      setAppStoreProductLoading(false);
+    }
+  };
+
+  const runAppStoreAction = async (
+    action: 'purchase' | 'restore',
+    execute: () => Promise<AppStoreMembershipActionResult>,
+  ) => {
+    if (appStoreBusy) return;
+    const loadingToast = showLoadingToast({
+      message:
+        action === 'purchase'
+          ? localize('settings.membership.appStore.purchasing', 'Processing purchase...')
+          : localize('settings.membership.appStore.restoring', 'Restoring purchase...'),
+    });
+    setAppStoreBusy(action);
+    try {
+      const result = await execute();
+      if (result.status === 'cancelled') return;
+      if (result.status === 'pending') {
+        showTopTips({
+          message: localize(
+            'settings.membership.appStore.pending',
+            'The purchase is awaiting approval. After approval, use Restore Purchase to activate membership.',
+          ),
+        });
+        return;
+      }
+      if (result.status === 'not-found') {
+        showTopTips({
+          message: localize(
+            'settings.membership.appStore.restoreNotFound',
+            'No purchase was found. Make sure you are signed in with the Apple Account used to buy membership.',
+          ),
+        });
+        return;
+      }
+      if (result.status !== 'activated') return;
+
+      await mutate(MEMBERSHIP_STATUS_SWR_KEY, result.membership, { revalidate: false });
+      showSuccessToast({
+        message: localize('settings.membership.activated', 'Membership activated'),
+      });
+    } catch (error) {
+      showTopTips({ message: appStoreErrorMessage(error) });
+    } finally {
+      setAppStoreBusy(undefined);
+      loadingToast.dispose();
+    }
+  };
+
+  const purchaseLabel = isIos
+    ? appStoreProduct
+      ? localize(
+          'settings.membership.appStore.buyPrice',
+          'Buy with App Store · {0}',
+          appStoreProduct.displayPrice,
+        )
+      : appStoreProductLoading
+        ? localize('settings.membership.appStore.loadingProduct', 'Loading App Store price...')
+        : localize('settings.membership.appStore.reloadProduct', 'Reload App Store product')
+    : localize('settings.membership.goPurchase', 'Purchase');
 
   const pageTitle = status.active
     ? localize('settings.membership.center', 'Membership')
@@ -167,11 +271,46 @@ export function SettingsMembershipPage() {
             className={styles.Membership.PurchaseButton}
             type='button'
             data-test-id={MembershipSettings.purchaseEntry}
-            disabled={isLoading || !status.configured}
-            onClick={() => navigationService.navigate({ path: '/settings/membership/purchase' })}
+            disabled={
+              isLoading || !status.configured || !!appStoreBusy || (isIos && appStoreProductLoading)
+            }
+            onClick={() => {
+              if (!isIos) {
+                navigationService.navigate({ path: '/settings/membership/purchase' });
+                return;
+              }
+              if (!appStoreProduct) {
+                void reloadAppStoreProduct();
+                return;
+              }
+              void runAppStoreAction('purchase', () => membershipService.purchaseWithAppStore());
+            }}
           >
-            {localize('settings.membership.goPurchase', 'Purchase')}
+            {purchaseLabel}
           </button>
+          {isIos && (
+            <>
+              <button
+                className={styles.Membership.AppStoreRestoreButton}
+                type='button'
+                data-test-id={MembershipSettings.appStoreRestore}
+                disabled={isLoading || !status.configured || !!appStoreBusy}
+                onClick={() =>
+                  void runAppStoreAction('restore', () =>
+                    membershipService.restoreAppStorePurchase(),
+                  )
+                }
+              >
+                {localize('settings.membership.appStore.restore', 'Restore Purchase')}
+              </button>
+              <p className={styles.Membership.AppStoreTransferNote}>
+                {localize(
+                  'settings.membership.appStore.restoreTransfer',
+                  'Restoring transfers this purchase to the current Account ID. The previous Account ID will lose membership access.',
+                )}
+              </p>
+            </>
+          )}
         </div>
       )}
     </HeaderLayoutPage>
@@ -182,4 +321,27 @@ function showError(showTopTips: ReturnType<typeof useTopTips>, error: unknown) {
   showTopTips({
     message: error instanceof Error ? error.message : String(error),
   });
+}
+
+function appStoreErrorMessage(error: unknown): string {
+  const code =
+    error && typeof error === 'object' && 'code' in error
+      ? String((error as { code?: unknown }).code)
+      : undefined;
+  if (code === 'PAYMENTS_NOT_ALLOWED') {
+    return localize(
+      'settings.membership.appStore.error.notAllowed',
+      'App Store purchases are not allowed on this device. Check Screen Time or account restrictions.',
+    );
+  }
+  if (code === 'PRODUCT_NOT_FOUND' || code === 'INVALID_PRODUCT_TYPE') {
+    return localize(
+      'settings.membership.appStore.error.productUnavailable',
+      'The App Store product is temporarily unavailable. Try again later.',
+    );
+  }
+  return localize(
+    'settings.membership.appStore.error.purchaseFailed',
+    'Membership could not be activated. Check your connection and try again. Your purchase will not be lost; you can restore it later.',
+  );
 }

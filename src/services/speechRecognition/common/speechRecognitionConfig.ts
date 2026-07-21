@@ -1,7 +1,5 @@
 import { z } from 'zod';
-
-export const SPEECH_RECOGNITION_CONFIG_KEY = 'speech-recognition';
-export const SPEECH_RECOGNITION_CONFIG_SWR_KEY = 'speech-recognition-config';
+import { definePreference } from '@/services/preferences/common/preference';
 
 export const SpeechRecognitionConfigSchema = z.object({
   provider: z.literal('baidu'),
@@ -13,6 +11,13 @@ export const SpeechRecognitionConfigSchema = z.object({
 export type BaiduSpeechRecognitionConfigRecord = z.infer<typeof SpeechRecognitionConfigSchema>;
 
 export type SpeechRecognitionConfigRecord = BaiduSpeechRecognitionConfigRecord;
+
+export const SpeechRecognitionConfigPreference = definePreference({
+  channel: 'host',
+  key: 'speech-recognition',
+  schema: SpeechRecognitionConfigSchema.nullable(),
+  defaultValue: null,
+});
 
 export type SpeechRecognitionCredentials = Pick<
   BaiduSpeechRecognitionConfigRecord,

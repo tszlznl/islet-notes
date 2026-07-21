@@ -6,7 +6,7 @@ import {
 import type { IHostService } from '@/services/native/common/hostService';
 import {
   createSyncConfigPreference,
-  SYNC_CONFIG_KEY,
+  SyncConfigPreference,
 } from '@/services/preferences/common/appPreferences';
 
 export class FileAssetObjectStoreController {
@@ -37,7 +37,7 @@ export class FileAssetObjectStoreController {
   ): Promise<SyncConfigRecord | undefined> {
     if (!this.syncConfigEnabled) return undefined;
     const nextConfig = createSyncConfigPreference(config);
-    this.syncConfig = await this.hostService.savePreference(SYNC_CONFIG_KEY, nextConfig);
+    this.syncConfig = await this.hostService.savePreference(SyncConfigPreference, nextConfig);
     this.objectStore = createFileAssetObjectStore(this.syncConfig, this.hostService);
     this.onDidChangeConfig();
     return this.syncConfig;
@@ -45,7 +45,7 @@ export class FileAssetObjectStoreController {
 
   async clearSyncConfig(): Promise<void> {
     if (!this.syncConfigEnabled) return;
-    await this.hostService.clearPreference(SYNC_CONFIG_KEY);
+    await this.hostService.clearPreference(SyncConfigPreference);
     this.syncConfig = undefined;
     this.objectStore = createFileAssetObjectStore(this.syncConfig, this.hostService);
     this.onDidChangeConfig();

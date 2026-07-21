@@ -17,7 +17,10 @@ import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
 import { Emitter } from 'vscf/base/common/event';
-import type { ZodType } from 'zod';
+import type {
+  HostPreferenceDefinition,
+  PreferenceValue,
+} from '@/services/preferences/common/preference';
 import {
   HostFeature,
   HostAttachmentFileOptions,
@@ -45,6 +48,7 @@ import {
   HostVideoPrepareResult,
   ImagePickSource,
   IHostService,
+  HostPreferenceCache,
   HostPlatform,
   HostRouterType,
   HostWriteAttachmentFileOptions,
@@ -84,6 +88,7 @@ export class CapacitorNativeService implements IHostService {
   private readonly memoryAttachmentFiles: BrowserAttachmentBlobStore =
     createBrowserAttachmentBlobStore(true);
   private readonly livePhotoVideoObjectUrls = new Map<string, string>();
+  private readonly preferences = new HostPreferenceCache();
 
   constructor(
     private readonly useMemoryFilesystem = false,
@@ -325,30 +330,59 @@ export class CapacitorNativeService implements IHostService {
     }
   }
 
-  async getPreference<T>(key: string, schema?: ZodType<T>): Promise<T | undefined> {
-    const value = (await Preferences.get({ key })).value;
-    if (!value) return undefined;
+  getPreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+  ): PreferenceValue<TDefinition> {
+    return this.preferences.get(definition);
+  }
+
+  async loadPreferences(definitions: readonly HostPreferenceDefinition[]): Promise<void> {
+    await Promise.all(definitions.map((definition) => this.doGetPreference(definition)));
+  }
+
+  private async doGetPreference(definition: HostPreferenceDefinition): Promise<void> {
+    const value = (await Preferences.get({ key: definition.key })).value;
+    if (!value) {
+      this.preferences.set(definition, undefined);
+      return;
+    }
     try {
       const parsed = JSON.parse(value) as unknown;
-      if (parsed === null) return undefined;
-      if (!schema) return parsed as T;
-      const result = schema.safeParse(parsed);
-      return result.success ? result.data : undefined;
+      const result = definition.schema.safeParse(parsed);
+      this.preferences.set(definition, result.success ? result.data : undefined);
     } catch {
-      return undefined;
+      this.preferences.set(definition, undefined);
     }
   }
 
-  async savePreference<T>(key: string, value: T): Promise<T> {
-    await Preferences.set({
-      key,
-      value: JSON.stringify(value),
-    });
-    return value;
+  async savePreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+    value: PreferenceValue<TDefinition>,
+  ): Promise<PreferenceValue<TDefinition>> {
+    const parsed = definition.schema.parse(value) as PreferenceValue<TDefinition>;
+    const previousValue = this.preferences.get(definition);
+    this.preferences.set(definition, parsed);
+    try {
+      await Preferences.set({
+        key: definition.key,
+        value: JSON.stringify(parsed),
+      });
+    } catch (error) {
+      this.preferences.set(definition, previousValue);
+      throw error;
+    }
+    return parsed;
   }
 
-  async clearPreference(key: string): Promise<void> {
-    await Preferences.remove({ key });
+  async clearPreference(definition: HostPreferenceDefinition): Promise<void> {
+    const previousValue = this.preferences.get(definition);
+    this.preferences.set(definition, undefined);
+    try {
+      await Preferences.remove({ key: definition.key });
+    } catch (error) {
+      this.preferences.set(definition, previousValue);
+      throw error;
+    }
   }
 
   async request(options: HostRequestOptions): Promise<HostResponse> {

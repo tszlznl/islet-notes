@@ -9,10 +9,7 @@ import {
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { localize } from '@/nls';
 import { IHostService } from '@/services/native/common/hostService';
-import {
-  SPEECH_RECOGNITION_CONFIG_KEY,
-  SpeechRecognitionConfigSchema,
-} from '@/services/speechRecognition/common/speechRecognitionConfig';
+import { SpeechRecognitionConfigPreference } from '@/services/speechRecognition/common/speechRecognitionConfig';
 import { ISpeechRecognitionService } from '@/services/speechRecognition/common/speechRecognitionService';
 import { useEffect, useRef } from 'react';
 
@@ -30,10 +27,7 @@ export function useAttachmentUploadCommitter() {
     const commitDoneTasks = async () => {
       const tasks = await fileAssetService.listAttachmentTasks();
       if (disposed) return;
-      const speechConfig = await hostService.getPreference(
-        SPEECH_RECOGNITION_CONFIG_KEY,
-        SpeechRecognitionConfigSchema,
-      );
+      const speechConfig = hostService.getPreference(SpeechRecognitionConfigPreference);
       if (disposed) return;
       const autoTranscribe = speechConfig?.autoTranscribe ?? false;
       for (const task of tasks) {

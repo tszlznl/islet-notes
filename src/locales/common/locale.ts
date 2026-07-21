@@ -13,7 +13,7 @@ export const languageOptions = [
     label: '简体中文',
     value: 'zh-CN',
   },
-];
+] as const;
 
 const locales = {
   'en-US': ['en-US', 'en'],

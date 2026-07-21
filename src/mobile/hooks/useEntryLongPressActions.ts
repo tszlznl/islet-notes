@@ -9,6 +9,7 @@ import {
 } from '@/core/diary/selectors';
 import { useService } from '@/hooks/use-service';
 import { useLongPress } from '@/mobile/hooks/useLongPress';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { useDateTimePicker } from '@/mobile/overlay/dateTimePicker/useDateTimePicker';
 import { useDialog } from '@/mobile/overlay/dialog/useDialog';
 import { useIdentityPicker } from '@/mobile/overlay/identityPicker/useIdentityPicker';
@@ -20,16 +21,11 @@ import { useTextInputDialog } from '@/mobile/overlay/textInputDialog/useTextInpu
 import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
-import {
-  IDENTITY_CONFIG_KEY,
-  IDENTITY_CONFIG_SWR_KEY,
-  IdentityConfigSchema,
-} from '@/services/diary/common/identityConfig';
+import { IdentityConfigPreference } from '@/services/diary/common/identityConfig';
 import { IHostService } from '@/services/native/common/hostService';
 import { useReplyDraft } from '@/mobile/components/pages/diary-chat/chat/replyDraftContext';
 import { CircleUserRound, Clock3, Copy, Edit3, MoveRight, Quote, Trash2 } from 'lucide-react';
 import { useRef } from 'react';
-import useSWR from 'swr';
 
 /** 身份选择器里“恢复为本人”选项的哨兵 id,不会与 nanoid 生成的身份 id 冲突。 */
 const SWITCH_TO_SELF_OPTION_ID = '__self__';
@@ -74,10 +70,8 @@ export function useEntryLongPressActions<T extends HTMLElement>(
   // 引用草稿只在聊天页提供;日历页等无 Provider 时不显示"引用"入口。
   const replyDraft = useReplyDraft();
   // 身份开关(身份管理页顶部)关闭时,长按菜单也不提供切换身份入口。
-  const { data: identityConfig } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
-    hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
-  );
-  const identityEntryEnabled = identityConfig?.chatEntryEnabled ?? true;
+  const [identityConfig] = usePreference(IdentityConfigPreference);
+  const identityEntryEnabled = identityConfig.chatEntryEnabled;
   const anchorRef = useRef<T>(null);
   const content = text ?? '';
 

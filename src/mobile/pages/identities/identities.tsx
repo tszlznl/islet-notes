@@ -3,35 +3,20 @@ import { useService } from '@/hooks/use-service';
 import { PageHeader } from '@/mobile/components/PageHeader';
 import { IdentityItem } from '@/mobile/components/pages/identities/IdentityItem';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { cx, styles } from '@/mobile/styles/ui';
 import { IdentityList } from '@/mobile/test.id';
 import { localize } from '@/nls';
-import {
-  IDENTITY_CONFIG_KEY,
-  IDENTITY_CONFIG_SWR_KEY,
-  IdentityConfigSchema,
-} from '@/services/diary/common/identityConfig';
-import { IHostService } from '@/services/native/common/hostService';
+import { IdentityConfigPreference } from '@/services/diary/common/identityConfig';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
 import React from 'react';
-import useSWR from 'swr';
 
 export function IdentitiesPage() {
   const model = useDiaryModel();
   const navigationService = useService(INavigationService);
-  const hostService = useService(IHostService);
   const identities = getActiveIdentities(model);
   const hasArchived = getArchivedIdentities(model).length > 0;
-  const { data: identityConfig, mutate } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
-    hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
-  );
-  const chatEntryEnabled = identityConfig?.chatEntryEnabled ?? true;
-
-  const setChatEntryEnabled = async (enabled: boolean) => {
-    const nextConfig = { chatEntryEnabled: enabled };
-    await hostService.savePreference(IDENTITY_CONFIG_KEY, nextConfig);
-    await mutate(nextConfig, { revalidate: false });
-  };
+  const [identityConfig, setIdentityConfig] = usePreference(IdentityConfigPreference);
 
   return (
     <div className={styles.Page.GroupedRoot} data-test-id={IdentityList.page}>
@@ -58,8 +43,8 @@ export function IdentitiesPage() {
             type='checkbox'
             className={styles.Choice.Input}
             data-test-id={IdentityList.chatEntrySwitch}
-            checked={chatEntryEnabled}
-            onChange={(event) => void setChatEntryEnabled(event.target.checked)}
+            checked={identityConfig.chatEntryEnabled}
+            onChange={(event) => void setIdentityConfig({ chatEntryEnabled: event.target.checked })}
           />
         </label>
         <div>

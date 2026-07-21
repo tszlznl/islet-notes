@@ -4,8 +4,7 @@ import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService'
 import { IHostService } from '@/services/native/common/hostService';
 import { BaiduSpeechRecognitionProvider } from '@/services/speechRecognition/common/baiduSpeechRecognitionProvider';
 import {
-  SPEECH_RECOGNITION_CONFIG_KEY,
-  SpeechRecognitionConfigSchema,
+  SpeechRecognitionConfigPreference,
   type SpeechRecognitionCredentials,
 } from '@/services/speechRecognition/common/speechRecognitionConfig';
 import { Emitter, Event } from 'vscf/base/common/event';
@@ -76,10 +75,7 @@ export class SpeechRecognitionService implements ISpeechRecognitionService {
   }
 
   private async loadCredentials(): Promise<SpeechRecognitionCredentials> {
-    const config = await this.hostService.getPreference(
-      SPEECH_RECOGNITION_CONFIG_KEY,
-      SpeechRecognitionConfigSchema,
-    );
+    const config = this.hostService.getPreference(SpeechRecognitionConfigPreference);
     const apiKey = config?.apiKey.trim();
     const secretKey = config?.secretKey.trim();
     if (!apiKey || !secretKey) {

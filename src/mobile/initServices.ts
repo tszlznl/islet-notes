@@ -24,8 +24,7 @@ import {
 } from '@/services/overlay/common/WorkbenchOverlayService';
 import {
   getAppStorageScopeKey,
-  SyncConfigSchema,
-  SYNC_CONFIG_KEY,
+  SyncConfigPreference,
 } from '@/services/preferences/common/appPreferences';
 import { ITrackService, TrackService } from '@/services/track/common/trackService';
 import {
@@ -38,6 +37,7 @@ import {
   SyncDescriptor,
 } from 'vscf/platform/instantiation/common';
 import { isExperienceMode } from './utils/experienceMode';
+import { loadPreferences } from './loadPreferences';
 
 export type StorageMode = 'persistent' | 'memory';
 
@@ -50,9 +50,9 @@ export interface InitServicesResult {
 export async function initServices(): Promise<InitServicesResult> {
   const mode = getDefaultStorageMode();
   const testInjectionService = new TestInjectionService();
-  const hostService = createHostService(mode, testInjectionService);
+  const hostService = await createHostService(mode, testInjectionService);
   const initialSyncConfig =
-    mode === 'memory' ? null : await hostService.getPreference(SYNC_CONFIG_KEY, SyncConfigSchema);
+    mode === 'memory' ? null : hostService.getPreference(SyncConfigPreference);
   const serviceCollection = new ServiceCollection();
 
   serviceCollection.set(IHostService, hostService);
@@ -99,12 +99,15 @@ function getDefaultStorageMode(): StorageMode {
   return isExperienceMode() ? 'memory' : 'persistent';
 }
 
-function createHostService(mode: StorageMode, testInjectionService: TestInjectionService) {
+async function createHostService(mode: StorageMode, testInjectionService: TestInjectionService) {
+  let hostService: IHostService;
   if (CapacitorNativeService.isNative()) {
-    return new CapacitorNativeService(mode === 'memory', testInjectionService);
+    hostService = new CapacitorNativeService(mode === 'memory', testInjectionService);
+  } else if (ExtensionHostService.isExtension()) {
+    hostService = new ExtensionHostService(mode === 'memory', testInjectionService);
+  } else {
+    hostService = new BrowserHostService(mode === 'memory', testInjectionService);
   }
-  if (ExtensionHostService.isExtension()) {
-    return new ExtensionHostService(mode === 'memory', testInjectionService);
-  }
-  return new BrowserHostService(mode === 'memory', testInjectionService);
+  await loadPreferences(hostService);
+  return hostService;
 }

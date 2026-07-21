@@ -5,11 +5,13 @@ import { CalendarCard } from '@/mobile/components/pages/calendar/CalendarCard.vi
 import { DayRecords } from '@/mobile/components/pages/calendar/DayRecords';
 import { PageHeader } from '@/mobile/components/PageHeader';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { Calendar } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
 import { useService } from '@/hooks/use-service';
 import { localize } from '@/nls';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
+import { CalendarDisplayOrderPreference } from '@/services/preferences/common/appPreferences';
 import { startOfDay, startOfMonth } from 'date-fns';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate, useSearchParams } from 'react-router';
@@ -19,6 +21,7 @@ const CALENDAR_SESSION_STATE_KEY = 'islet.calendar.state';
 export function CalendarPage() {
   const model = useDiaryModel();
   const navigationService = useService(INavigationService);
+  const [displayOrder] = usePreference(CalendarDisplayOrderPreference);
   const [searchParams] = useSearchParams();
   // 带 notebookId 时进入“单个日记本”模式:只展示该日记本的记录,隐藏底部标签栏并显示返回。
   const notebookId = searchParams.get('notebookId') ?? undefined;
@@ -36,7 +39,8 @@ export function CalendarPage() {
   );
 
   const recordsByDate = useMemo(() => groupEntriesByDate(model, notebookId), [model, notebookId]);
-  const selectedRecords = recordsByDate.get(dateKey(selectedDate)) ?? [];
+  const records = recordsByDate.get(dateKey(selectedDate)) ?? [];
+  const selectedRecords = displayOrder === 'newest-first' ? [...records].reverse() : records;
   const selectedDateKey = dateKey(selectedDate);
   const visibleMonthKey = getMonthKey(visibleMonth);
 

@@ -12,7 +12,6 @@ import { styles } from '@/mobile/styles/ui';
 import { useService } from '@/hooks/use-service';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
-import { IHostService } from '@/services/native/common/hostService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
 import React from 'react';
 import { clearExperienceSeedMarker, writeExperienceTestData } from './experienceSeedData';
@@ -21,14 +20,13 @@ export function SettingsPage() {
   const navigationService = useService(INavigationService);
   const diaryService = useService(IDiaryService);
   const fileAssetService = useService(IFileAssetService);
-  const hostService = useService(IHostService);
   const showDialog = useDialog();
   const showLoadingToast = useLoadingToast();
   const showSuccessToast = useSuccessToast();
   const experienceMode = isExperienceMode();
   // 会员依赖云同步身份（recovery key）：未配置同步时隐藏入口，避免进入后是禁用购买的死胡同页。
   const hasCloudSync = hasRecoveryKey(fileAssetService.getSyncConfig());
-  const showMembership = !experienceMode && hostService.platform !== 'ios' && hasCloudSync;
+  const showMembership = !experienceMode && hasCloudSync;
 
   const seedExperienceData = async () => {
     const loadingToast = showLoadingToast({
@@ -82,9 +80,9 @@ export function SettingsPage() {
             onClick: () => navigationService.navigate({ path: '/settings/language' }),
           },
           {
-            label: localize('settings.theme', 'Theme'),
-            testId: Settings.theme,
-            onClick: () => navigationService.navigate({ path: '/settings/theme' }),
+            label: localize('settings.display', 'Display settings'),
+            testId: Settings.display,
+            onClick: () => navigationService.navigate({ path: '/settings/display' }),
           },
           {
             label: localize('settings.version', 'Version'),

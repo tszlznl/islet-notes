@@ -21,6 +21,7 @@ export function CellListRows({ items }: { items: CellListItem[] }) {
               data-test-id={item.testId}
               onClick={item.onClick}
               disabled={item.disabled}
+              aria-pressed={item.selected}
             >
               <span className={styles.Cell.RowLabel}>{item.label}</span>
               {item.selected && (

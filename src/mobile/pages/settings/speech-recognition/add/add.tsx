@@ -3,22 +3,17 @@ import { FormPage } from '@/mobile/components/layout/FormPage';
 import { HeaderLayoutPage } from '@/mobile/components/layout/HeaderLayoutPage';
 import { FormGroup } from '@/mobile/components/WeuiForm';
 import { useForm } from '@/mobile/hooks/useForm';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { useLoadingToast } from '@/mobile/overlay/loadingToast/useLoadingToast';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { useTopTips } from '@/mobile/overlay/topTips/useTopTips';
 import { SpeechRecognitionSettings } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
-import { IHostService } from '@/services/native/common/hostService';
-import {
-  SPEECH_RECOGNITION_CONFIG_KEY,
-  SPEECH_RECOGNITION_CONFIG_SWR_KEY,
-  type SpeechRecognitionConfigRecord,
-} from '@/services/speechRecognition/common/speechRecognitionConfig';
+import { SpeechRecognitionConfigPreference } from '@/services/speechRecognition/common/speechRecognitionConfig';
 import { ISpeechRecognitionService } from '@/services/speechRecognition/common/speechRecognitionService';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { mutate } from 'swr';
 
 type SpeechRecognitionFormValues = {
   apiKey: string;
@@ -29,7 +24,7 @@ type SpeechRecognitionFormValues = {
 
 export function SettingsSpeechRecognitionAddPage() {
   const navigate = useNavigate();
-  const hostService = useService(IHostService);
+  const [, setSpeechRecognitionConfig] = usePreference(SpeechRecognitionConfigPreference);
   const speechRecognitionService = useService(ISpeechRecognitionService);
   const showLoadingToast = useLoadingToast();
   const showSuccessToast = useSuccessToast();
@@ -87,17 +82,11 @@ export function SettingsSpeechRecognitionAddPage() {
     setSaving(true);
     try {
       await speechRecognitionService.testConfig(config);
-      const nextConfig = await hostService.savePreference<SpeechRecognitionConfigRecord>(
-        SPEECH_RECOGNITION_CONFIG_KEY,
-        {
-          provider: 'baidu',
-          apiKey: config.apiKey.trim(),
-          secretKey: config.secretKey.trim(),
-          autoTranscribe: form.values.autoTranscribe,
-        },
-      );
-      await mutate(SPEECH_RECOGNITION_CONFIG_SWR_KEY, nextConfig, {
-        revalidate: false,
+      await setSpeechRecognitionConfig({
+        provider: 'baidu',
+        apiKey: config.apiKey.trim(),
+        secretKey: config.secretKey.trim(),
+        autoTranscribe: form.values.autoTranscribe,
       });
       showSuccessToast({ message: localize('settings.speechRecognition.saved', 'Saved') });
       navigate('/settings/speech-recognition', { replace: true });

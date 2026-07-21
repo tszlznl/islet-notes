@@ -1,11 +1,11 @@
-const DEFAULT_BASE_URL = 'https://cloud.hamsterbase.com/api/membership/v1';
+const MEMBERSHIP_API_BASE_URL = 'https://cloud.hamsterbase.com/api/membership/v1';
 const DEFAULT_PRODUCT_NAME = 'islet';
 
 export interface HamsterBaseMembershipStatus {
   productName?: string;
   memberId: string;
   active: boolean;
-  provider?: 'mbd' | 'admin';
+  provider?: 'mbd' | 'admin' | 'app-store';
   productId?: string;
   updatedAt?: number;
 }
@@ -15,9 +15,13 @@ export interface RedeemMbdOrderInput {
   orderId: string;
 }
 
+export interface RedeemAppStoreTransactionInput {
+  memberId: string;
+  signedTransaction: string;
+  operation: 'purchase' | 'restore';
+}
+
 export interface HamsterBaseCloudClientOptions {
-  /** 覆盖默认接口地址，通常用于本地开发或自建服务端；为空时指向 cloud.hamsterbase.com。 */
-  baseUrl?: string;
   /** 业务产品名，默认 islet。 */
   productName?: string;
 }
@@ -25,6 +29,9 @@ export interface HamsterBaseCloudClientOptions {
 export interface HamsterBaseCloudClient {
   getMembershipStatus(memberId: string): Promise<HamsterBaseMembershipStatus>;
   redeemMbdOrder(input: RedeemMbdOrderInput): Promise<HamsterBaseMembershipStatus>;
+  redeemAppStoreTransaction(
+    input: RedeemAppStoreTransactionInput,
+  ): Promise<HamsterBaseMembershipStatus>;
 }
 
 type ServerResponse<T> =
@@ -43,32 +50,36 @@ type ServerResponse<T> =
 export function createHamsterBaseCloudClient(
   options: HamsterBaseCloudClientOptions = {},
 ): HamsterBaseCloudClient {
-  const baseUrl = (options.baseUrl || DEFAULT_BASE_URL).replace(/\/+$/, '');
   const productName = options.productName || DEFAULT_PRODUCT_NAME;
 
   return {
     getMembershipStatus(memberId) {
       const query = `productName=${encodeURIComponent(productName)}&memberId=${encodeURIComponent(memberId)}`;
-      return request<HamsterBaseMembershipStatus>(baseUrl, `status?${query}`);
+      return request<HamsterBaseMembershipStatus>(`status?${query}`);
     },
     redeemMbdOrder({ memberId, orderId }) {
-      return request<HamsterBaseMembershipStatus>(baseUrl, 'redeem/mbd', {
+      return request<HamsterBaseMembershipStatus>('redeem/mbd', {
         method: 'POST',
         body: { productName, memberId, orderId },
+      });
+    },
+    redeemAppStoreTransaction({ memberId, signedTransaction, operation }) {
+      return request<HamsterBaseMembershipStatus>('redeem/app-store', {
+        method: 'POST',
+        body: { productName, memberId, signedTransaction, operation },
       });
     },
   };
 }
 
 async function request<T>(
-  baseUrl: string,
   path: string,
   options?: {
     method?: 'GET' | 'POST';
     body?: unknown;
   },
 ): Promise<T> {
-  const response = await fetch(`${baseUrl}/${path}`, {
+  const response = await fetch(`${MEMBERSHIP_API_BASE_URL}/${path}`, {
     method: options?.method ?? 'GET',
     headers: {
       'Content-Type': 'application/json',

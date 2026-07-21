@@ -893,11 +893,16 @@ export const styles = {
     FutureMessageDeleteButton:
       'grid h-8 w-8 flex-none place-items-center rounded text-danger transition active:bg-danger/10',
     FutureMessagesEmpty: cx('mt-10 text-center text-muted', font.Desc),
-    PurchaseActions: 'px-0 py-5',
+    PurchaseActions: 'flex flex-col px-0 py-5',
     PurchaseButton: cx(
       'block h-12 w-full rounded-lg bg-accent text-center text-onaccent transition active:brightness-90 disabled:opacity-40',
       font.Button,
     ),
+    AppStoreRestoreButton: cx(
+      'mt-2 block h-10 w-full text-center text-accent transition active:opacity-60 disabled:opacity-40',
+      font.Button,
+    ),
+    AppStoreTransferNote: cx('m-0 px-4 text-center text-muted', font.Footnote),
     StepList: 'flex flex-col gap-4 bg-surface py-4',
     StepItem: 'grid grid-cols-[28px_minmax(0,1fr)] gap-3',
     StepNumber: cx(

@@ -1,4 +1,5 @@
 import { deriveRecoveryKeyHash } from '@/base/just-vibes/attachment-encryption';
+import { appStoreAccountTokenFromMemberId } from '@/base/just-vibes/app-store-account-token';
 import {
   createHamsterBaseCloudClient,
   type HamsterBaseCloudClient,
@@ -6,6 +7,12 @@ import {
 import { memberIdFromRecoveryKeyHash } from '@/base/just-vibes/member-id';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
 import { IHostService } from '@/services/native/common/hostService';
+import {
+  APP_STORE_MEMBERSHIP_PRODUCT_ID,
+  type AppStoreMembershipProduct,
+  NativeAppStoreMembership,
+} from '@/services/native/capacitor/plugins/appStoreMembership';
+import { definePreference } from '@/services/preferences/common/preference';
 import { Emitter, Event } from 'vscf/base/common/event';
 import { createDecorator } from 'vscf/platform/instantiation/common';
 import { z } from 'zod';
@@ -14,24 +21,30 @@ export interface MembershipStatus {
   configured: boolean;
   active: boolean;
   memberId?: string;
-  provider?: 'mbd' | 'admin';
+  provider?: 'mbd' | 'admin' | 'app-store';
   productId?: string;
   updatedAt?: number;
 }
 
-export const MEMBERSHIP_STATUS_SWR_KEY = 'settings-membership-status';
-export const MEMBERSHIP_PURCHASED_CACHE_KEY = 'settings-membership-purchased';
+export type AppStoreProduct = AppStoreMembershipProduct;
 
-const MembershipPurchasedCacheSchema = z.object({
+export const MEMBERSHIP_STATUS_SWR_KEY = 'settings-membership-status';
+
+export const MembershipPurchasedCacheSchema = z.object({
   active: z.literal(true),
   memberId: z.string(),
-  provider: z.enum(['mbd', 'admin']).optional(),
+  provider: z.enum(['mbd', 'admin', 'app-store']).optional(),
   productId: z.string().optional(),
   updatedAt: z.number().optional(),
   cachedAt: z.number(),
 });
 
-type MembershipPurchasedCache = z.infer<typeof MembershipPurchasedCacheSchema>;
+export const MembershipPurchasedCachePreference = definePreference({
+  channel: 'host',
+  key: 'settings-membership-purchased',
+  schema: MembershipPurchasedCacheSchema.optional(),
+  defaultValue: undefined,
+});
 
 export interface IMembershipService {
   readonly _serviceBrand: undefined;
@@ -39,7 +52,14 @@ export interface IMembershipService {
   getMemberId(): Promise<string | undefined>;
   getStatus(): Promise<MembershipStatus>;
   redeemMbdOrder(orderId: string): Promise<MembershipStatus>;
+  getAppStoreProduct(): Promise<AppStoreProduct>;
+  purchaseWithAppStore(): Promise<AppStoreMembershipActionResult>;
+  restoreAppStorePurchase(): Promise<AppStoreMembershipActionResult>;
 }
+
+export type AppStoreMembershipActionResult =
+  | { status: 'activated'; membership: MembershipStatus }
+  | { status: 'cancelled' | 'pending' | 'not-found' };
 
 export const IMembershipService = createDecorator<IMembershipService>('IMembershipService');
 
@@ -86,29 +106,78 @@ export class MembershipService implements IMembershipService {
     return nextStatus;
   }
 
+  getAppStoreProduct(): Promise<AppStoreProduct> {
+    return NativeAppStoreMembership.getProduct({ productId: APP_STORE_MEMBERSHIP_PRODUCT_ID });
+  }
+
+  async purchaseWithAppStore(): Promise<AppStoreMembershipActionResult> {
+    const memberId = await this.requireMemberId();
+    const result = await NativeAppStoreMembership.purchase({
+      productId: APP_STORE_MEMBERSHIP_PRODUCT_ID,
+      appAccountToken: await appStoreAccountTokenFromMemberId(memberId),
+    });
+    if (result.status !== 'purchased') return { status: result.status };
+
+    const membership = await this.activateAppStoreTransaction(
+      memberId,
+      result.signedTransaction,
+      'purchase',
+    );
+    // cloud 已确认权益后再结束 StoreKit 交易；失败时保留 unfinished 交易供稍后恢复。
+    await NativeAppStoreMembership.finish({ transactionId: result.transactionId }).catch(
+      () => undefined,
+    );
+    return { status: 'activated', membership };
+  }
+
+  async restoreAppStorePurchase(): Promise<AppStoreMembershipActionResult> {
+    const memberId = await this.requireMemberId();
+    const result = await NativeAppStoreMembership.restore({
+      productId: APP_STORE_MEMBERSHIP_PRODUCT_ID,
+    });
+    if (result.status === 'not-found') return { status: 'not-found' };
+
+    const membership = await this.activateAppStoreTransaction(
+      memberId,
+      result.signedTransaction,
+      'restore',
+    );
+    return { status: 'activated', membership };
+  }
+
+  private async activateAppStoreTransaction(
+    memberId: string,
+    signedTransaction: string,
+    operation: 'purchase' | 'restore',
+  ): Promise<MembershipStatus> {
+    const status = await this.cloud.redeemAppStoreTransaction({
+      memberId,
+      signedTransaction,
+      operation,
+    });
+    const nextStatus = { configured: true, ...status };
+    await this.syncPurchasedCache(nextStatus);
+    this._onDidChange.fire();
+    return nextStatus;
+  }
+
   private async syncPurchasedCache(status: MembershipStatus): Promise<void> {
     if (status.active && status.memberId) {
-      await this.hostService.savePreference<MembershipPurchasedCache>(
-        MEMBERSHIP_PURCHASED_CACHE_KEY,
-        {
-          active: true,
-          memberId: status.memberId,
-          provider: status.provider,
-          productId: status.productId,
-          updatedAt: status.updatedAt,
-          cachedAt: Date.now(),
-        },
-      );
+      await this.hostService.savePreference(MembershipPurchasedCachePreference, {
+        active: true,
+        memberId: status.memberId,
+        provider: status.provider,
+        productId: status.productId,
+        updatedAt: status.updatedAt,
+        cachedAt: Date.now(),
+      });
       return;
     }
-    await this.hostService.clearPreference(MEMBERSHIP_PURCHASED_CACHE_KEY);
+    await this.hostService.clearPreference(MembershipPurchasedCachePreference);
   }
 
   private async getPurchasedCache(memberId: string): Promise<MembershipStatus | undefined> {
-    const cached = await this.hostService.getPreference(
-      MEMBERSHIP_PURCHASED_CACHE_KEY,
-      MembershipPurchasedCacheSchema,
-    );
+    const cached = this.hostService.getPreference(MembershipPurchasedCachePreference);
     if (!cached || cached.memberId !== memberId) return undefined;
     return {
       configured: true,

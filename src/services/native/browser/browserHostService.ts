@@ -28,7 +28,12 @@ import {
   HostLivePhotoVideoPreviewOptions,
   ImagePickSource,
   IHostService,
+  HostPreferenceCache,
 } from '@/services/native/common/hostService';
+import type {
+  HostPreferenceDefinition,
+  PreferenceValue,
+} from '@/services/preferences/common/preference';
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
 import { blobToDataUrl } from '@/base/just-vibes/binary-codec';
 import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
@@ -50,7 +55,6 @@ import {
   type BrowserAttachmentBlobStore,
 } from '@/base/just-vibes/browser-attachment-blob-store';
 import { Event } from 'vscf/base/common/event';
-import type { ZodType } from 'zod';
 import { normalizeAndCheckMime } from '@/base/just-vibes/media-mime';
 import { nanoid } from 'nanoid';
 
@@ -66,6 +70,7 @@ export class BrowserHostService implements IHostService {
   private readonly attachmentBlobs: BrowserAttachmentBlobStore;
   private readonly videoObjectUrls = new Map<string, string>();
   private readonly livePhotoVideoObjectUrls = new Map<string, string>();
+  private readonly preferences = new HostPreferenceCache();
 
   constructor(
     useMemoryFilesystem = false,
@@ -259,27 +264,56 @@ export class BrowserHostService implements IHostService {
     }
   }
 
-  async getPreference<T>(key: string, schema?: ZodType<T>): Promise<T | undefined> {
-    const value = localStorage.getItem(getBrowserPreferenceStorageKey(key));
-    if (!value) return undefined;
+  getPreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+  ): PreferenceValue<TDefinition> {
+    return this.preferences.get(definition);
+  }
+
+  async loadPreferences(definitions: readonly HostPreferenceDefinition[]): Promise<void> {
+    await Promise.all(definitions.map((definition) => this.doGetPreference(definition)));
+  }
+
+  private async doGetPreference(definition: HostPreferenceDefinition): Promise<void> {
+    const value = localStorage.getItem(getBrowserPreferenceStorageKey(definition.key));
+    if (!value) {
+      this.preferences.set(definition, undefined);
+      return;
+    }
     try {
       const parsed = JSON.parse(value) as unknown;
-      if (parsed === null) return undefined;
-      if (!schema) return parsed as T;
-      const result = schema.safeParse(parsed);
-      return result.success ? result.data : undefined;
+      const result = definition.schema.safeParse(parsed);
+      this.preferences.set(definition, result.success ? result.data : undefined);
     } catch {
-      return undefined;
+      this.preferences.set(definition, undefined);
     }
   }
 
-  async savePreference<T>(key: string, value: T): Promise<T> {
-    localStorage.setItem(getBrowserPreferenceStorageKey(key), JSON.stringify(value));
-    return value;
+  async savePreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+    value: PreferenceValue<TDefinition>,
+  ): Promise<PreferenceValue<TDefinition>> {
+    const parsed = definition.schema.parse(value) as PreferenceValue<TDefinition>;
+    const previousValue = this.preferences.get(definition);
+    this.preferences.set(definition, parsed);
+    try {
+      localStorage.setItem(getBrowserPreferenceStorageKey(definition.key), JSON.stringify(parsed));
+    } catch (error) {
+      this.preferences.set(definition, previousValue);
+      throw error;
+    }
+    return parsed;
   }
 
-  async clearPreference(key: string): Promise<void> {
-    localStorage.removeItem(getBrowserPreferenceStorageKey(key));
+  async clearPreference(definition: HostPreferenceDefinition): Promise<void> {
+    const previousValue = this.preferences.get(definition);
+    this.preferences.set(definition, undefined);
+    try {
+      localStorage.removeItem(getBrowserPreferenceStorageKey(definition.key));
+    } catch (error) {
+      this.preferences.set(definition, previousValue);
+      throw error;
+    }
   }
 
   async request(_options: HostRequestOptions): Promise<HostResponse> {

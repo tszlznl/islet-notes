@@ -1,11 +1,18 @@
-export type ThemePreference = 'auto' | 'light' | 'dark';
+import {
+  ThemePreferenceDefinition,
+  type ThemePreference,
+} from '@/services/preferences/common/uiPreferences';
+
+export type { ThemePreference } from '@/services/preferences/common/uiPreferences';
 export type ResolvedTheme = 'light' | 'dark';
 
 export const themePreferenceChangeEvent = 'islet:theme-preference-change';
 
 export function getThemePreference(): ThemePreference {
-  const savedTheme = localStorage.getItem('theme');
-  return savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'auto';
+  const result = ThemePreferenceDefinition.schema.safeParse(
+    localStorage.getItem(ThemePreferenceDefinition.key),
+  );
+  return result.success ? result.data : ThemePreferenceDefinition.defaultValue;
 }
 
 export function getResolvedTheme(): ResolvedTheme {
@@ -24,8 +31,7 @@ export function initializeTheme() {
   setResolvedTheme(getResolvedTheme());
 }
 
-export function saveThemePreference(theme: ThemePreference) {
-  localStorage.setItem('theme', theme);
+export function applyThemePreference() {
   initializeTheme();
   window.dispatchEvent(new Event(themePreferenceChangeEvent));
 }

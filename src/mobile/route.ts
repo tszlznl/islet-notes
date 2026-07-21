@@ -261,10 +261,22 @@ export const routes: PageRoute[] = [
     fallback: '/settings',
   },
   {
+    url: '/settings/display',
+    file: './pages/settings/display/display',
+    component: 'SettingsDisplayPage',
+    fallback: '/settings',
+  },
+  {
+    url: '/settings/display/calendar',
+    file: './pages/settings/display/calendar/calendar',
+    component: 'SettingsCalendarDisplayPage',
+    fallback: '/settings/display',
+  },
+  {
     url: '/settings/theme',
     file: './pages/settings/theme/theme',
     component: 'SettingsThemePage',
-    fallback: '/settings',
+    fallback: '/settings/display',
   },
 ];
 

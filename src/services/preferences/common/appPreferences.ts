@@ -2,10 +2,19 @@ import { SyncConfigRecord } from '@/core/diary/type';
 import { normalizeUploadPrefix } from '@/core/spec/syncStoragePathUtils';
 import { LOCAL_DIARY_SCOPE_ID } from '@/services/diary/common/storage';
 import { deriveRecoveryKeyHash } from '@/base/just-vibes/attachment-encryption';
+import { definePreference } from './preference';
 import { z } from 'zod';
 
-export const SYNC_CONFIG_KEY = 'cloud-sync';
 export const MEMORY_STORAGE_SCOPE_KEY = 'memory';
+
+export const CalendarDisplayOrderSchema = z.enum(['newest-first', 'oldest-first']);
+export type CalendarDisplayOrder = z.infer<typeof CalendarDisplayOrderSchema>;
+export const CalendarDisplayOrderPreference = definePreference({
+  channel: 'host',
+  key: 'calendar-display-order',
+  schema: CalendarDisplayOrderSchema,
+  defaultValue: 'oldest-first',
+});
 
 export type AppStorageMode = 'persistent' | 'memory';
 
@@ -34,6 +43,13 @@ export const SyncConfigSchema = z.discriminatedUnion('provider', [
     updatedAt: z.number(),
   }),
 ]);
+
+export const SyncConfigPreference = definePreference({
+  channel: 'host',
+  key: 'cloud-sync',
+  schema: SyncConfigSchema.optional(),
+  defaultValue: undefined,
+});
 
 export function createSyncConfigPreference(
   config: Omit<SyncConfigRecord, 'updatedAt'> | SyncConfigRecord,

@@ -8,6 +8,7 @@ import { styles, zIndex } from '@/mobile/styles/ui';
 import { useService } from '@/hooks/use-service';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
 import { useMembershipStatus } from '@/mobile/hooks/useMembershipStatus';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { useDateTimePicker } from '@/mobile/overlay/dateTimePicker/useDateTimePicker';
 import { useDialog } from '@/mobile/overlay/dialog/useDialog';
 import { useIdentityPicker } from '@/mobile/overlay/identityPicker/useIdentityPicker';
@@ -15,20 +16,14 @@ import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
-import {
-  IDENTITY_CONFIG_KEY,
-  IDENTITY_CONFIG_SWR_KEY,
-  IdentityConfigSchema,
-} from '@/services/diary/common/identityConfig';
+import { IdentityConfigPreference } from '@/services/diary/common/identityConfig';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
-import { IHostService } from '@/services/native/common/hostService';
 import { ITrackService } from '@/services/track/common/trackService';
 import {
   isVoiceRecordingSupported,
   type VoiceRecordingResult,
 } from '@/mobile/overlay/voiceRecording/voiceRecorderEngine';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
-import useSWR from 'swr';
 import { useReplyDraft } from '@/mobile/components/pages/diary-chat/chat/replyDraftContext';
 import { AttachmentActionPanel } from './AttachmentActionPanel';
 import { ChatInputRow } from './ChatInputRow';
@@ -46,7 +41,6 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
   function DiaryChatFooter({ notebookId }, ref) {
     const diaryService = useService(IDiaryService);
     const fileAssetService = useService(IFileAssetService);
-    const hostService = useService(IHostService);
     const navigationService = useService(INavigationService);
     const trackService = useService(ITrackService);
     const showToast = useSuccessToast();
@@ -61,8 +55,6 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
       isLoading: membershipLoading,
     } = useMembershipStatus();
     const membershipStatusPending = membershipLoading || !resolvedMembershipStatus;
-    // iOS 上未开通会员不展示时光机入口，避免引导到应用外购买；其它平台展示并弹会员引导。
-    const timeMachineVisible = hostService.platform !== 'ios' || membershipStatus.active;
     const [text, setText] = useState('');
     const [voiceMode, setVoiceMode] = useState(false);
     const [plusOpen, setPlusOpen] = useState(false);
@@ -75,10 +67,8 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
       identityCandidate && !identityCandidate.archivedAt ? identityCandidate : undefined;
     const activeIdentities = getActiveIdentities(model);
     // 身份开关（身份管理页顶部）关闭时，输入区不显示身份按钮。
-    const { data: identityConfig } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
-      hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
-    );
-    const identityEntryEnabled = identityConfig?.chatEntryEnabled ?? true;
+    const [identityConfig] = usePreference(IdentityConfigPreference);
+    const identityEntryEnabled = identityConfig.chatEntryEnabled;
     const replyDraft = useReplyDraft();
     const replyToEntryId = replyDraft?.replyToEntryId;
     const voiceSupported = useMemo(() => isVoiceRecordingSupported(), []);
@@ -239,7 +229,7 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
           {plusOpen && (
             <AttachmentActionPanel
               videoSupported={videoSupported}
-              timeMachineVisible={timeMachineVisible}
+              timeMachineVisible
               timeMachineDisabled={membershipStatusPending}
               onPickFromAlbum={() => {
                 trackService.trackEvent('diary_chat_album_click');

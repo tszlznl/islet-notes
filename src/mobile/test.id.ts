@@ -212,6 +212,7 @@ export const Settings = {
   speechRecognition: 'settings.speech-recognition',
   import: 'settings.import',
   language: 'settings.language',
+  display: 'settings.display',
   theme: 'settings.theme',
   version: 'settings.version',
   exitExperience: 'settings.exit-experience',
@@ -242,6 +243,7 @@ export const MembershipSettings = {
   futureMessagesDeleteConfirm: 'membership-settings.future-messages-delete-confirm',
   futureMessagesDeleteCancel: 'membership-settings.future-messages-delete-cancel',
   purchaseEntry: 'membership-settings.purchase-entry',
+  appStoreRestore: 'membership-settings.app-store-restore',
   mbdChannel: 'membership-settings.mbd-channel',
   mbdPurchaseLink: 'membership-settings.mbd-purchase-link',
   mbdOrderId: 'membership-settings.mbd-order-id',
@@ -378,6 +380,20 @@ export const ThemeSettings = {
   option: 'theme-settings.option',
   auto: 'theme-settings.auto',
   dark: 'theme-settings.dark',
+} as const;
+
+export const DisplaySettings = {
+  page: 'display-settings.page',
+  content: 'display-settings.content',
+  theme: 'display-settings.theme',
+  calendar: 'display-settings.calendar',
+} as const;
+
+export const CalendarDisplaySettings = {
+  page: 'calendar-display-settings.page',
+  content: 'calendar-display-settings.content',
+  newestFirst: 'calendar-display-settings.newest-first',
+  oldestFirst: 'calendar-display-settings.oldest-first',
 } as const;
 
 export const CloudSync = {

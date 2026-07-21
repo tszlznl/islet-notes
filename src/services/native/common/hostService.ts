@@ -1,6 +1,9 @@
 import { createDecorator } from 'vscf/platform/instantiation/common';
 import { Event } from 'vscf/base/common/event';
-import type { ZodType } from 'zod';
+import type {
+  HostPreferenceDefinition,
+  PreferenceValue,
+} from '@/services/preferences/common/preference';
 
 export type HostPlatform = 'ios' | 'android' | 'web';
 
@@ -49,9 +52,15 @@ export interface IHostService {
   /** 附件明文文件存储：不存在时返回 undefined。 */
   readAttachmentFile(options: HostAttachmentFileOptions): Promise<Blob | undefined>;
 
-  getPreference<T>(key: string, schema?: ZodType<T>): Promise<T | undefined>;
-  savePreference<T>(key: string, value: T): Promise<T>;
-  clearPreference(key: string): Promise<void>;
+  getPreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+  ): PreferenceValue<TDefinition>;
+  loadPreferences(definitions: readonly HostPreferenceDefinition[]): Promise<void>;
+  savePreference<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+    value: PreferenceValue<TDefinition>,
+  ): Promise<PreferenceValue<TDefinition>>;
+  clearPreference(definition: HostPreferenceDefinition): Promise<void>;
 
   request(options: HostRequestOptions): Promise<HostResponse>;
 
@@ -68,6 +77,32 @@ export interface IHostService {
 }
 
 export const IHostService = createDecorator<IHostService>('IHostService');
+
+export class HostPreferenceCache {
+  private readonly loadedKeys = new Set<string>();
+  private readonly values = new Map<string, unknown>();
+
+  get<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+  ): PreferenceValue<TDefinition> {
+    if (!this.loadedKeys.has(definition.key)) {
+      throw new Error(`Preference "${definition.key}" has not been loaded.`);
+    }
+    if (!this.values.has(definition.key)) {
+      return definition.defaultValue as PreferenceValue<TDefinition>;
+    }
+    return this.values.get(definition.key) as PreferenceValue<TDefinition>;
+  }
+
+  set<TDefinition extends HostPreferenceDefinition>(
+    definition: TDefinition,
+    value: PreferenceValue<TDefinition> | undefined,
+  ): void {
+    this.loadedKeys.add(definition.key);
+    if (value === undefined) this.values.delete(definition.key);
+    else this.values.set(definition.key, value);
+  }
+}
 
 export type HostRouterType = 'hash' | 'browser';
 

@@ -4,20 +4,15 @@ import type { AudioAttachmentRecord } from '@/core/diary/type';
 import { useService } from '@/hooks/use-service';
 import { useEntryLongPressActions } from '@/mobile/hooks/useEntryLongPressActions';
 import { useAttachmentAudioPlayback } from '@/mobile/hooks/useAttachmentAudioPlayback';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import type { LongPressMenuAction } from '@/mobile/overlay/longPressMenu/LongPressMenuController';
 import { styles } from '@/mobile/styles/ui';
 import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
-import { IHostService } from '@/services/native/common/hostService';
-import {
-  SPEECH_RECOGNITION_CONFIG_KEY,
-  SPEECH_RECOGNITION_CONFIG_SWR_KEY,
-  SpeechRecognitionConfigSchema,
-} from '@/services/speechRecognition/common/speechRecognitionConfig';
+import { SpeechRecognitionConfigPreference } from '@/services/speechRecognition/common/speechRecognitionConfig';
 import { ISpeechRecognitionService } from '@/services/speechRecognition/common/speechRecognitionService';
 import { FileText, RefreshCw } from 'lucide-react';
 import React from 'react';
-import useSWR from 'swr';
 import { AudioWaveIcon } from './AudioWaveIcon';
 import { getAudioBubbleWidth } from './layout';
 
@@ -35,10 +30,7 @@ export function AttachmentAudio({
   align,
 }: AttachmentAudioProps) {
   const speechRecognitionService = useService(ISpeechRecognitionService);
-  const hostService = useService(IHostService);
-  const { data: speechRecognitionConfig } = useSWR(SPEECH_RECOGNITION_CONFIG_SWR_KEY, async () =>
-    hostService.getPreference(SPEECH_RECOGNITION_CONFIG_KEY, SpeechRecognitionConfigSchema),
-  );
+  const [speechRecognitionConfig] = usePreference(SpeechRecognitionConfigPreference);
   const { failed, loading, playing, togglePlay } = useAttachmentAudioPlayback(attachment);
   const highlighted = useIsEntryHighlighted(entryId);
 
