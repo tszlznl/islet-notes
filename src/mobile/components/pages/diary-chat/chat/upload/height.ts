@@ -10,7 +10,7 @@ export function estimateUploadMessageHeight(
   if (task.type === 'audio') {
     const belowExtra = transcribing
       ? AUDIO_TRANSCRIBING_HEIGHT
-      : estimateAudioTranscriptHeight(task.transcript, Math.min(viewportWidth - 32, 520));
+      : estimateAudioTranscriptHeight(task.transcript, viewportWidth);
     return 50 + belowExtra;
   }
   return estimateImageMessageHeight(task.width, task.height, viewportWidth);

@@ -23,6 +23,7 @@
 		A10000000000000000000006 /* MediaPickerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* MediaPickerPlugin.swift */; };
 		A10000000000000000000007 /* FileSharePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* FileSharePlugin.swift */; };
 		A10000000000000000000008 /* AppStoreMembershipPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* AppStoreMembershipPlugin.swift */; };
+		A10000000000000000000009 /* DeviceAuthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* DeviceAuthPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		A20000000000000000000006 /* MediaPickerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPickerPlugin.swift; sourceTree = "<group>"; };
 		A20000000000000000000007 /* FileSharePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSharePlugin.swift; sourceTree = "<group>"; };
 		A20000000000000000000008 /* AppStoreMembershipPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStoreMembershipPlugin.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* DeviceAuthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceAuthPlugin.swift; sourceTree = "<group>"; };
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
@@ -103,6 +105,7 @@
 				A20000000000000000000006 /* MediaPickerPlugin.swift */,
 				A20000000000000000000007 /* FileSharePlugin.swift */,
 				A20000000000000000000008 /* AppStoreMembershipPlugin.swift */,
+				A20000000000000000000009 /* DeviceAuthPlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -251,6 +254,7 @@
 				A10000000000000000000006 /* MediaPickerPlugin.swift in Sources */,
 				A10000000000000000000007 /* FileSharePlugin.swift in Sources */,
 				A10000000000000000000008 /* AppStoreMembershipPlugin.swift in Sources */,
+				A10000000000000000000009 /* DeviceAuthPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

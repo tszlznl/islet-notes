@@ -16,6 +16,7 @@ import { Clipboard } from '@capacitor/clipboard';
 import { Capacitor, SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { Preferences } from '@capacitor/preferences';
+import { AppLauncher } from '@capacitor/app-launcher';
 import { Emitter } from 'vscf/base/common/event';
 import type {
   HostPreferenceDefinition,
@@ -41,6 +42,7 @@ import {
   HostRequestOptions,
   HostResponse,
   HostSystemBarStyle,
+  HostDeviceAuthOptions,
   HostCleanVideoRecordOptions,
   HostPrepareVideoUploadOptions,
   HostVideoRecordOptions,
@@ -53,6 +55,7 @@ import {
   HostRouterType,
   HostWriteAttachmentFileOptions,
   HostLivePhotoVideoPreviewOptions,
+  normalizeExternalHttpUrl,
 } from '../common/hostService';
 import {
   createMemoryHostFilesystem,
@@ -62,6 +65,7 @@ import {
   createBrowserAttachmentBlobStore,
   type BrowserAttachmentBlobStore,
 } from '@/base/just-vibes/browser-attachment-blob-store';
+import { NativeDeviceAuth } from './plugins/deviceAuth';
 import { NativeImageTools } from './plugins/imageTools';
 import { NativeAttachmentFileCache } from './plugins/attachmentFileCache';
 import {
@@ -133,6 +137,16 @@ export class CapacitorNativeService implements IHostService {
     await writeBrowserClipboardText(text);
   }
 
+  async openExternalUrl(url: string): Promise<void> {
+    const normalizedUrl = normalizeExternalHttpUrl(url);
+    if (!this.isNative) {
+      window.open(normalizedUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+    const result = await AppLauncher.openUrl({ url: normalizedUrl });
+    if (!result.completed) throw new Error('System browser did not open the URL.');
+  }
+
   async exportTextFile(options: HostExportTextFileOptions): Promise<void> {
     if (!this.isNative) {
       downloadBrowserTextFile(options);
@@ -162,6 +176,18 @@ export class CapacitorNativeService implements IHostService {
     await SystemBars.setStyle({
       style: theme === 'dark' ? SystemBarsStyle.Dark : SystemBarsStyle.Light,
     });
+  }
+
+  async canUseDeviceAuth(): Promise<boolean> {
+    if (!this.caniuse('deviceAuth')) return false;
+    const result = await NativeDeviceAuth.canAuthenticate();
+    return result.available;
+  }
+
+  async requestDeviceAuth(options: HostDeviceAuthOptions): Promise<boolean> {
+    if (!this.caniuse('deviceAuth')) return false;
+    const result = await NativeDeviceAuth.authenticate(options);
+    return result.success;
   }
 
   async pickImageBlob(source: ImagePickSource): Promise<Blob | undefined> {
@@ -540,6 +566,8 @@ function caniuseHostFeature(feature: HostFeature): boolean {
     case 'videoUpload':
       return nativeMobile;
     case 'videoTranscode':
+      return nativeMobile;
+    case 'deviceAuth':
       return nativeMobile;
   }
 }

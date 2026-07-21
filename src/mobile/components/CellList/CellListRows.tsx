@@ -44,6 +44,23 @@ export function CellListRows({ items }: { items: CellListItem[] }) {
             </button>
           );
         }
+        if (item.type === 'switch') {
+          return (
+            <label key={key} className={styles.CellList.Row}>
+              <span className={styles.Cell.RowLabel}>{item.label}</span>
+              <input
+                type='checkbox'
+                className={styles.Choice.Input}
+                data-test-id={item.testId}
+                checked={item.checked}
+                disabled={item.disabled}
+                onChange={(event) => {
+                  if (!item.disabled) item.onChange(event.target.checked);
+                }}
+              />
+            </label>
+          );
+        }
         const content = (
           <>
             {item.icon && <span className={styles.CellList.Icon}>{item.icon}</span>}

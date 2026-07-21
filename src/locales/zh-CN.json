@@ -1,5 +1,97 @@
 {
   "__i18n_ease__": "true",
+  "appLock.desc": {
+    "defaultMessage": "When enabled, returning to the app requires fingerprint, face, or device passcode verification. Your database encryption password also unlocks the app. Membership is required.",
+    "content": "开启后，回到应用时需要通过指纹、面容或设备密码验证身份；也可以输入数据库加密密码解锁。该功能为会员专属。"
+  },
+  "appLock.deviceAuth.subtitle": {
+    "defaultMessage": "Unlock Islet Journal to continue",
+    "content": "验证通过后继续使用屿声"
+  },
+  "appLock.deviceAuth.title": {
+    "defaultMessage": "Verify your identity",
+    "content": "验证你的身份"
+  },
+  "appLock.disableAction": {
+    "defaultMessage": "Turn off",
+    "content": "关闭"
+  },
+  "appLock.disableConfirm": {
+    "defaultMessage": "Turn off authentication?",
+    "content": "确定关闭身份验证吗？"
+  },
+  "appLock.enable.confirm": {
+    "defaultMessage": "Verify and turn on",
+    "content": "验证并开启"
+  },
+  "appLock.enable.noSync": {
+    "defaultMessage": "Cloud sync is not set up.",
+    "content": "尚未配置云同步。"
+  },
+  "appLock.enable.warning": {
+    "defaultMessage": "Verify your database encryption password to turn this on. Keep the password safe: if it is lost, data synced to the cloud cannot be recovered.",
+    "content": "开启前需要验证数据库加密密码。请务必妥善保管该密码：一旦丢失，云端同步的数据将无法恢复。"
+  },
+  "appLock.enable.wrongKey": {
+    "defaultMessage": "Incorrect password. Try again.",
+    "content": "密码不正确，请重试。"
+  },
+  "appLock.enabled": {
+    "defaultMessage": "Authentication is on",
+    "content": "身份验证已开启"
+  },
+  "appLock.goPurchase": {
+    "defaultMessage": "Get membership",
+    "content": "开通会员"
+  },
+  "appLock.goSync": {
+    "defaultMessage": "Set up cloud sync",
+    "content": "去配置云同步"
+  },
+  "appLock.keyPlaceholder": {
+    "defaultMessage": "Database encryption password",
+    "content": "数据库加密密码"
+  },
+  "appLock.locked.desc": {
+    "defaultMessage": "Verify your identity to continue",
+    "content": "验证身份后继续使用"
+  },
+  "appLock.locked.title": {
+    "defaultMessage": "Islet Journal is locked",
+    "content": "屿声已锁定"
+  },
+  "appLock.locked.unlock": {
+    "defaultMessage": "Unlock",
+    "content": "解锁"
+  },
+  "appLock.locked.useKey": {
+    "defaultMessage": "Unlock with database encryption password",
+    "content": "使用数据库加密密码解锁"
+  },
+  "appLock.locked.verify": {
+    "defaultMessage": "Verify identity",
+    "content": "验证身份"
+  },
+  "appLock.memberOnly": {
+    "defaultMessage": "Authentication is a membership feature. Get a membership to enable it.",
+    "content": "身份验证是会员专属功能，开通会员后即可开启。"
+  },
+  "appLock.needSync": {
+    "defaultMessage": "Authentication verifies your database encryption password. Set up cloud sync first.",
+    "content": "身份验证需要校验数据库加密密码，请先配置云同步。"
+  },
+  "appLock.switchLabel": {
+    "defaultMessage": "Require authentication",
+    "content": "开启身份验证"
+  },
+  "appLock.title": {
+    "defaultMessage": "Authentication",
+    "content": "身份验证"
+  },
+  "appLock.unsupported": {
+    "defaultMessage": "System authentication is unavailable. Set up a screen lock or biometrics on this device first.",
+    "content": "系统身份验证不可用，请先在系统设置中设置锁屏密码或生物识别。"
+  },
   "attachment.image.tooLarge": {
     "content": "图片不能超过 50 MB",
     "defaultMessage": "Images must be 50 MB or smaller."
@@ -712,6 +804,10 @@
     "content": "AI 设置",
     "defaultMessage": "AI settings"
   },
+  "settings.authentication": {
+    "defaultMessage": "Authentication",
+    "content": "身份验证"
+  },
   "settings.calendar": {
     "defaultMessage": "Calendar",
     "content": "日历"
@@ -1016,6 +1112,10 @@
     "defaultMessage": "Unlocked",
     "content": "已解锁"
   },
+  "settings.messageLinks": {
+    "defaultMessage": "Detect links in messages",
+    "content": "识别消息中的链接"
+  },
   "settings.myNotebook": {
     "content": "我的日记本",
     "defaultMessage": "My notebook"
@@ -1268,9 +1368,17 @@
     "content": "关闭同步",
     "defaultMessage": "Turn off sync"
   },
+  "settings.sync.turnOff.appLockFirst": {
+    "defaultMessage": "Authentication is on and uses your database encryption password. Turn off authentication first, then turn off sync.",
+    "content": "身份验证已开启，并使用数据库加密密码进行校验。请先关闭身份验证，再关闭同步。"
+  },
   "settings.sync.turnOff.desc": {
     "content": "关闭后，本设备会停止同步，并移除本地同步配置。云端数据仍由恢复密钥加密；如果未备份密钥，将无法再解密这些数据。",
     "defaultMessage": "After you turn off sync, this device stops syncing and its local sync settings are removed. Cloud data remains encrypted with the recovery key. Without a backup of the key, that data cannot be decrypted."
+  },
+  "settings.sync.turnOff.goAppLock": {
+    "defaultMessage": "Go to Authentication",
+    "content": "去关闭身份验证"
   },
   "settings.sync.webdav.desc": {
     "defaultMessage": "Data is encrypted on this device before syncing to your WebDAV storage.",

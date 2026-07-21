@@ -1,5 +1,97 @@
 {
   "__i18n_ease__": "true",
+  "appLock.desc": {
+    "defaultMessage": "When enabled, returning to the app requires fingerprint, face, or device passcode verification. Your database encryption password also unlocks the app. Membership is required.",
+    "content": "When enabled, returning to the app requires fingerprint, face, or device passcode verification. Your database encryption password also unlocks the app. Membership is required."
+  },
+  "appLock.deviceAuth.subtitle": {
+    "defaultMessage": "Unlock Islet Journal to continue",
+    "content": "Unlock Islet Journal to continue"
+  },
+  "appLock.deviceAuth.title": {
+    "defaultMessage": "Verify your identity",
+    "content": "Verify your identity"
+  },
+  "appLock.disableAction": {
+    "defaultMessage": "Turn off",
+    "content": "Turn off"
+  },
+  "appLock.disableConfirm": {
+    "defaultMessage": "Turn off authentication?",
+    "content": "Turn off authentication?"
+  },
+  "appLock.enable.confirm": {
+    "defaultMessage": "Verify and turn on",
+    "content": "Verify and turn on"
+  },
+  "appLock.enable.noSync": {
+    "defaultMessage": "Cloud sync is not set up.",
+    "content": "Cloud sync is not set up."
+  },
+  "appLock.enable.warning": {
+    "defaultMessage": "Verify your database encryption password to turn this on. Keep the password safe: if it is lost, data synced to the cloud cannot be recovered.",
+    "content": "Verify your database encryption password to turn this on. Keep the password safe: if it is lost, data synced to the cloud cannot be recovered."
+  },
+  "appLock.enable.wrongKey": {
+    "defaultMessage": "Incorrect password. Try again.",
+    "content": "Incorrect password. Try again."
+  },
+  "appLock.enabled": {
+    "defaultMessage": "Authentication is on",
+    "content": "Authentication is on"
+  },
+  "appLock.goPurchase": {
+    "defaultMessage": "Get membership",
+    "content": "Get membership"
+  },
+  "appLock.goSync": {
+    "defaultMessage": "Set up cloud sync",
+    "content": "Set up cloud sync"
+  },
+  "appLock.keyPlaceholder": {
+    "defaultMessage": "Database encryption password",
+    "content": "Database encryption password"
+  },
+  "appLock.locked.desc": {
+    "defaultMessage": "Verify your identity to continue",
+    "content": "Verify your identity to continue"
+  },
+  "appLock.locked.title": {
+    "defaultMessage": "Islet Journal is locked",
+    "content": "Islet Journal is locked"
+  },
+  "appLock.locked.unlock": {
+    "defaultMessage": "Unlock",
+    "content": "Unlock"
+  },
+  "appLock.locked.useKey": {
+    "defaultMessage": "Unlock with database encryption password",
+    "content": "Unlock with database encryption password"
+  },
+  "appLock.locked.verify": {
+    "defaultMessage": "Verify identity",
+    "content": "Verify identity"
+  },
+  "appLock.memberOnly": {
+    "defaultMessage": "Authentication is a membership feature. Get a membership to enable it.",
+    "content": "Authentication is a membership feature. Get a membership to enable it."
+  },
+  "appLock.needSync": {
+    "defaultMessage": "Authentication verifies your database encryption password. Set up cloud sync first.",
+    "content": "Authentication verifies your database encryption password. Set up cloud sync first."
+  },
+  "appLock.switchLabel": {
+    "defaultMessage": "Require authentication",
+    "content": "Require authentication"
+  },
+  "appLock.title": {
+    "defaultMessage": "Authentication",
+    "content": "Authentication"
+  },
+  "appLock.unsupported": {
+    "defaultMessage": "System authentication is unavailable. Set up a screen lock or biometrics on this device first.",
+    "content": "System authentication is unavailable. Set up a screen lock or biometrics on this device first."
+  },
   "attachment.image.tooLarge": {
     "defaultMessage": "Images must be 50 MB or smaller.",
     "content": "Images must be 50 MB or smaller."
@@ -712,6 +804,10 @@
     "defaultMessage": "AI settings",
     "content": "AI settings"
   },
+  "settings.authentication": {
+    "defaultMessage": "Authentication",
+    "content": "Authentication"
+  },
   "settings.calendar": {
     "defaultMessage": "Calendar",
     "content": "Calendar"
@@ -1016,6 +1112,10 @@
     "defaultMessage": "Unlocked",
     "content": "Unlocked"
   },
+  "settings.messageLinks": {
+    "defaultMessage": "Detect links in messages",
+    "content": "Detect links in messages"
+  },
   "settings.myNotebook": {
     "defaultMessage": "My notebook",
     "content": "My notebook"
@@ -1268,9 +1368,17 @@
     "defaultMessage": "Turn off sync",
     "content": "Turn off sync"
   },
+  "settings.sync.turnOff.appLockFirst": {
+    "defaultMessage": "Authentication is on and uses your database encryption password. Turn off authentication first, then turn off sync.",
+    "content": "Authentication is on and uses your database encryption password. Turn off authentication first, then turn off sync."
+  },
   "settings.sync.turnOff.desc": {
     "defaultMessage": "After you turn off sync, this device stops syncing and its local sync settings are removed. Cloud data remains encrypted with the recovery key. Without a backup of the key, that data cannot be decrypted.",
     "content": "After you turn off sync, this device stops syncing and its local sync settings are removed. Cloud data remains encrypted with the recovery key. Without a backup of the key, that data cannot be decrypted."
+  },
+  "settings.sync.turnOff.goAppLock": {
+    "defaultMessage": "Go to Authentication",
+    "content": "Go to Authentication"
   },
   "settings.sync.webdav.desc": {
     "defaultMessage": "Data is encrypted on this device before syncing to your WebDAV storage.",

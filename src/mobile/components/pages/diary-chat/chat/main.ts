@@ -17,7 +17,6 @@ const DEFAULT_ITEM_HEIGHT = 64;
 export function estimateDiaryChatItemHeight(
   item: DiaryChatItem | undefined,
   viewportWidth: number,
-  containerWidth: number,
   model: DiaryModelData,
   isTranscribing?: (entryId: string) => boolean,
 ) {
@@ -29,7 +28,7 @@ export function estimateDiaryChatItemHeight(
     case 'text':
       return estimateTextMessageHeight(
         resolved.text,
-        containerWidth,
+        viewportWidth,
         !!resolved.entry.replyToEntryId,
       );
     case 'image':
@@ -41,7 +40,7 @@ export function estimateDiaryChatItemHeight(
     case 'audio':
       return estimateAudioMessageHeight(
         resolved.entry.text,
-        containerWidth,
+        viewportWidth,
         isTranscribing?.(resolved.entry.id),
       );
     case 'video':

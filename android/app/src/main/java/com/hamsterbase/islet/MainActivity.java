@@ -19,6 +19,7 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(ImageToolsPlugin.class);
+    registerPlugin(DeviceAuthPlugin.class);
     registerPlugin(AttachmentFileCachePlugin.class);
     registerPlugin(WebDavHttpPlugin.class);
     registerPlugin(VideoToolsPlugin.class);

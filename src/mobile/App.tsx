@@ -1,3 +1,4 @@
+import { AppLockScreen } from '@/mobile/components/AppLockScreen';
 import { OverlayHost } from '@/mobile/overlay/OverlayHost';
 import { routes } from '@/mobile/route';
 import { useAttachmentUploadCommitter } from '@/mobile/hooks/useAttachmentUploadCommitter';
@@ -19,6 +20,7 @@ export function App() {
   return (
     <Router>
       <OverlayHost />
+      <AppLockScreen />
       <Suspense fallback={null}>
         <Routes>
           <Route element={<ContentNavigation />}>

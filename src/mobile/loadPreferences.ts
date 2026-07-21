@@ -1,16 +1,20 @@
+import { AppLockConfigPreference } from '@/services/appLock/common/appLockConfig';
 import { IdentityConfigPreference } from '@/services/diary/common/identityConfig';
 import { MembershipPurchasedCachePreference } from '@/services/membership/common/membershipService';
 import type { IHostService } from '@/services/native/common/hostService';
 import {
   CalendarDisplayOrderPreference,
+  MessageLinkDetectionPreference,
   SyncConfigPreference,
 } from '@/services/preferences/common/appPreferences';
 import { SpeechRecognitionConfigPreference } from '@/services/speechRecognition/common/speechRecognitionConfig';
 
 const hostPreferences = [
+  AppLockConfigPreference,
   SyncConfigPreference,
   IdentityConfigPreference,
   CalendarDisplayOrderPreference,
+  MessageLinkDetectionPreference,
   SpeechRecognitionConfigPreference,
   MembershipPurchasedCachePreference,
 ] as const;

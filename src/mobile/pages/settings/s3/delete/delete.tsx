@@ -3,11 +3,14 @@ import { useWatchEvent } from '@/hooks/use-watch-event';
 import { FormPage } from '@/mobile/components/layout/FormPage';
 import { HeaderLayoutPage } from '@/mobile/components/layout/HeaderLayoutPage';
 import { FormGroup } from '@/mobile/components/WeuiForm';
+import { useDialog } from '@/mobile/overlay/dialog/useDialog';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { CloudSync } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
+import { IAppLockService } from '@/services/appLock/common/appLockService';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
+import { INavigationService } from '@/services/navigationService/common/navigationService';
 import { IHostService } from '@/services/native/common/hostService';
 import { Check, Copy } from 'lucide-react';
 import React, { useState } from 'react';
@@ -16,6 +19,9 @@ import { Navigate } from 'react-router';
 export function SettingsS3DeletePage() {
   const fileAssetService = useService(IFileAssetService);
   const hostService = useService(IHostService);
+  const appLockService = useService(IAppLockService);
+  const navigationService = useService(INavigationService);
+  const showDialog = useDialog();
   const showSuccessToast = useSuccessToast();
   useWatchEvent(fileAssetService.onDidChangeConfig);
   const config = fileAssetService.getSyncConfig();
@@ -41,6 +47,23 @@ export function SettingsS3DeletePage() {
   };
 
   const turnOffSync = async () => {
+    // 身份验证依赖同步配置里的加密密码校验,锁开着时先引导去关锁,避免指纹与新同步密码脱节。
+    if (appLockService.enabled) {
+      showDialog({
+        title: localize('settings.sync.turnOff', 'Turn off sync'),
+        message: localize(
+          'settings.sync.turnOff.appLockFirst',
+          'Authentication is on and uses your database encryption password. Turn off authentication first, then turn off sync.',
+        ),
+        confirmLabel: localize('settings.sync.turnOff.goAppLock', 'Go to Authentication'),
+        cancelLabel: localize('common.cancel', 'Cancel'),
+        tone: 'primary',
+        rootTestId: CloudSync.deleteAppLockDialog,
+        confirmTestId: CloudSync.deleteAppLockConfirm,
+        onConfirm: () => navigationService.navigate({ path: '/settings/authentication' }),
+      });
+      return;
+    }
     await fileAssetService.clearSyncConfig();
   };
 

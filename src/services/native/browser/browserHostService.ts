@@ -20,6 +20,7 @@ import {
   HostRequestOptions,
   HostResponse,
   HostSystemBarStyle,
+  HostDeviceAuthOptions,
   HostVideoPick,
   HostPrepareVideoUploadOptions,
   HostVideoPrepareResult,
@@ -29,6 +30,7 @@ import {
   ImagePickSource,
   IHostService,
   HostPreferenceCache,
+  normalizeExternalHttpUrl,
 } from '@/services/native/common/hostService';
 import type {
   HostPreferenceDefinition,
@@ -94,6 +96,7 @@ export class BrowserHostService implements IHostService {
       case 'generateThumbnail':
       case 'webDavHttpRequest':
       case 'attachmentFileCache':
+      case 'deviceAuth':
         return false;
     }
   }
@@ -108,6 +111,25 @@ export class BrowserHostService implements IHostService {
     await writeBrowserClipboardText(text);
   }
 
+  async openExternalUrl(url: string): Promise<void> {
+    const normalizedUrl = normalizeExternalHttpUrl(url);
+    const injected = this.testInjectionService?.list()['host.openExternalUrl'];
+    if (injected) {
+      if (injected.action === 'delay') {
+        await new Promise((resolve) => setTimeout(resolve, injected.delayMs));
+        return;
+      }
+      if (injected.action === 'throw') {
+        throw new Error(injected.message ?? 'Injected test error: host.openExternalUrl');
+      }
+      if (typeof injected.value === 'function') {
+        await (injected.value as (url: string) => void | Promise<void>)(normalizedUrl);
+      }
+      return;
+    }
+    window.open(normalizedUrl, '_blank', 'noopener,noreferrer');
+  }
+
   async exportTextFile(options: HostExportTextFileOptions): Promise<void> {
     if (await this.tryInjectedTextFileExport(options)) return;
     downloadBrowserTextFile(options);
@@ -119,6 +141,15 @@ export class BrowserHostService implements IHostService {
   }
 
   async setBarStyle(_theme: HostSystemBarStyle): Promise<void> {}
+
+  async canUseDeviceAuth(): Promise<boolean> {
+    return this.caniuse('deviceAuth');
+  }
+
+  async requestDeviceAuth(_options: HostDeviceAuthOptions): Promise<boolean> {
+    const injected = await this.testInjectionService?.get<boolean>('host.requestDeviceAuth');
+    return injected ?? false;
+  }
 
   async pickImageBlob(source: ImagePickSource): Promise<Blob | undefined> {
     try {

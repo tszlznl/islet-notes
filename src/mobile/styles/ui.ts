@@ -63,6 +63,7 @@ export const zIndex = {
   voiceRecording: 5200,
   toast: 5500,
   topTips: 5600,
+  appLock: 6000,
 } as const;
 
 export const styles = {
@@ -175,6 +176,28 @@ export const styles = {
   Text: {
     Hint: cx(font.Desc, 'text-muted'),
     Error: cx(font.Desc, 'text-danger'),
+  },
+  AppLockPage: {
+    SwitchRow: 'flex min-h-[56px] items-center justify-between gap-3 px-4',
+    SwitchLabel: cx('min-w-0 flex-1 text-ink', font.Body),
+    GroupDesc: cx('m-0 mt-2 px-4 text-muted', font.Desc),
+    WarnDesc: cx('m-0 mt-2 px-4 text-danger', font.Desc),
+    InputError: cx('m-0 px-4 pb-3 text-danger', font.Desc),
+    Actions: 'mt-4 flex flex-col gap-3',
+  },
+  AppLockScreen: {
+    Root: 'fixed inset-0 flex flex-col bg-canvas px-8 pb-[calc(1.5rem+var(--sab))] pt-[var(--sat)] text-ink',
+    Main: 'flex flex-1 flex-col items-center justify-center gap-2 text-center',
+    Icon: 'mb-3 text-accent',
+    Title: cx('m-0', font.Headline),
+    Desc: cx('m-0 text-muted', font.SubBody),
+    Actions: 'flex flex-col items-stretch gap-4 pb-4',
+    KeyArea: 'flex flex-col gap-3 pb-2',
+    KeyInput: cx(
+      'h-12 w-full rounded-lg bg-surface px-4 text-ink placeholder:text-placeholder',
+      font.Body,
+    ),
+    KeyError: cx('m-0 text-center text-danger', font.Desc),
   },
   Dialog: {
     Root: 'fixed inset-0',
@@ -767,14 +790,14 @@ export const styles = {
   },
   TextMessage: {
     Root: cx(
-      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--message-background,var(--c-bubble))] text-onbubble text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
+      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--message-background,var(--c-bubble))] text-onbubble text-left whitespace-pre-wrap break-all',
       font.Body,
       "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--message-background,var(--c-bubble))] after:content-['']",
     ),
     // 左侧身份消息：仿微信接收方气泡，白色底 + 左侧小尾巴；设置了消息颜色时
     // 行容器会注入 --bubble-left-* 变量切到气泡配色。
     RootLeft: cx(
-      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--bubble-left-background,var(--c-surface))] text-[color:var(--bubble-left-fg,var(--c-ink))] text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
+      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--bubble-left-background,var(--c-surface))] text-[color:var(--bubble-left-fg,var(--c-ink))] text-left whitespace-pre-wrap break-all',
       font.Body,
       "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--bubble-left-background,var(--c-surface))] after:content-['']",
     ),
@@ -787,6 +810,7 @@ export const styles = {
       'mb-1 block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded bg-black/5 px-2 py-1 text-left text-[color:var(--bubble-left-fg,var(--c-muted))] transition active:opacity-70',
       font.Footnote,
     ),
+    Link: 'text-link underline decoration-current underline-offset-2 active:opacity-70',
   },
   ImageMessage: {
     Root: 'relative w-[min(64vw,var(--message-image-fit-width),180px)]',
@@ -827,7 +851,7 @@ export const styles = {
     AudioLoadingSpinner:
       'h-4 w-4 animate-spin rounded-full border-2 border-onbubble/30 border-t-onbubble',
     AudioTranscript: cx(
-      'relative rounded bg-surface px-3 py-2 text-left text-ink whitespace-pre-wrap [overflow-wrap:anywhere]',
+      'relative rounded bg-surface px-3 py-2 text-left text-ink whitespace-pre-wrap break-all',
       font.Body,
     ),
     AudioTranscribing: cx(

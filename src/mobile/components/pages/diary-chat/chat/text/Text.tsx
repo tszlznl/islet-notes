@@ -1,11 +1,15 @@
 import { EntryHighlightOverlay, useIsEntryHighlighted } from '@/base/just-vibes/entry-highlight';
+import { parseMessageLinks } from '@/base/just-vibes/message-links';
 import { useService } from '@/hooks/use-service';
+import { usePreference } from '@/mobile/hooks/usePreference';
 import { useEntryLongPressActions } from '@/mobile/hooks/useEntryLongPressActions';
 import { DiaryChat } from '@/mobile/test.id';
 import { styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
-import React from 'react';
+import { IHostService } from '@/services/native/common/hostService';
+import { MessageLinkDetectionPreference } from '@/services/preferences/common/appPreferences';
+import React, { useMemo } from 'react';
 import { TextMessageQuote } from './TextMessageQuote';
 
 interface TextMessageProps {
@@ -17,7 +21,16 @@ interface TextMessageProps {
 
 export function TextMessage({ entryId, text, replyToEntryId, align }: TextMessageProps) {
   const diaryService = useService(IDiaryService);
+  const hostService = useService(IHostService);
+  const [messageLinkDetection] = usePreference(MessageLinkDetectionPreference);
   const content = text ?? '';
+  const contentSegments = useMemo(
+    () =>
+      messageLinkDetection
+        ? parseMessageLinks(content)
+        : [{ type: 'text' as const, text: content }],
+    [content, messageLinkDetection],
+  );
   const highlighted = useIsEntryHighlighted(entryId);
   const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLDivElement>(entryId, {
     text: content,
@@ -43,7 +56,26 @@ export function TextMessage({ entryId, text, replyToEntryId, align }: TextMessag
       {replyToEntryId && (
         <TextMessageQuote entryId={entryId} replyToEntryId={replyToEntryId} align={align} />
       )}
-      {content}
+      {contentSegments.map((segment, index) =>
+        segment.type === 'link' ? (
+          <a
+            key={index}
+            className={styles.TextMessage.Link}
+            href={segment.href}
+            target='_blank'
+            rel='noopener noreferrer'
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              void hostService.openExternalUrl(segment.href);
+            }}
+          >
+            {segment.text}
+          </a>
+        ) : (
+          <React.Fragment key={index}>{segment.text}</React.Fragment>
+        ),
+      )}
       <EntryHighlightOverlay active={highlighted} tail />
     </div>
   );

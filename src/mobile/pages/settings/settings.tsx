@@ -12,6 +12,7 @@ import { useService } from '@/hooks/use-service';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
+import { IHostService } from '@/services/native/common/hostService';
 import React from 'react';
 import { clearExperienceSeedMarker, writeExperienceTestData } from './experienceSeedData';
 
@@ -19,6 +20,7 @@ export function SettingsPage() {
   const navigationService = useService(INavigationService);
   const diaryService = useService(IDiaryService);
   const fileAssetService = useService(IFileAssetService);
+  const hostService = useService(IHostService);
   const showDialog = useDialog();
   const showLoadingToast = useLoadingToast();
   const showSuccessToast = useSuccessToast();
@@ -78,6 +80,13 @@ export function SettingsPage() {
             label: localize('settings.display', 'Display settings'),
             testId: Settings.display,
             onClick: () => navigationService.navigate({ path: '/settings/display' }),
+          },
+          {
+            // 依赖系统身份验证能力，仅原生端展示入口。
+            hide: !hostService.caniuse('deviceAuth'),
+            label: localize('settings.authentication', 'Authentication'),
+            testId: Settings.authentication,
+            onClick: () => navigationService.navigate({ path: '/settings/authentication' }),
           },
           {
             label: localize('settings.version', 'Version'),

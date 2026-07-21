@@ -49,4 +49,16 @@ interface ActionItem {
   disabled?: boolean;
 }
 
-export type CellListItem = CellItem | OptionItem | ActionItem;
+interface SwitchItem {
+  /** 布尔开关行，使用原生 checkbox 语义。 */
+  type: 'switch';
+  key?: string;
+  hide?: boolean;
+  label: string;
+  checked: boolean;
+  testId?: string;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+}
+
+export type CellListItem = CellItem | OptionItem | ActionItem | SwitchItem;

@@ -51,13 +51,7 @@ export function useDiaryChatVirtualList({
     (index: number) => {
       const item = chatItems[index];
       if (!item) return 64;
-      return estimateDiaryChatItemHeight(
-        item,
-        viewportWidth,
-        Math.min(viewportWidth - 32, 520),
-        model,
-        isTranscribing,
-      );
+      return estimateDiaryChatItemHeight(item, viewportWidth, model, isTranscribing);
     },
     [chatItems, model, viewportWidth, isTranscribing],
   );

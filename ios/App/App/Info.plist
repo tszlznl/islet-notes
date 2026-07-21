@@ -29,6 +29,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Islet Journal uses the camera to add photos or videos to your diary. For example, you can take a photo for today's entry or record a short video and save it with the entry.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Islet Journal uses Face ID to verify it is you when the app returns to the foreground after you turn on authentication in settings.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Islet Journal uses the microphone to record audio when you capture a video in the app. For example, a video added to a diary entry can include its original sound.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

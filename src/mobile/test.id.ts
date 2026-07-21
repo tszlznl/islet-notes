@@ -213,6 +213,7 @@ export const Settings = {
   import: 'settings.import',
   language: 'settings.language',
   display: 'settings.display',
+  authentication: 'settings.authentication',
   theme: 'settings.theme',
   version: 'settings.version',
   exitExperience: 'settings.exit-experience',
@@ -220,6 +221,31 @@ export const Settings = {
   exitExperienceDialog: 'settings.exit-experience-dialog',
   exitExperienceConfirm: 'settings.exit-experience-confirm',
   exitExperienceCancel: 'settings.exit-experience-cancel',
+} as const;
+
+export const AppLockSettings = {
+  page: 'app-lock-settings.page',
+  content: 'app-lock-settings.content',
+  switch: 'app-lock-settings.switch',
+  unsupportedHint: 'app-lock-settings.unsupported-hint',
+  memberOnlyDialog: 'app-lock-settings.member-only-dialog',
+  noSyncDialog: 'app-lock-settings.no-sync-dialog',
+  disableDialog: 'app-lock-settings.disable-dialog',
+  disableConfirm: 'app-lock-settings.disable-confirm',
+  enableCard: 'app-lock-settings.enable-card',
+  keyInput: 'app-lock-settings.key-input',
+  keyError: 'app-lock-settings.key-error',
+  confirmEnable: 'app-lock-settings.confirm-enable',
+  cancelEnable: 'app-lock-settings.cancel-enable',
+} as const;
+
+export const AppLock = {
+  screen: 'app-lock.screen',
+  deviceAuth: 'app-lock.device-auth',
+  useRecoveryKey: 'app-lock.use-recovery-key',
+  keyInput: 'app-lock.key-input',
+  keyError: 'app-lock.key-error',
+  unlock: 'app-lock.unlock',
 } as const;
 
 export const MembershipSettings = {
@@ -401,6 +427,7 @@ export const DisplaySettings = {
   content: 'display-settings.content',
   theme: 'display-settings.theme',
   calendar: 'display-settings.calendar',
+  messageLinks: 'display-settings.message-links',
 } as const;
 
 export const CalendarDisplaySettings = {
@@ -453,4 +480,6 @@ export const CloudSync = {
   deleteConfirm: 'cloud-sync.delete-confirm',
   deleteBackedUp: 'cloud-sync.delete-backed-up',
   deleteConfirmAction: 'cloud-sync.delete-confirm-action',
+  deleteAppLockDialog: 'cloud-sync.delete-app-lock-dialog',
+  deleteAppLockConfirm: 'cloud-sync.delete-app-lock-confirm',
 } as const;

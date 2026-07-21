@@ -6,6 +6,7 @@ class AppViewController: CAPBridgeViewController {
         super.capacitorDidLoad()
 
         bridge?.registerPluginInstance(ImageToolsPlugin())
+        bridge?.registerPluginInstance(DeviceAuthPlugin())
         bridge?.registerPluginInstance(AttachmentFileCachePlugin())
         bridge?.registerPluginInstance(WebDavHttpPlugin())
         bridge?.registerPluginInstance(VideoToolsPlugin())

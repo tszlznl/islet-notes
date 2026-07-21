@@ -1,3 +1,4 @@
+import { AppLockService, IAppLockService } from '@/services/appLock/common/appLockService';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import { WorkbenchDiaryService } from '@/services/diary/browser/workbenchDiaryService';
 import { E2eDriverService, IE2eDriverService } from '@/services/e2e/common/e2eDriverService';
@@ -67,6 +68,7 @@ export async function initServices(): Promise<InitServicesResult> {
     IFileAssetService,
     new SyncDescriptor(FileAssetService, [initialSyncConfig]),
   );
+  serviceCollection.set(IAppLockService, new SyncDescriptor(AppLockService));
   serviceCollection.set(IE2eDriverService, new SyncDescriptor(E2eDriverService));
 
   const instantiationService = new InstantiationService(serviceCollection, true);

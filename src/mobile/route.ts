@@ -279,6 +279,12 @@ export const routes: PageRoute[] = [
     fallback: '/settings',
   },
   {
+    url: '/settings/authentication',
+    file: './pages/settings/authentication/authentication',
+    component: 'SettingsAuthenticationPage',
+    fallback: '/settings',
+  },
+  {
     url: '/settings/display/calendar',
     file: './pages/settings/display/calendar/calendar',
     component: 'SettingsCalendarDisplayPage',

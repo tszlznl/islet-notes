@@ -16,6 +16,13 @@ export const CalendarDisplayOrderPreference = definePreference({
   defaultValue: 'oldest-first',
 });
 
+export const MessageLinkDetectionPreference = definePreference({
+  channel: 'host',
+  key: 'message-link-detection',
+  schema: z.boolean(),
+  defaultValue: true,
+});
+
 export type AppStorageMode = 'persistent' | 'memory';
 
 export const SyncConfigSchema = z.discriminatedUnion('provider', [

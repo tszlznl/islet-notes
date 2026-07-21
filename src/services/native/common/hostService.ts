@@ -21,11 +21,17 @@ export interface IHostService {
   exitApp(): void;
   vibrateShort(): void;
   writeToClipboard(text: string): Promise<void>;
+  /** 使用系统默认浏览器打开已校验的 HTTP(S) 外部链接。 */
+  openExternalUrl(url: string): Promise<void>;
   /** 导出用户可拿到的 UTF-8 文本文件。浏览器端下载，原生端打开系统分享面板。 */
   exportTextFile(options: HostExportTextFileOptions): Promise<void>;
   /** 导出二进制文件（图片/视频原件等）。浏览器端下载，原生端打开系统分享面板。 */
   exportBlobFile(options: HostExportBlobFileOptions): Promise<void>;
   setBarStyle(theme: HostSystemBarStyle): Promise<void>;
+  /** 系统身份验证是否可用：平台支持且设备已录入生物识别或锁屏密码。 */
+  canUseDeviceAuth(): Promise<boolean>;
+  /** 调起系统身份验证（指纹/面容/设备密码）。验证通过返回 true，取消或失败返回 false。 */
+  requestDeviceAuth(options: HostDeviceAuthOptions): Promise<boolean>;
   /** 返回已通过图片类型和大小校验的 Blob，用户取消时返回 undefined。 */
   pickImageBlob(source: ImagePickSource): Promise<Blob | undefined>;
 
@@ -78,6 +84,20 @@ export interface IHostService {
 
 export const IHostService = createDecorator<IHostService>('IHostService');
 
+/** 拒绝会触发脚本或其他应用协议的地址，并统一 URL 序列化结果。 */
+export function normalizeExternalHttpUrl(value: string): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('External URL must be a valid absolute URL.');
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error('External URL must use HTTP or HTTPS.');
+  }
+  return url.href;
+}
+
 export class HostPreferenceCache {
   private readonly loadedKeys = new Set<string>();
   private readonly values = new Map<string, unknown>();
@@ -111,7 +131,17 @@ export type HostFeature =
   | 'webDavHttpRequest'
   | 'attachmentFileCache'
   | 'videoUpload'
-  | 'videoTranscode';
+  | 'videoTranscode'
+  | 'deviceAuth';
+
+export interface HostDeviceAuthOptions {
+  /** 系统验证弹窗标题。 */
+  title: string;
+  /** 系统验证弹窗副标题，仅 Android 使用。 */
+  subtitle?: string;
+  /** 取消按钮文案，仅 iOS 使用。 */
+  cancelLabel?: string;
+}
 
 export interface HostVideoPick {
   /** 原视频已复制到 app 私有目录后的路径，task 只持久化这个路径。 */

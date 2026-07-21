@@ -3,6 +3,8 @@ PODS:
     - CapacitorCordova
   - CapacitorApp (8.1.0):
     - Capacitor
+  - CapacitorAppLauncher (8.0.1):
+    - Capacitor
   - CapacitorCamera (8.2.0):
     - Capacitor
     - IONCameraLib (~> 1.0.4)
@@ -20,6 +22,7 @@ PODS:
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@8.4.0_@capacitor+core@8.4.0/node_modules/@capacitor/ios`)"
   - "CapacitorApp (from `../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.0/node_modules/@capacitor/app`)"
+  - "CapacitorAppLauncher (from `../../node_modules/.pnpm/@capacitor+app-launcher@8.0.1_@capacitor+core@8.4.0/node_modules/@capacitor/app-launcher`)"
   - "CapacitorCamera (from `../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.0/node_modules/@capacitor/camera`)"
   - "CapacitorClipboard (from `../../node_modules/.pnpm/@capacitor+clipboard@8.0.1_@capacitor+core@8.4.0/node_modules/@capacitor/clipboard`)"
   - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@8.4.0_@capacitor+core@8.4.0/node_modules/@capacitor/ios`)"
@@ -36,6 +39,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/.pnpm/@capacitor+ios@8.4.0_@capacitor+core@8.4.0/node_modules/@capacitor/ios"
   CapacitorApp:
     :path: "../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.4.0/node_modules/@capacitor/app"
+  CapacitorAppLauncher:
+    :path: "../../node_modules/.pnpm/@capacitor+app-launcher@8.0.1_@capacitor+core@8.4.0/node_modules/@capacitor/app-launcher"
   CapacitorCamera:
     :path: "../../node_modules/.pnpm/@capacitor+camera@8.2.0_@capacitor+core@8.4.0/node_modules/@capacitor/camera"
   CapacitorClipboard:
@@ -50,6 +55,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Capacitor: 75bd117ba037a51bb0f19ded32c67f4b3bc16600
   CapacitorApp: 449ffe26375e96f8aaaee625ac6e01e5c57c8650
+  CapacitorAppLauncher: 43949ccc5aaa5139a1ebe27a98c0a4d76c883fa7
   CapacitorCamera: 8f6acf83664118321111e76acef86390211ccb08
   CapacitorClipboard: c75fdaa6e622111119f35e7914ecfc67b05efecb
   CapacitorCordova: 71d81f350e6c30bf2a846593b5c480fbd68e9bac
@@ -58,6 +64,6 @@ SPEC CHECKSUMS:
   IONCameraLib: f2349804460bd9e3f892e42109b8d996ab3fa19d
   IONFilesystemLib: 21a63377696b2d8fab5632ecfb7d2ac67bddb68a
 
-PODFILE CHECKSUM: 3f0f37710b7a4f10dee71b699e18e82e002398a0
+PODFILE CHECKSUM: 0bcf0d2af067675fe086c5935a73df422fa7b124
 
 COCOAPODS: 1.16.2

@@ -1,4 +1,9 @@
 import { layout, prepare } from '@chenglou/pretext';
+import {
+  MESSAGE_TEXT_FONT,
+  MESSAGE_TEXT_LINE_HEIGHT,
+  getMessageTextMaxWidth,
+} from '../text/height';
 
 const MESSAGE_VISIBLE_GAP = 10;
 const TEXT_MESSAGE_MIN_HEIGHT = 40;
@@ -10,24 +15,23 @@ export const AUDIO_TRANSCRIBING_HEIGHT = 38;
 
 export function estimateAudioMessageHeight(
   text: string | undefined,
-  containerWidth: number,
+  viewportWidth: number,
   transcribing?: boolean,
 ) {
   if (transcribing) return AUDIO_MESSAGE_HEIGHT + AUDIO_TRANSCRIBING_HEIGHT;
-  return AUDIO_MESSAGE_HEIGHT + estimateAudioTranscriptHeight(text, containerWidth);
+  return AUDIO_MESSAGE_HEIGHT + estimateAudioTranscriptHeight(text, viewportWidth);
 }
 
 export function estimateAudioTranscriptHeight(
   text: string | undefined,
-  containerWidth: number,
+  viewportWidth: number,
 ): number {
   const content = text?.trim();
   if (!content) return 0;
-  const maxBubbleWidth = Math.min(containerWidth * 0.72, 340) - 24;
   const measured = layout(
-    prepare(content, '17px PingFang SC', { whiteSpace: 'pre-wrap' }),
-    maxBubbleWidth,
-    24,
+    prepare(content, MESSAGE_TEXT_FONT, { whiteSpace: 'pre-wrap' }),
+    getMessageTextMaxWidth(viewportWidth),
+    MESSAGE_TEXT_LINE_HEIGHT,
   );
   return (
     Math.max(TEXT_MESSAGE_MIN_HEIGHT, measured.height + TEXT_MESSAGE_VERTICAL_PADDING) +
