@@ -27,7 +27,6 @@ public class MainActivity extends BridgeActivity {
     registerPlugin(FileSharePlugin.class);
     SplashScreen.installSplashScreen(this);
     super.onCreate(savedInstanceState);
-    configureWebViewTextZoom();
     configureWebViewDebugging();
     configureEdgeToEdge();
     configureSafeAreaInsets();
@@ -43,10 +42,6 @@ public class MainActivity extends BridgeActivity {
 
   private void configureWebViewDebugging() {
     WebView.setWebContentsDebuggingEnabled(true);
-  }
-
-  private void configureWebViewTextZoom() {
-    getBridge().getWebView().getSettings().setTextZoom(100);
   }
 
   private void configureEdgeToEdge() {
