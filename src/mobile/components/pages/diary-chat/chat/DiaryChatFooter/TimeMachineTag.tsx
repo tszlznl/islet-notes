@@ -7,16 +7,27 @@ import React from 'react';
 
 interface TimeMachineTagProps {
   timestamp: number;
+  onEdit: () => void;
   onRemove: () => void;
 }
 
-/** 输入框上方的时光机时间 tag，点 X 取消选择。与身份 tag 同款样式。 */
-export function TimeMachineTag({ timestamp, onRemove }: TimeMachineTagProps) {
+/** 输入框上方的时光机时间气泡，点时间重新编辑，点 X 取消选择。 */
+export function TimeMachineTag({ timestamp, onEdit, onRemove }: TimeMachineTagProps) {
   return (
     <div className={styles.DiaryChatFooter.IdentityTagRow}>
-      <span className={styles.DiaryChatFooter.IdentityTag} data-test-id={DiaryChat.timeMachineTag}>
-        <Hourglass size={14} />
-        <span className={styles.DiaryChatFooter.IdentityTagName}>{formatEntryTime(timestamp)}</span>
+      <span className={styles.DiaryChatFooter.IdentityTag}>
+        <button
+          type='button'
+          className={styles.DiaryChatFooter.IdentityTagEdit}
+          aria-label={localize('diary.timeMachine.tagEdit', 'Edit selected time')}
+          data-test-id={DiaryChat.timeMachineTag}
+          onClick={onEdit}
+        >
+          <Hourglass size={14} />
+          <span className={styles.DiaryChatFooter.IdentityTagName}>
+            {formatEntryTime(timestamp)}
+          </span>
+        </button>
         <button
           type='button'
           className={styles.DiaryChatFooter.IdentityTagRemove}

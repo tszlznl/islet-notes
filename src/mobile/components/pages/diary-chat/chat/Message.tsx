@@ -3,7 +3,8 @@ import type { DiaryModelData, ImageAttachmentRecord } from '@/core/diary/type';
 import { IdentityAvatar } from '@/mobile/components/IdentityAvatar';
 import { UserAvatar } from '@/mobile/components/UserAvatar';
 import { DiaryChat } from '@/mobile/test.id';
-import { styles } from '@/mobile/styles/ui';
+import { getMessagePresentation, resolveMessageColor } from '@/base/just-vibes/message-color';
+import { cx, styles } from '@/mobile/styles/ui';
 import React, { type CSSProperties } from 'react';
 import type { ListChildComponentProps } from 'react-window';
 import { DividerMessage } from './divider/main';
@@ -34,6 +35,14 @@ export function ChatMessage({ index, style, data }: ListChildComponentProps<Chat
         : undefined;
   const identity = identityId ? getIdentityById(data.model, identityId) : undefined;
   const alignLeft = identity?.messagePosition === 'left';
+  // 身份消息用身份的消息颜色，本人消息用 profile 的；未知 type 或主题不匹配时兜底默认气泡。
+  const messageColor = resolveMessageColor(
+    identity ? identity.messageColor : data.model.profile.messageColor,
+  );
+  const bubble = getMessagePresentation(messageColor);
+  if (bubble?.style) {
+    Object.assign(rowStyle, bubble.style);
+  }
   const avatar = identity ? (
     <IdentityAvatar
       model={data.model}
@@ -47,7 +56,11 @@ export function ChatMessage({ index, style, data }: ListChildComponentProps<Chat
 
   if (alignLeft) {
     return (
-      <div className={styles.ChatMessage.RowLeft} data-test-id={DiaryChat.row} style={rowStyle}>
+      <div
+        className={cx(styles.ChatMessage.RowLeft, bubble?.className)}
+        data-test-id={DiaryChat.row}
+        style={rowStyle}
+      >
         {avatar}
         <MessageBody
           resolved={resolved}
@@ -59,7 +72,11 @@ export function ChatMessage({ index, style, data }: ListChildComponentProps<Chat
   }
 
   return (
-    <div className={styles.ChatMessage.RowRight} data-test-id={DiaryChat.row} style={rowStyle}>
+    <div
+      className={cx(styles.ChatMessage.RowRight, bubble?.className)}
+      data-test-id={DiaryChat.row}
+      style={rowStyle}
+    >
       <MessageBody resolved={resolved} previewAttachments={data.previewAttachments} />
       {avatar}
     </div>

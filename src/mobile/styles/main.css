@@ -81,6 +81,15 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+/* 自定义背景只在保存时的实际主题中生效；切换主题后自动回退到主题默认值。 */
+[data-theme='light'] .message-color-theme-light,
+[data-theme='dark'] .message-color-theme-dark {
+  --message-background: var(--message-css-background);
+  --c-onbubble: var(--message-css-foreground);
+  --bubble-left-background: var(--message-css-background);
+  --bubble-left-fg: var(--message-css-foreground);
+}
+
 /* Safe-area helpers — env() can't be expressed as a spacing token, so expose
    them as first-class utilities. */
 @utility safe-top {

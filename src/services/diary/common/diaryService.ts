@@ -1,5 +1,6 @@
 import {
   AttachmentRecord,
+  MessageColor,
   CreateAttachmentEntryOptions,
   CreateTextEntryOptions,
   DiaryEntryRecord,
@@ -30,10 +31,12 @@ export interface IDiaryService {
   ): void;
   updateProfileName(name: string): void;
   updateProfileAvatar(avatarAttachmentId: string | undefined): void;
+  updateProfileMessageColor(messageColor: MessageColor | undefined): void;
   addIdentity(name: string): string;
   updateIdentityName(identityId: string, name: string): void;
   updateIdentityAvatar(identityId: string, avatarAttachmentId: string | undefined): void;
   updateIdentityMessagePosition(identityId: string, messagePosition: IdentityMessagePosition): void;
+  updateIdentityMessageColor(identityId: string, messageColor: MessageColor | undefined): void;
   archiveIdentity(identityId: string): void;
   unarchiveIdentity(identityId: string): void;
   addTextEntry(notebookId: string, text: string): string;

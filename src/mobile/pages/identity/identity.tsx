@@ -78,6 +78,12 @@ export function IdentityPage() {
               disabled: avatarPicker.uploading,
               onClick: () => void avatarPicker.pick(),
             },
+            {
+              label: localize('messageColor.title', 'Message color'),
+              testId: IdentityEdit.messageColor,
+              onClick: () =>
+                navigationService.navigate({ path: `/identity/${identityId}/message-color` }),
+            },
           ]}
         />
         <CellListGroup

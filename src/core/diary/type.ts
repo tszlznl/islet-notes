@@ -1,8 +1,37 @@
+import type { CssMessageColor } from '@/base/just-vibes/message-color';
+
+export type { CssMessageColor } from '@/base/just-vibes/message-color';
+
 export const PROFILE_ATTACHMENT_NOTEBOOK_ID = 'profile';
 
 export const IDENTITY_ATTACHMENT_NOTEBOOK_ID = 'identity';
 
 export type IdentityMessagePosition = 'left' | 'right';
+
+/** 当前版本只支持经过界面校验、且绑定实际浅色或深色主题的 CSS background。 */
+export type KnownMessageColor = CssMessageColor;
+
+/** 存储形态对未来的背景类型开放：未知 type 原样保留（老版本不丢新版本数据），渲染层兜底为默认气泡。 */
+export type MessageColor = KnownMessageColor | { type: string & {} };
+
+export function isKnownMessageColor(style: MessageColor): style is KnownMessageColor {
+  if (style.type !== 'css') return false;
+  const { value, theme, textColor } = style as CssMessageColor;
+  return (
+    typeof value === 'string' &&
+    value.trim().length > 0 &&
+    (theme === 'light' || theme === 'dark') &&
+    (textColor === 'auto' || textColor === 'black' || textColor === 'white')
+  );
+}
+
+/** 读取存储中的消息颜色：仅要求是带非空字符串 type 的对象，其余字段原样透传。 */
+export function readMessageColorValue(raw: unknown): MessageColor | undefined {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return undefined;
+  const { type } = raw as { type?: unknown };
+  if (typeof type !== 'string' || !type) return undefined;
+  return raw as MessageColor;
+}
 
 export interface IdentityRecord {
   id: string;
@@ -10,6 +39,8 @@ export interface IdentityRecord {
   avatarAttachmentId?: string;
   /** 聊天消息的显示位置；读取时缺失或非法值一律按 'right' 容错。 */
   messagePosition: IdentityMessagePosition;
+  /** 消息颜色；缺失或渲染层无法识别时使用默认气泡。 */
+  messageColor?: MessageColor;
   createdAt: number;
   updatedAt: number;
   /** 归档时间。身份只能归档不能删除，与软删除 deletedAt 区分。 */
@@ -29,6 +60,8 @@ export interface NotebookRecord {
 export interface ProfileRecord {
   name?: string;
   avatarAttachmentId?: string;
+  /** 本人消息的消息颜色；缺失或渲染层无法识别时使用默认气泡。 */
+  messageColor?: MessageColor;
   updatedAt?: number;
 }
 

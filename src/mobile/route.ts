@@ -159,6 +159,12 @@ export const routes: PageRoute[] = [
     fallback: ({ identityId }) => (identityId ? `/identity/${identityId}` : '/identities'),
   },
   {
+    url: '/identity/:identityId/message-color',
+    file: './pages/identity/message-color/message-color',
+    component: 'IdentityMessageColorPage',
+    fallback: ({ identityId }) => (identityId ? `/identity/${identityId}` : '/identities'),
+  },
+  {
     url: '/settings',
     file: './pages/settings/settings',
     component: 'SettingsPage',
@@ -171,9 +177,15 @@ export const routes: PageRoute[] = [
     fallback: '/me',
   },
   {
+    url: '/settings/profile/message-color',
+    file: './pages/settings/profile/message-color/message-color',
+    component: 'ProfileMessageColorPage',
+    fallback: '/settings/profile',
+  },
+  {
     url: '/settings/membership',
     file: './pages/settings/membership/membership',
-    component: 'SettingsMembershipPage',
+    component: 'SettingsMembershipPageRoute',
     fallback: '/settings',
   },
   {

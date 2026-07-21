@@ -70,6 +70,12 @@ export function SettingsProfilePage() {
               testId: Profile.name,
               onClick: () => navigationService.navigate({ path: '/settings/name' }),
             },
+            {
+              label: localize('messageColor.title', 'Message color'),
+              testId: Profile.messageColor,
+              onClick: () =>
+                navigationService.navigate({ path: '/settings/profile/message-color' }),
+            },
           ]}
         />
         {error && (

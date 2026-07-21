@@ -1,5 +1,6 @@
 import type {
   AttachmentRecord,
+  MessageColor,
   CreateAttachmentEntryOptions,
   CreateTextEntryOptions,
   DiaryEntryRecord,
@@ -38,6 +39,8 @@ export interface IE2eDriverService {
   addNotebook(name: string): string;
   addIdentity(options: { name: string; messagePosition?: IdentityMessagePosition }): string;
   archiveIdentity(identityId: string): void;
+  updateIdentityMessageColor(identityId: string, messageColor: MessageColor | undefined): void;
+  updateProfileMessageColor(messageColor: MessageColor | undefined): void;
   addTextEntryWithOptions(options: CreateTextEntryOptions): string;
   addEntryForTest(entry: DiaryEntryRecord): string;
   addAttachmentEntry(options: CreateAttachmentEntryOptions): string;
@@ -112,6 +115,14 @@ export class E2eDriverService implements IE2eDriverService {
 
   archiveIdentity(identityId: string): void {
     this.diaryService.archiveIdentity(identityId);
+  }
+
+  updateIdentityMessageColor(identityId: string, messageColor: MessageColor | undefined): void {
+    this.diaryService.updateIdentityMessageColor(identityId, messageColor);
+  }
+
+  updateProfileMessageColor(messageColor: MessageColor | undefined): void {
+    this.diaryService.updateProfileMessageColor(messageColor);
   }
 
   addTextEntryWithOptions(options: CreateTextEntryOptions): string {

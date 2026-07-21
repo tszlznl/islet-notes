@@ -5,6 +5,7 @@ import { loadLoro, type LoroDoc, type LoroMap, type LoroMovableList, type PeerID
 import { isNotebookNameTaken } from './selectors';
 import {
   AttachmentRecord,
+  MessageColor,
   CreateAttachmentEntryOptions,
   CreateTextEntryOptions,
   DiaryEntryRecord,
@@ -13,6 +14,7 @@ import {
   IdentityRecord,
   NotebookRecord,
   ProfileRecord,
+  readMessageColorValue,
 } from './type';
 
 const PROFILE = 'profile';
@@ -129,6 +131,17 @@ export class DiaryModel {
     this.doc.commit();
   }
 
+  /** 传 undefined 时删除配置；直接写 undefined 会被序列化为 null，因此需要整体删掉字段。 */
+  updateProfileMessageColor(messageColor: MessageColor | undefined) {
+    if (messageColor) {
+      this.profileMap.set('messageColor', messageColor);
+    } else {
+      this.profileMap.delete('messageColor');
+    }
+    this.profileMap.set('updatedAt', Date.now());
+    this.doc.commit();
+  }
+
   addIdentity(name: string, createdAt = Date.now()): string {
     const id = nanoid();
     const record: IdentityRecord = {
@@ -173,6 +186,20 @@ export class DiaryModel {
       messagePosition,
       updatedAt: Date.now(),
     });
+    this.doc.commit();
+  }
+
+  /** 传 undefined 时删除配置；直接写 undefined 会被序列化为 null，因此需要整体删掉字段。 */
+  updateIdentityMessageColor(identityId: string, messageColor: MessageColor | undefined) {
+    const existing = this.getIdentity(identityId);
+    if (!existing) return;
+    const record: IdentityRecord = { ...existing, updatedAt: Date.now() };
+    if (messageColor) {
+      record.messageColor = messageColor;
+    } else {
+      delete record.messageColor;
+    }
+    this.identitiesMap.set(identityId, record);
     this.doc.commit();
   }
 
@@ -508,6 +535,10 @@ export class DiaryModel {
       if (typeof value.archivedAt === 'number') {
         record.archivedAt = value.archivedAt;
       }
+      const messageColor = readMessageColorValue(value.messageColor);
+      if (messageColor) {
+        record.messageColor = messageColor;
+      }
       identities.push(record);
     }
     identities.sort((a, b) =>
@@ -527,6 +558,10 @@ export class DiaryModel {
     }
     if (typeof raw.avatarAttachmentId === 'string' && raw.avatarAttachmentId.trim()) {
       profile.avatarAttachmentId = raw.avatarAttachmentId;
+    }
+    const messageColor = readMessageColorValue(raw.messageColor);
+    if (messageColor) {
+      profile.messageColor = messageColor;
     }
     if (typeof raw.updatedAt === 'number') {
       profile.updatedAt = raw.updatedAt;

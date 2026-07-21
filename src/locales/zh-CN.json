@@ -324,6 +324,10 @@
     "defaultMessage": "Choose a time",
     "content": "选择时间"
   },
+  "diary.timeMachine.tagEdit": {
+    "defaultMessage": "Edit selected time",
+    "content": "编辑所选时间"
+  },
   "diary.timeMachine.tagRemove": {
     "defaultMessage": "Clear selected time",
     "content": "清除已选时间"
@@ -596,6 +600,86 @@
     "content": "已记录 {0} 条日记",
     "defaultMessage": "{0} entries recorded"
   },
+  "messageColor.cssLabel": {
+    "defaultMessage": "CSS background",
+    "content": "CSS background"
+  },
+  "messageColor.customCssInvalid": {
+    "defaultMessage": "Enter a valid CSS color or a single linear-gradient(). The default is applied.",
+    "content": "请输入有效的 CSS 色值或单个 linear-gradient()，已使用默认值"
+  },
+  "messageColor.customCssPlaceholder": {
+    "defaultMessage": "#95ec69 or linear-gradient(135deg, #9ec9ff, #b3aef7)",
+    "content": "#95ec69 或 linear-gradient(135deg, #9ec9ff, #b3aef7)"
+  },
+  "messageColor.darkThemeHint": {
+    "defaultMessage": "Only applies to the current dark theme; supports CSS colors and gradients",
+    "content": "仅在当前深色主题下生效，支持颜色值与渐变函数"
+  },
+  "messageColor.lightThemeHint": {
+    "defaultMessage": "Only applies to the current light theme; supports CSS colors and gradients",
+    "content": "仅在当前浅色主题下生效，支持颜色值与渐变函数"
+  },
+  "messageColor.previewMessage": {
+    "defaultMessage": "This is a sent message",
+    "content": "这是一条我发出的消息"
+  },
+  "messageColor.quickFill": {
+    "defaultMessage": "Quick fill",
+    "content": "快捷填充"
+  },
+  "messageColor.quickFillApricot": {
+    "defaultMessage": "Apricot",
+    "content": "杏橙"
+  },
+  "messageColor.quickFillGraphite": {
+    "defaultMessage": "Graphite",
+    "content": "石墨灰"
+  },
+  "messageColor.quickFillGray": {
+    "defaultMessage": "Gray",
+    "content": "浅灰"
+  },
+  "messageColor.quickFillGreen": {
+    "defaultMessage": "Green",
+    "content": "绿色"
+  },
+  "messageColor.quickFillLemon": {
+    "defaultMessage": "Lemon",
+    "content": "柠檬黄"
+  },
+  "messageColor.quickFillPink": {
+    "defaultMessage": "Pink",
+    "content": "粉红"
+  },
+  "messageColor.quickFillPurple": {
+    "defaultMessage": "Purple",
+    "content": "浅紫"
+  },
+  "messageColor.quickFillSky": {
+    "defaultMessage": "Sky blue",
+    "content": "天蓝"
+  },
+  "messageColor.textColor": {
+    "defaultMessage": "Text color",
+    "content": "文字颜色"
+  },
+  "messageColor.textColorAuto": {
+    "defaultMessage": "Auto",
+    "content": "自动"
+  },
+  "messageColor.textColorBlack": {
+    "defaultMessage": "Black",
+    "content": "黑"
+  },
+  "messageColor.textColorWhite": {
+    "defaultMessage": "White",
+    "content": "白"
+  },
+  "messageColor.title": {
+    "defaultMessage": "Message color",
+    "content": "消息颜色"
+  },
   "parser.minimalDiary.note": {
     "content": "备注：{0}",
     "defaultMessage": "Note: {0}"
@@ -776,10 +860,6 @@
     "defaultMessage": "Benefits are active.",
     "content": "权益已生效"
   },
-  "settings.membership.error.loadFailed": {
-    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
-    "content": "暂时无法加载会员信息，请稍后重试。"
-  },
   "settings.membership.appStore.buyPrice": {
     "defaultMessage": "Buy with App Store · {0}",
     "content": "通过 App Store 购买 · {0}"
@@ -831,6 +911,10 @@
   "settings.membership.center": {
     "defaultMessage": "Membership",
     "content": "会员"
+  },
+  "settings.membership.error.loadFailed": {
+    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
+    "content": "暂时无法加载会员信息，请稍后重试。"
   },
   "settings.membership.feature.chatBackground": {
     "content": "聊天背景",

@@ -1,6 +1,7 @@
 import { DiaryModel } from '@/core/diary/model';
 import {
   AttachmentRecord,
+  MessageColor,
   CreateAttachmentEntryOptions,
   CreateTextEntryOptions,
   DiaryEntryRecord,
@@ -161,6 +162,10 @@ export class WorkbenchDiaryService implements IDiaryService {
     this.diaryModel.updateProfileAvatar(avatarAttachmentId);
   }
 
+  updateProfileMessageColor(messageColor: MessageColor | undefined): void {
+    this.diaryModel.updateProfileMessageColor(messageColor);
+  }
+
   addIdentity(name: string): string {
     return this.diaryModel.addIdentity(name);
   }
@@ -178,6 +183,10 @@ export class WorkbenchDiaryService implements IDiaryService {
     messagePosition: IdentityMessagePosition,
   ): void {
     this.diaryModel.updateIdentityMessagePosition(identityId, messagePosition);
+  }
+
+  updateIdentityMessageColor(identityId: string, messageColor: MessageColor | undefined): void {
+    this.diaryModel.updateIdentityMessageColor(identityId, messageColor);
   }
 
   archiveIdentity(identityId: string): void {

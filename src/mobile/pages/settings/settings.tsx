@@ -1,6 +1,5 @@
 import { APP_VERSION, PROJECT_COMMIT_HASH } from '@/base/common/version';
 import { localize } from '@/nls';
-import type { SyncConfigRecord } from '@/core/diary/type';
 import { CellListGroup } from '@/mobile/components/CellList';
 import { HeaderPage } from '@/mobile/components/layout/HeaderPage';
 import { useDialog } from '@/mobile/overlay/dialog/useDialog';
@@ -24,9 +23,6 @@ export function SettingsPage() {
   const showLoadingToast = useLoadingToast();
   const showSuccessToast = useSuccessToast();
   const experienceMode = isExperienceMode();
-  // 会员依赖云同步身份（recovery key）：未配置同步时隐藏入口，避免进入后是禁用购买的死胡同页。
-  const hasCloudSync = hasRecoveryKey(fileAssetService.getSyncConfig());
-  const showMembership = !experienceMode && hasCloudSync;
 
   const seedExperienceData = async () => {
     const loadingToast = showLoadingToast({
@@ -63,7 +59,6 @@ export function SettingsPage() {
             onClick: () => navigationService.navigate({ path: '/settings/s3' }),
           },
           {
-            hide: !showMembership,
             label: localize('settings.membership', 'Membership'),
             testId: Settings.membership,
             onClick: () => navigationService.navigate({ path: '/settings/membership' }),
@@ -138,8 +133,4 @@ export function SettingsPage() {
       )}
     </HeaderPage>
   );
-}
-
-function hasRecoveryKey(config: SyncConfigRecord | undefined): boolean {
-  return Boolean(config?.recoveryKeyHash?.trim() || config?.recoveryKey?.trim());
 }

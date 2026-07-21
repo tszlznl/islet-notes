@@ -298,7 +298,20 @@ export const Profile = {
   avatar: 'profile.avatar',
   avatarImage: 'profile.avatar-image',
   name: 'profile.name',
+  messageColor: 'profile.message-color',
   error: 'profile.error',
+} as const;
+
+export const MessageColorUI = {
+  identityPage: 'message-color.identity-page',
+  profilePage: 'message-color.profile-page',
+  content: 'message-color.content',
+  preview: 'message-color.preview',
+  /** 快捷色块：拼接从 0 开始的索引。 */
+  swatchPrefix: 'message-color.swatch-',
+  customInput: 'message-color.custom-input',
+  customError: 'message-color.custom-error',
+  textColorPrefix: 'message-color.text-color-',
 } as const;
 
 export const ProfileName = {
@@ -332,6 +345,7 @@ export const IdentityEdit = {
   content: 'identity-edit.content',
   name: 'identity-edit.name',
   avatar: 'identity-edit.avatar',
+  messageColor: 'identity-edit.message-color',
   positionLeft: 'identity-edit.position-left',
   positionRight: 'identity-edit.position-right',
   archive: 'identity-edit.archive',

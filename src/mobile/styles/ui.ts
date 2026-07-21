@@ -754,6 +754,7 @@ export const styles = {
     IdentityTag:
       'flex max-w-full min-w-0 items-center gap-1.5 rounded bg-surface px-2 py-1 text-ink shadow-[0_1px_2px_rgba(0,0,0,0.04)]',
     IdentityTagAvatar: 'rounded-full',
+    IdentityTagEdit: 'flex min-w-0 items-center gap-1.5 text-ink transition active:opacity-60',
     IdentityTagName: cx('min-w-0 overflow-hidden text-ellipsis whitespace-nowrap', font.Desc),
     IdentityTagRemove:
       'grid h-5 w-5 flex-none place-items-center rounded-full text-muted transition active:opacity-60',
@@ -766,15 +767,16 @@ export const styles = {
   },
   TextMessage: {
     Root: cx(
-      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded bg-bubble text-onbubble text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
+      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--message-background,var(--c-bubble))] text-onbubble text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
       font.Body,
-      "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-['']",
+      "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--message-background,var(--c-bubble))] after:content-['']",
     ),
-    // 左侧身份消息：仿微信接收方气泡，白色底 + 左侧小尾巴。
+    // 左侧身份消息：仿微信接收方气泡，白色底 + 左侧小尾巴；设置了消息颜色时
+    // 行容器会注入 --bubble-left-* 变量切到气泡配色。
     RootLeft: cx(
-      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded bg-surface text-ink text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
+      'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded [background:var(--bubble-left-background,var(--c-surface))] text-[color:var(--bubble-left-fg,var(--c-ink))] text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
       font.Body,
-      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-['']",
+      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--bubble-left-background,var(--c-surface))] after:content-['']",
     ),
     // 气泡内引用块：单行截断，高度需与 text/height.ts 的 TEXT_MESSAGE_QUOTE_HEIGHT 保持一致。
     Quote: cx(
@@ -782,7 +784,7 @@ export const styles = {
       font.Footnote,
     ),
     QuoteLeft: cx(
-      'mb-1 block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded bg-black/5 px-2 py-1 text-left text-muted transition active:opacity-70',
+      'mb-1 block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded bg-black/5 px-2 py-1 text-left text-[color:var(--bubble-left-fg,var(--c-muted))] transition active:opacity-70',
       font.Footnote,
     ),
   },
@@ -807,13 +809,13 @@ export const styles = {
     AudioMessageStack: 'flex max-w-[min(72vw,340px)] flex-col items-end gap-1.5',
     AudioMessageStackLeft: 'flex max-w-[min(72vw,340px)] flex-col items-start gap-1.5',
     AudioMessage: cx(
-      'relative flex min-h-10 items-center justify-end gap-1 rounded bg-bubble px-3 py-2 text-left text-onbubble transition active:opacity-85',
-      "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-['']",
+      'relative flex min-h-10 items-center justify-end gap-1 rounded [background:var(--message-background,var(--c-bubble))] px-3 py-2 text-left text-onbubble transition active:opacity-85',
+      "after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--message-background,var(--c-bubble))] after:content-['']",
     ),
     // 左侧身份语音：仿微信接收方气泡，白色底 + 左侧小尾巴，内容靠左。
     AudioMessageLeft: cx(
-      'relative flex min-h-10 items-center justify-start gap-1 rounded bg-surface px-3 py-2 text-left text-ink transition active:opacity-85',
-      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-['']",
+      'relative flex min-h-10 items-center justify-start gap-1 rounded [background:var(--bubble-left-background,var(--c-surface))] px-3 py-2 text-left text-[color:var(--bubble-left-fg,var(--c-ink))] transition active:opacity-85',
+      "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--bubble-left-background,var(--c-surface))] after:content-['']",
     ),
     AudioWaveIcon: 'inline-block h-5 w-5 origin-center',
     // 波纹方向与微信一致:右侧气泡喇叭口朝左,左侧气泡镜像后朝右。
@@ -843,13 +845,28 @@ export const styles = {
     UploadAudioRow: 'flex items-center justify-end gap-1.5',
     UploadAudioRowLeft: 'flex items-center justify-start gap-1.5',
     UploadAudioBubble: cx(
-      'relative flex min-h-10 items-center justify-end gap-1 rounded bg-bubble px-3 py-2 text-onbubble opacity-80',
-      'after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-bubble after:content-[""]',
+      'relative flex min-h-10 items-center justify-end gap-1 rounded [background:var(--message-background,var(--c-bubble))] px-3 py-2 text-onbubble opacity-80',
+      'after:absolute after:-right-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--message-background,var(--c-bubble))] after:content-[""]',
     ),
     UploadAudioBubbleLeft: cx(
-      'relative flex min-h-10 items-center justify-start gap-1 rounded bg-surface px-3 py-2 text-ink opacity-80',
-      'after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-[""]',
+      'relative flex min-h-10 items-center justify-start gap-1 rounded [background:var(--bubble-left-background,var(--c-surface))] px-3 py-2 text-[color:var(--bubble-left-fg,var(--c-ink))] opacity-80',
+      'after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:[background:var(--bubble-left-background,var(--c-surface))] after:content-[""]',
     ),
+  },
+  MessageColorPicker: {
+    Preview: 'flex min-h-28 flex-col justify-center bg-chat px-4 py-5',
+    QuickFillSection: 'bg-surface px-2 py-4',
+    SwatchGrid: 'grid grid-cols-4 justify-items-center gap-y-4',
+    Swatch:
+      'grid h-10 w-10 flex-none place-items-center rounded-full border border-line transition active:opacity-70 disabled:opacity-40',
+    Editor: 'flex flex-col bg-surface px-4 py-3',
+    CustomInput: cx(
+      'block min-h-24 w-full resize-y rounded-lg bg-soft px-3 py-2.5 font-mono text-ink placeholder:text-placeholder [-webkit-user-select:text] [user-select:text]',
+      font.Desc,
+    ),
+    CustomError: cx('mt-2 text-danger', font.Footnote),
+    CombinedHint: cx('px-4 py-2 text-muted', font.Footnote),
+    TextColorGroup: 'mt-2',
   },
   S3SettingsPage: {
     SetupContent: 'bg-surface pb-[calc(5.25rem+var(--sab))]',

@@ -324,6 +324,10 @@
     "defaultMessage": "Choose a time",
     "content": "Choose a time"
   },
+  "diary.timeMachine.tagEdit": {
+    "defaultMessage": "Edit selected time",
+    "content": "Edit selected time"
+  },
   "diary.timeMachine.tagRemove": {
     "defaultMessage": "Clear selected time",
     "content": "Clear selected time"
@@ -596,6 +600,86 @@
     "defaultMessage": "{0} entries recorded",
     "content": "{0} entries recorded"
   },
+  "messageColor.cssLabel": {
+    "defaultMessage": "CSS background",
+    "content": "CSS background"
+  },
+  "messageColor.customCssInvalid": {
+    "defaultMessage": "Enter a valid CSS color or a single linear-gradient(). The default is applied.",
+    "content": "Enter a valid CSS color or a single linear-gradient(). The default is applied."
+  },
+  "messageColor.customCssPlaceholder": {
+    "defaultMessage": "#95ec69 or linear-gradient(135deg, #9ec9ff, #b3aef7)",
+    "content": "#95ec69 or linear-gradient(135deg, #9ec9ff, #b3aef7)"
+  },
+  "messageColor.darkThemeHint": {
+    "defaultMessage": "Only applies to the current dark theme; supports CSS colors and gradients",
+    "content": "Only applies to the current dark theme; supports CSS colors and gradients"
+  },
+  "messageColor.lightThemeHint": {
+    "defaultMessage": "Only applies to the current light theme; supports CSS colors and gradients",
+    "content": "Only applies to the current light theme; supports CSS colors and gradients"
+  },
+  "messageColor.previewMessage": {
+    "defaultMessage": "This is a sent message",
+    "content": "This is a sent message"
+  },
+  "messageColor.quickFill": {
+    "defaultMessage": "Quick fill",
+    "content": "Quick fill"
+  },
+  "messageColor.quickFillApricot": {
+    "defaultMessage": "Apricot",
+    "content": "Apricot"
+  },
+  "messageColor.quickFillGraphite": {
+    "defaultMessage": "Graphite",
+    "content": "Graphite"
+  },
+  "messageColor.quickFillGray": {
+    "defaultMessage": "Gray",
+    "content": "Gray"
+  },
+  "messageColor.quickFillGreen": {
+    "defaultMessage": "Green",
+    "content": "Green"
+  },
+  "messageColor.quickFillLemon": {
+    "defaultMessage": "Lemon",
+    "content": "Lemon"
+  },
+  "messageColor.quickFillPink": {
+    "defaultMessage": "Pink",
+    "content": "Pink"
+  },
+  "messageColor.quickFillPurple": {
+    "defaultMessage": "Purple",
+    "content": "Purple"
+  },
+  "messageColor.quickFillSky": {
+    "defaultMessage": "Sky blue",
+    "content": "Sky blue"
+  },
+  "messageColor.textColor": {
+    "defaultMessage": "Text color",
+    "content": "Text color"
+  },
+  "messageColor.textColorAuto": {
+    "defaultMessage": "Auto",
+    "content": "Auto"
+  },
+  "messageColor.textColorBlack": {
+    "defaultMessage": "Black",
+    "content": "Black"
+  },
+  "messageColor.textColorWhite": {
+    "defaultMessage": "White",
+    "content": "White"
+  },
+  "messageColor.title": {
+    "defaultMessage": "Message color",
+    "content": "Message color"
+  },
   "parser.minimalDiary.note": {
     "defaultMessage": "Note: {0}",
     "content": "Note: {0}"
@@ -776,10 +860,6 @@
     "defaultMessage": "Benefits are active.",
     "content": "Benefits are active."
   },
-  "settings.membership.error.loadFailed": {
-    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
-    "content": "Membership information is temporarily unavailable. Try again later."
-  },
   "settings.membership.appStore.buyPrice": {
     "defaultMessage": "Buy with App Store · {0}",
     "content": "Buy with App Store · {0}"
@@ -831,6 +911,10 @@
   "settings.membership.center": {
     "defaultMessage": "Membership",
     "content": "Membership"
+  },
+  "settings.membership.error.loadFailed": {
+    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
+    "content": "Membership information is temporarily unavailable. Try again later."
   },
   "settings.membership.feature.chatBackground": {
     "defaultMessage": "Chat background",

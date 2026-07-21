@@ -168,7 +168,7 @@ export function DiaryChatPage() {
               </EntryHighlightProvider>
             )}
           </main>
-          <DiaryChatFooter ref={footerRef} notebookId={notebookId} />
+          <DiaryChatFooter ref={footerRef} notebookId={notebookId} onPastEntrySent={focusEntry} />
         </div>
       </div>
     </ReplyDraftContext.Provider>

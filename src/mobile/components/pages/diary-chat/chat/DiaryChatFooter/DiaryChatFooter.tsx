@@ -35,10 +35,11 @@ import { useDiaryChatMediaActions } from './useDiaryChatMediaActions';
 
 interface DiaryChatFooterProps {
   notebookId: string;
+  onPastEntrySent?: (entryId: string) => void;
 }
 
 export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
-  function DiaryChatFooter({ notebookId }, ref) {
+  function DiaryChatFooter({ notebookId, onPastEntrySent }, ref) {
     const diaryService = useService(IDiaryService);
     const fileAssetService = useService(IFileAssetService);
     const navigationService = useService(INavigationService);
@@ -86,16 +87,20 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
     const sendText = () => {
       const content = text.trim();
       if (!content || voiceMode) return;
-      diaryService.addTextEntryWithOptions({
+      const entryId = diaryService.addTextEntryWithOptions({
         notebookId,
         text: content,
         identityId: selectedIdentity?.id,
         displayAt: timeMachineAt,
         replyToEntryId,
       });
+      const now = Date.now();
+      if (timeMachineAt !== undefined && timeMachineAt < now) {
+        onPastEntrySent?.(entryId);
+      }
       replyDraft?.setReplyToEntryId(undefined);
       // 未来消息不会出现在聊天列表，用 toast 告知用户已保存，避免误以为发送失败。
-      if (timeMachineAt !== undefined && timeMachineAt > Date.now()) {
+      if (timeMachineAt !== undefined && timeMachineAt > now) {
         showToast({
           message: localize('diary.timeMachine.futureSaved', 'Saved to future messages'),
         });
@@ -199,7 +204,11 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
           />
         )}
         {timeMachineAt !== undefined && (
-          <TimeMachineTag timestamp={timeMachineAt} onRemove={() => setTimeMachineAt(undefined)} />
+          <TimeMachineTag
+            timestamp={timeMachineAt}
+            onEdit={openTimeMachine}
+            onRemove={() => setTimeMachineAt(undefined)}
+          />
         )}
         {replyToEntryId && (
           <ReplyQuoteTag
