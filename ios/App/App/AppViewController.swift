@@ -10,5 +10,6 @@ class AppViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(WebDavHttpPlugin())
         bridge?.registerPluginInstance(VideoToolsPlugin())
         bridge?.registerPluginInstance(MediaPickerPlugin())
+        bridge?.registerPluginInstance(FileSharePlugin())
     }
 }

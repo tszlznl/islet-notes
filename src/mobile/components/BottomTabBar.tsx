@@ -24,21 +24,21 @@ export function BottomTabBar({ active }: BottomTabBarProps) {
         icon={<BookOpenText size={24} />}
         testId={BottomTab.diary}
         isActive={active === 'diary'}
-        onClick={() => navigationService.navigate({ path: '/diaries' })}
+        onClick={() => navigationService.navigate({ path: '/diaries', transition: 'none' })}
       />
       <TabButton
         label={localize('tab.calendar', 'Calendar')}
         icon={<CalendarDays size={24} />}
         testId={BottomTab.calendar}
         isActive={active === 'calendar'}
-        onClick={() => navigationService.navigate({ path: '/calendar' })}
+        onClick={() => navigationService.navigate({ path: '/calendar', transition: 'none' })}
       />
       <TabButton
         label={localize('tab.settings', 'My')}
         icon={<UserRound size={24} />}
         testId={BottomTab.settings}
         isActive={active === 'me'}
-        onClick={() => navigationService.navigate({ path: '/me' })}
+        onClick={() => navigationService.navigate({ path: '/me', transition: 'none' })}
       />
     </nav>
   );

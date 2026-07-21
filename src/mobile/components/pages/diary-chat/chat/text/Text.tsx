@@ -6,14 +6,16 @@ import { styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
 import React from 'react';
+import { TextMessageQuote } from './TextMessageQuote';
 
 interface TextMessageProps {
   entryId: string;
   text: string | undefined;
+  replyToEntryId?: string;
   align?: 'left' | 'right';
 }
 
-export function TextMessage({ entryId, text, align }: TextMessageProps) {
+export function TextMessage({ entryId, text, replyToEntryId, align }: TextMessageProps) {
   const diaryService = useService(IDiaryService);
   const content = text ?? '';
   const highlighted = useIsEntryHighlighted(entryId);
@@ -38,6 +40,9 @@ export function TextMessage({ entryId, text, align }: TextMessageProps) {
       data-test-id={DiaryChat.textMessage}
       {...longPressEvents}
     >
+      {replyToEntryId && (
+        <TextMessageQuote entryId={entryId} replyToEntryId={replyToEntryId} align={align} />
+      )}
       {content}
       <EntryHighlightOverlay active={highlighted} tail />
     </div>

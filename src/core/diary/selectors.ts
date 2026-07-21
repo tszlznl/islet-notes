@@ -1,5 +1,6 @@
 import { format, isSameDay } from 'date-fns';
 import { getDateFnsLocale } from '@/locales/common/locale';
+import { localize } from '@/nls';
 import {
   AttachmentRecord,
   DiaryEntryRecord,
@@ -15,6 +16,21 @@ export function getNotebookById(
 ): NotebookRecord | undefined {
   const notebook = model.notebookMap.get(notebookId);
   return notebook?.deletedAt ? undefined : notebook;
+}
+
+export function isNotebookNameTaken(
+  model: DiaryModelData,
+  name: string,
+  excludeNotebookId?: string,
+): boolean {
+  const normalized = normalizeNotebookName(name);
+  if (!normalized) return false;
+  return model.notebooks.some(
+    (notebook) =>
+      notebook.id !== excludeNotebookId &&
+      !notebook.deletedAt &&
+      normalizeNotebookName(notebook.name) === normalized,
+  );
 }
 
 export function getAttachmentById(
@@ -54,12 +70,33 @@ export function getIdentityAvatarAttachment(
   return getAttachmentById(model, identity.avatarAttachmentId);
 }
 
+/** 展示时间晚于 now 的消息（时光机写给未来的），常规视图不展示。 */
+export function isFutureEntry(
+  entry: Pick<DiaryEntryRecord, 'createdAt' | 'displayAt'>,
+  now: number,
+): boolean {
+  return getEntryDisplayTime(entry) > now;
+}
+
 export function getEntriesByNotebook(
   model: DiaryModelData,
   notebookId: string,
+  now = Date.now(),
 ): DiaryEntryRecord[] {
   return model.entries
-    .filter((entry) => entry.notebookId === notebookId && !entry.deletedAt)
+    .filter(
+      (entry) => entry.notebookId === notebookId && !entry.deletedAt && !isFutureEntry(entry, now),
+    )
+    .sort(compareEntries);
+}
+
+/** 全部未来消息（跨日记本），按展示时间升序，供会员“未来消息”页查看。 */
+export function getFutureEntries(model: DiaryModelData, now = Date.now()): DiaryEntryRecord[] {
+  return model.entries
+    .filter(
+      (entry) =>
+        !entry.deletedAt && !!getNotebookById(model, entry.notebookId) && isFutureEntry(entry, now),
+    )
     .sort(compareEntries);
 }
 
@@ -93,12 +130,12 @@ export function getNotebookListTime(model: DiaryModelData, notebook: NotebookRec
   return lastEntry ? getEntryDisplayTime(lastEntry) : notebook.createdAt;
 }
 
-export function getSortedNotebooks(model: DiaryModelData): NotebookRecord[] {
+export function getSortedNotebooks(model: DiaryModelData, now = Date.now()): NotebookRecord[] {
   const orderIndex = new Map(model.notebooks.map((notebook, index) => [notebook.id, index]));
   const lastEntryByNotebook = new Map<string, DiaryEntryRecord>();
 
   for (const entry of model.entries) {
-    if (entry.deletedAt) continue;
+    if (entry.deletedAt || isFutureEntry(entry, now)) continue;
     const current = lastEntryByNotebook.get(entry.notebookId);
     if (!current || compareEntries(current, entry) < 0) {
       lastEntryByNotebook.set(entry.notebookId, entry);
@@ -120,6 +157,25 @@ export function getSortedNotebooks(model: DiaryModelData): NotebookRecord[] {
 
     return (orderIndex.get(a.id) ?? 0) - (orderIndex.get(b.id) ?? 0);
   });
+}
+
+export interface EntryQuote {
+  senderName: string;
+  summary: string;
+}
+
+/** 解析被引用消息的展示信息；被引用消息不存在或已删除时返回 undefined（渲染占位文案）。 */
+export function getEntryQuote(
+  model: DiaryModelData,
+  replyToEntryId: string | undefined,
+): EntryQuote | undefined {
+  if (!replyToEntryId) return undefined;
+  const entry = model.entryMap.get(replyToEntryId);
+  if (!entry || entry.deletedAt) return undefined;
+  const identity = entry.identityId ? getIdentityById(model, entry.identityId) : undefined;
+  const senderName =
+    identity?.name ?? (model.profile.name?.trim() || localize('identity.switchToSelf', 'Me'));
+  return { senderName, summary: getEntrySummary(model, entry) };
 }
 
 export function getEntrySummary(
@@ -152,4 +208,8 @@ export function formatEntryTime(timestamp: number): string {
     return format(date, 'HH:mm', { locale });
   }
   return format(date, 'yyyy-MM-dd HH:mm', { locale });
+}
+
+function normalizeNotebookName(name: string): string {
+  return name.trim();
 }

@@ -95,6 +95,11 @@ export function DiaryChatSettingsPage() {
               testId: DiarySettings.search,
               onClick: () => navigationService.navigate({ path: `/diary/${notebookId}/search` }),
             },
+            {
+              label: localize('diary.export.title', 'Export'),
+              testId: DiarySettings.export,
+              onClick: () => navigationService.navigate({ path: `/diary/${notebookId}/export` }),
+            },
           ]}
         />
         <CellListGroup

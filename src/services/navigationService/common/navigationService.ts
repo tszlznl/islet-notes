@@ -3,10 +3,15 @@ import { Emitter, Event } from 'vscf/base/common/event';
 import { IDisposable } from 'vscf/base/common/lifecycle';
 import { createDecorator } from 'vscf/platform/instantiation/common';
 
+/** 页面切换动画方向；'none' 用于底部标签栏等不需要动画的切换。 */
+export type NavigateTransition = 'push' | 'pop' | 'none';
+
 export interface NavigateOptions {
   path: string;
   replace?: boolean;
   state?: unknown;
+  /** 缺省按 'push'（新页面从右侧滑入）。 */
+  transition?: NavigateTransition;
 }
 
 export interface GoBackOptions {

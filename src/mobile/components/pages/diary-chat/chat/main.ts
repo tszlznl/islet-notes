@@ -27,7 +27,11 @@ export function estimateDiaryChatItemHeight(
     case 'divider':
       return estimateDividerHeight();
     case 'text':
-      return estimateTextMessageHeight(resolved.text, containerWidth);
+      return estimateTextMessageHeight(
+        resolved.text,
+        containerWidth,
+        !!resolved.entry.replyToEntryId,
+      );
     case 'image':
       return estimateImageMessageHeight(
         resolved.attachment.width,

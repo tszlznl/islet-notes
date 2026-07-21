@@ -2,6 +2,7 @@ import { localize } from '@/nls';
 import { nanoid } from 'nanoid';
 import { Emitter } from 'vscf/base/common/event';
 import { loadLoro, type LoroDoc, type LoroMap, type LoroMovableList, type PeerID } from './loro';
+import { isNotebookNameTaken } from './selectors';
 import {
   AttachmentRecord,
   CreateAttachmentEntryOptions,
@@ -57,10 +58,13 @@ export class DiaryModel {
   }
 
   addNotebook(name: string, createdAt = Date.now()): string {
+    const trimmedName = name.trim();
+    if (!trimmedName) throw new Error('Notebook name is required.');
+    if (this.isNotebookNameTaken(trimmedName)) throw new Error('Notebook name already exists.');
     const id = nanoid();
     const record: NotebookRecord = {
       id,
-      name,
+      name: trimmedName,
       createdAt,
       updatedAt: createdAt,
     };
@@ -73,9 +77,15 @@ export class DiaryModel {
   updateNotebookName(notebookId: string, name: string) {
     const existing = this.getNotebook(notebookId);
     if (!existing) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
+    if (this.isNotebookNameTaken(trimmedName, notebookId)) {
+      throw new Error('Notebook name already exists.');
+    }
+    if (existing.name === trimmedName) return;
     this.notebooksMap.set(notebookId, {
       ...existing,
-      name,
+      name: trimmedName,
       updatedAt: Date.now(),
     });
     this.doc.commit();
@@ -213,6 +223,8 @@ export class DiaryModel {
       externalSource: options.externalSource,
       externalId: options.externalId,
     };
+    applyCreateDisplayAt(entry, options.displayAt);
+    applyCreateReplyTo(entry, options.replyToEntryId);
     this.entriesMap.set(id, entry);
     this.touchNotebook(options.notebookId, now);
     this.doc.commit();
@@ -237,6 +249,8 @@ export class DiaryModel {
         externalSource: options.externalSource,
         externalId: options.externalId,
       };
+      applyCreateDisplayAt(entry, options.displayAt);
+      applyCreateReplyTo(entry, options.replyToEntryId);
       this.entriesMap.set(id, entry);
       ids.push(id);
       touchedNotebooks.set(
@@ -284,6 +298,7 @@ export class DiaryModel {
       externalSource: options.externalSource,
       externalId: options.externalId,
     };
+    applyCreateDisplayAt(entry, options.displayAt);
     this.attachmentsMap.set(options.attachment.id, options.attachment);
     this.entriesMap.set(entryId, entry);
     this.touchNotebook(options.attachment.notebookId, options.createdAt);
@@ -442,6 +457,10 @@ export class DiaryModel {
     return this.toJSON().notebooks;
   }
 
+  private isNotebookNameTaken(name: string, excludeNotebookId?: string): boolean {
+    return isNotebookNameTaken(this.toJSON(), name, excludeNotebookId);
+  }
+
   private getNotebook(notebookId: string): NotebookRecord | undefined {
     return this.notebooksMap.get(notebookId) as NotebookRecord | undefined;
   }
@@ -538,4 +557,17 @@ export class DiaryModel {
   private get identitiesMap(): LoroMap<Record<string, unknown>> {
     return this.doc.getMap(IDENTITIES) as LoroMap<Record<string, unknown>>;
   }
+}
+
+/** 与 updateEntryDisplayAt 语义一致：非法值或与 createdAt 相同时不落库 displayAt。 */
+function applyCreateDisplayAt(entry: DiaryEntryRecord, displayAt: number | undefined) {
+  if (typeof displayAt !== 'number' || !Number.isFinite(displayAt)) return;
+  if (displayAt === entry.createdAt) return;
+  entry.displayAt = displayAt;
+}
+
+/** 直接写 undefined 会被序列化为 null，缺省时整体不落库 replyToEntryId 字段。 */
+function applyCreateReplyTo(entry: DiaryEntryRecord, replyToEntryId: string | undefined) {
+  if (typeof replyToEntryId !== 'string' || !replyToEntryId) return;
+  entry.replyToEntryId = replyToEntryId;
 }

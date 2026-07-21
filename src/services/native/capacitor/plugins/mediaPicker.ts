@@ -3,9 +3,11 @@ import { registerPlugin } from '@capacitor/core';
 export interface NativeMediaPickerPickOptions {
   mediaTypes: 'images' | 'images-and-videos';
   cacheScope?: string;
+  /** 最多可选数量，大于 1 时 Android 相册开启多选；缺省单选。 */
+  limit?: number;
 }
 
-export type NativeMediaPickerPickResult =
+export type NativeMediaPickerPickItem =
   | {
       kind: 'image';
       photoPath: string;
@@ -22,8 +24,22 @@ export type NativeMediaPickerPickResult =
       uri: string;
     };
 
+/** Android 返回 items 数组；iOS 仍返回单个对象，读取时统一走 normalize。 */
+export type NativeMediaPickerPickResponse =
+  | NativeMediaPickerPickItem
+  | { items: NativeMediaPickerPickItem[] };
+
+export function normalizeNativeMediaPickerResponse(
+  response: NativeMediaPickerPickResponse,
+): NativeMediaPickerPickItem[] {
+  if ('items' in response && Array.isArray(response.items)) {
+    return response.items;
+  }
+  return [response as NativeMediaPickerPickItem];
+}
+
 interface NativeMediaPickerPlugin {
-  pick(options: NativeMediaPickerPickOptions): Promise<NativeMediaPickerPickResult>;
+  pick(options: NativeMediaPickerPickOptions): Promise<NativeMediaPickerPickResponse>;
 }
 
 export const NativeMediaPicker = registerPlugin<NativeMediaPickerPlugin>('MediaPicker');

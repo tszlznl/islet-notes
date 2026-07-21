@@ -188,6 +188,30 @@
     "defaultMessage": "Time updated",
     "content": "时间已更新"
   },
+  "diary.export.allText": {
+    "defaultMessage": "Export all text",
+    "content": "导出所有文本"
+  },
+  "diary.export.done": {
+    "defaultMessage": "Export ready",
+    "content": "已准备导出"
+  },
+  "diary.export.empty": {
+    "defaultMessage": "No text to export",
+    "content": "没有可导出的文本"
+  },
+  "diary.export.exporting": {
+    "defaultMessage": "Preparing export...",
+    "content": "正在准备导出…"
+  },
+  "diary.export.failed": {
+    "defaultMessage": "Could not export text",
+    "content": "无法导出文本"
+  },
+  "diary.export.title": {
+    "defaultMessage": "Export",
+    "content": "导出"
+  },
   "diary.image.loadFailed": {
     "content": "图片加载失败",
     "defaultMessage": "Image failed to load"
@@ -207,6 +231,14 @@
   "diary.media.empty": {
     "defaultMessage": "No images or videos yet",
     "content": "还没有图片或视频"
+  },
+  "diary.media.exportAction": {
+    "defaultMessage": "Export",
+    "content": "导出"
+  },
+  "diary.media.exportMissing": {
+    "defaultMessage": "Original file is missing",
+    "content": "原文件不存在"
   },
   "diary.moveEntry.action": {
     "defaultMessage": "Move",
@@ -228,6 +260,10 @@
     "content": "日记本名称",
     "defaultMessage": "Notebook name"
   },
+  "diary.name.duplicate": {
+    "defaultMessage": "A notebook with this name already exists",
+    "content": "已存在同名日记本"
+  },
   "diary.notebook.emptySummary": {
     "content": "还没有日记",
     "defaultMessage": "No entries yet"
@@ -239,6 +275,18 @@
   "diary.recordVideo": {
     "defaultMessage": "Record video",
     "content": "拍视频"
+  },
+  "diary.reply.action": {
+    "defaultMessage": "Quote",
+    "content": "引用"
+  },
+  "diary.reply.tagRemove": {
+    "defaultMessage": "Clear quote",
+    "content": "取消引用"
+  },
+  "diary.reply.unavailable": {
+    "defaultMessage": "Original message unavailable",
+    "content": "原消息不可用"
   },
   "diary.search": {
     "defaultMessage": "Find diary content",
@@ -255,6 +303,30 @@
   "diary.settings": {
     "content": "日记本设置",
     "defaultMessage": "Notebook settings"
+  },
+  "diary.timeMachine": {
+    "defaultMessage": "Time machine",
+    "content": "时光机"
+  },
+  "diary.timeMachine.futureSaved": {
+    "defaultMessage": "Saved to future messages",
+    "content": "已存入未来消息"
+  },
+  "diary.timeMachine.goPurchase": {
+    "defaultMessage": "Get membership",
+    "content": "去开通"
+  },
+  "diary.timeMachine.memberOnly": {
+    "defaultMessage": "Time machine is a membership feature. Get membership to send entries to the past or future.",
+    "content": "时光机是会员专属功能，开通会员后可以把消息写给过去或未来。"
+  },
+  "diary.timeMachine.pickerTitle": {
+    "defaultMessage": "Choose a time",
+    "content": "选择时间"
+  },
+  "diary.timeMachine.tagRemove": {
+    "defaultMessage": "Clear selected time",
+    "content": "清除已选时间"
   },
   "diary.timePicker.confirm": {
     "defaultMessage": "Done",
@@ -700,9 +772,33 @@
     "defaultMessage": "Set a chat background.",
     "content": "设置聊天背景"
   },
+  "settings.membership.feature.timeMachine": {
+    "defaultMessage": "Time machine",
+    "content": "时光机"
+  },
+  "settings.membership.feature.timeMachineDesc": {
+    "defaultMessage": "Send entries to the past or future.",
+    "content": "把消息写给过去或未来"
+  },
   "settings.membership.features": {
     "defaultMessage": "Benefits",
     "content": "权益"
+  },
+  "settings.membership.futureMessages": {
+    "defaultMessage": "Future messages",
+    "content": "未来消息"
+  },
+  "settings.membership.futureMessages.delete": {
+    "defaultMessage": "Delete future message",
+    "content": "删除未来消息"
+  },
+  "settings.membership.futureMessages.deleteConfirm": {
+    "defaultMessage": "Deleted messages cannot be restored.",
+    "content": "删除后无法恢复。"
+  },
+  "settings.membership.futureMessages.empty": {
+    "defaultMessage": "No future messages yet",
+    "content": "还没有未来消息"
   },
   "settings.membership.goPurchase": {
     "defaultMessage": "Purchase",

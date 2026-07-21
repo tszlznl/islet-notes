@@ -18,7 +18,14 @@ export interface MessageBodyProps {
 export function MessageBody({ resolved, previewAttachments, align }: MessageBodyProps) {
   switch (resolved.type) {
     case 'text':
-      return <TextMessage entryId={resolved.entry.id} text={resolved.text} align={align} />;
+      return (
+        <TextMessage
+          entryId={resolved.entry.id}
+          text={resolved.text}
+          replyToEntryId={resolved.entry.replyToEntryId}
+          align={align}
+        />
+      );
     case 'image':
       return (
         <ImageMessage

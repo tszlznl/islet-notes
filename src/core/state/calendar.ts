@@ -3,6 +3,7 @@ import {
   getAttachmentById,
   getEntryDisplayTime,
   getNotebookById,
+  isFutureEntry,
 } from '@/core/diary/selectors';
 import type {
   AudioAttachmentRecord,
@@ -31,11 +32,12 @@ export function dateKey(date: Date): string {
 export function groupEntriesByDate(
   model: DiaryModelData,
   notebookId?: string,
+  now = Date.now(),
 ): Map<string, CalendarDayRecord[]> {
   const result = new Map<string, CalendarDayRecord[]>();
 
   for (const entry of model.entries) {
-    if (entry.deletedAt) continue;
+    if (entry.deletedAt || isFutureEntry(entry, now)) continue;
     if (notebookId && entry.notebookId !== notebookId) continue;
     if (!isKnownDiaryEntryType(entry.type)) continue;
     const notebook = getNotebookById(model, entry.notebookId);

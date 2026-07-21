@@ -6,6 +6,8 @@ import {
   imageAttachmentTaskToAttachment,
   videoAttachmentTaskToAttachment,
 } from '@/services/fileAsset/common/fileAssetService';
+import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
+import { localize } from '@/nls';
 import { IHostService } from '@/services/native/common/hostService';
 import {
   SPEECH_RECOGNITION_CONFIG_KEY,
@@ -19,6 +21,7 @@ export function useAttachmentUploadCommitter() {
   const fileAssetService = useService(IFileAssetService);
   const hostService = useService(IHostService);
   const speechRecognitionService = useService(ISpeechRecognitionService);
+  const showToast = useSuccessToast();
   const committedTaskIds = useRef(new Set<string>());
 
   useEffect(() => {
@@ -43,6 +46,7 @@ export function useAttachmentUploadCommitter() {
           const entryId = diaryService.addAttachmentEntry({
             attachment,
             createdAt: task.createdAt,
+            displayAt: task.displayAt,
             identityId: task.identityId,
           });
           if (autoTranscribe) speechRecognitionService.recognize(entryId, attachment);
@@ -50,13 +54,21 @@ export function useAttachmentUploadCommitter() {
           diaryService.addAttachmentEntry({
             attachment: videoAttachmentTaskToAttachment(task),
             createdAt: task.createdAt,
+            displayAt: task.displayAt,
             identityId: task.identityId,
           });
         } else {
           diaryService.addAttachmentEntry({
             attachment: imageAttachmentTaskToAttachment(task),
             createdAt: task.createdAt,
+            displayAt: task.displayAt,
             identityId: task.identityId,
+          });
+        }
+        // 未来消息落库后不出现在聊天列表（上传占位也随之移除），toast 告知用户已保存。
+        if (task.displayAt !== undefined && task.displayAt > Date.now()) {
+          showToast({
+            message: localize('diary.timeMachine.futureSaved', 'Saved to future messages'),
           });
         }
         void fileAssetService.deleteAttachmentTask(task.id);
@@ -71,5 +83,5 @@ export function useAttachmentUploadCommitter() {
       disposed = true;
       listener.dispose();
     };
-  }, [diaryService, fileAssetService, hostService, speechRecognitionService]);
+  }, [diaryService, fileAssetService, hostService, speechRecognitionService, showToast]);
 }

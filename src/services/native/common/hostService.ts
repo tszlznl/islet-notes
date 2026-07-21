@@ -2,9 +2,13 @@ import { createDecorator } from 'vscf/platform/instantiation/common';
 import { Event } from 'vscf/base/common/event';
 import type { ZodType } from 'zod';
 
+export type HostPlatform = 'ios' | 'android' | 'web';
+
 export interface IHostService {
   readonly _serviceBrand: undefined;
   readonly isNative: boolean;
+  /** 当前运行平台：原生端为 ios/android，其余（浏览器、扩展）统一为 web。 */
+  readonly platform: HostPlatform;
   readonly onBackButton: Event<void>;
   /** 当前平台使用的路由模式：扩展用 hash 路由，其余用 path 路由。 */
   readonly routerType: HostRouterType;
@@ -14,14 +18,19 @@ export interface IHostService {
   exitApp(): void;
   vibrateShort(): void;
   writeToClipboard(text: string): Promise<void>;
+  /** 导出用户可拿到的 UTF-8 文本文件。浏览器端下载，原生端打开系统分享面板。 */
+  exportTextFile(options: HostExportTextFileOptions): Promise<void>;
+  /** 导出二进制文件（图片/视频原件等）。浏览器端下载，原生端打开系统分享面板。 */
+  exportBlobFile(options: HostExportBlobFileOptions): Promise<void>;
   setBarStyle(theme: HostSystemBarStyle): Promise<void>;
   /** 返回已通过图片类型和大小校验的 Blob，用户取消时返回 undefined。 */
   pickImageBlob(source: ImagePickSource): Promise<Blob | undefined>;
 
   /**
-   * 原生端：从相册单选一项媒体，可能是图片或视频，用户取消时返回 undefined。
+   * 从相册选择媒体（图片或视频），limit > 1 时开启多选（iOS 暂仍单选）。
+   * 用户取消时返回 undefined。
    */
-  pickMediaFromGallery(options?: HostMediaPickOptions): Promise<HostGalleryPick | undefined>;
+  pickMediaFromGallery(options?: HostMediaPickOptions): Promise<HostGalleryPick[] | undefined>;
   /** 原生端：调用系统相机录像并保存到相册，用户取消时返回 undefined。 */
   recordVideo(options?: HostVideoRecordOptions): Promise<HostVideoPick | undefined>;
   /**
@@ -101,6 +110,8 @@ export interface HostLivePhotoPick {
 export interface HostMediaPickOptions {
   /** 视频源缓存 scope，调用方必须传当前本地数据 scope。 */
   cacheScope?: string;
+  /** 最多可选的媒体数量，大于 1 时相册开启多选；缺省单选。 */
+  limit?: number;
 }
 
 export type HostVideoRecordOptions = HostMediaPickOptions;
@@ -160,6 +171,17 @@ export interface HostResponse {
   status: number;
   /** base64 编码的响应体。 */
   body: string;
+}
+
+export interface HostExportTextFileOptions {
+  filename: string;
+  text: string;
+  mimeType?: string;
+}
+
+export interface HostExportBlobFileOptions {
+  filename: string;
+  blob: Blob;
 }
 
 export interface HostAttachmentFileOptions {

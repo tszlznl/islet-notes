@@ -28,6 +28,8 @@ interface AttachmentUploadTaskRecordBase {
   previewThumbnail?: string;
   /** 发送该附件消息时选中的身份，落库为 entry.identityId。 */
   identityId?: string;
+  /** 发送该附件消息时时光机选中的时间，落库为 entry.displayAt。 */
+  displayAt?: number;
   livePhoto?: LivePhotoAttachmentRecord;
   status: AttachmentUploadStatus;
   queueSeq: number;

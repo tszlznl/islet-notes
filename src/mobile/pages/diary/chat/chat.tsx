@@ -9,6 +9,10 @@ import {
   ChatMessage,
   EntryHighlightProvider,
 } from '@/mobile/components/pages/diary-chat/chat/main';
+import {
+  ReplyDraftContext,
+  type ReplyDraftContextValue,
+} from '@/mobile/components/pages/diary-chat/chat/replyDraftContext';
 import { useAttachmentFileUrl } from '@/mobile/hooks/useAttachmentFileUrl';
 import { useDiaryChatChromeHeight } from '@/mobile/hooks/pages/diary-chat/useDiaryChatChromeHeight';
 import { useDiaryChatVirtualList } from '@/mobile/hooks/pages/diary-chat/useDiaryChatVirtualList';
@@ -39,6 +43,15 @@ export function DiaryChatPage() {
   );
   const size = useWindowSize();
   const tasks = useUploadTasks(notebookId);
+  // 引用草稿:长按菜单选"引用"后写入,发送或手动清除后复位;切换日记本时不保留。
+  const [replyToEntryId, setReplyToEntryId] = useState<string>();
+  useEffect(() => {
+    setReplyToEntryId(undefined);
+  }, [notebookId]);
+  const replyDraft = useMemo<ReplyDraftContextValue>(
+    () => ({ replyToEntryId, setReplyToEntryId }),
+    [replyToEntryId],
+  );
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLElement>(null);
   const chromeHeight = useDiaryChatChromeHeight({
@@ -110,53 +123,55 @@ export function DiaryChatPage() {
   if (!notebook || !notebookId) return <Navigate to='/diaries' replace />;
 
   return (
-    <div
-      className={cx(styles.Page.Root, styles.DiaryChatPage.RootChat)}
-      data-test-id={DiaryChat.page}
-    >
-      {backgroundUrl && (
-        <div
-          className={styles.DiaryChatPage.Background}
-          data-test-id={DiaryChat.background}
-          style={backgroundFrameStyle}
-          aria-hidden='true'
-        />
-      )}
-      <div className={styles.DiaryChatPage.Content}>
-        <div ref={headerRef}>
-          <PageHeader title={notebook.name} showBack right={headerProps} />
-        </div>
-        <main
-          className={styles.DiaryChatPage.Main}
-          data-test-id={DiaryChat.list}
-          style={{ height: listHeight }}
-        >
-          {chatItems.length === 0 ? (
-            <div className={styles.DiaryChatPage.Empty} data-test-id={DiaryChat.empty}>
-              {localize('diary.chat.empty', 'No entries yet')}
-            </div>
-          ) : (
-            <EntryHighlightProvider
-              highlightedEntryId={highlightedEntryId}
-              triggerHighlight={focusEntry}
-            >
-              <VariableSizeList
-                ref={listRef}
-                height={listHeight}
-                width='100%'
-                itemCount={chatItems.length}
-                itemSize={itemSize}
-                itemKey={itemKey}
-                itemData={{ items: chatItems, model, previewAttachments }}
+    <ReplyDraftContext.Provider value={replyDraft}>
+      <div
+        className={cx(styles.Page.Root, styles.DiaryChatPage.RootChat)}
+        data-test-id={DiaryChat.page}
+      >
+        {backgroundUrl && (
+          <div
+            className={styles.DiaryChatPage.Background}
+            data-test-id={DiaryChat.background}
+            style={backgroundFrameStyle}
+            aria-hidden='true'
+          />
+        )}
+        <div className={styles.DiaryChatPage.Content}>
+          <div ref={headerRef}>
+            <PageHeader title={notebook.name} showBack right={headerProps} />
+          </div>
+          <main
+            className={styles.DiaryChatPage.Main}
+            data-test-id={DiaryChat.list}
+            style={{ height: listHeight }}
+          >
+            {chatItems.length === 0 ? (
+              <div className={styles.DiaryChatPage.Empty} data-test-id={DiaryChat.empty}>
+                {localize('diary.chat.empty', 'No entries yet')}
+              </div>
+            ) : (
+              <EntryHighlightProvider
+                highlightedEntryId={highlightedEntryId}
+                triggerHighlight={focusEntry}
               >
-                {ChatMessage}
-              </VariableSizeList>
-            </EntryHighlightProvider>
-          )}
-        </main>
-        <DiaryChatFooter ref={footerRef} notebookId={notebookId} />
+                <VariableSizeList
+                  ref={listRef}
+                  height={listHeight}
+                  width='100%'
+                  itemCount={chatItems.length}
+                  itemSize={itemSize}
+                  itemKey={itemKey}
+                  itemData={{ items: chatItems, model, previewAttachments }}
+                >
+                  {ChatMessage}
+                </VariableSizeList>
+              </EntryHighlightProvider>
+            )}
+          </main>
+          <DiaryChatFooter ref={footerRef} notebookId={notebookId} />
+        </div>
       </div>
-    </div>
+    </ReplyDraftContext.Provider>
   );
 }
 

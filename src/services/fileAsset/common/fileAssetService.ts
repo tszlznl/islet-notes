@@ -96,6 +96,8 @@ export interface IFileAssetService {
   putDatabaseSnapshot(key: string, snapshot: Uint8Array): Promise<void>;
   getDatabaseSnapshot(key: string): Promise<Uint8Array | undefined>;
   getFileUrl(key: string, options: FileUrlOptions): Promise<string | undefined>;
+  /** 取附件原文件 Blob（优先本地缓存，缺失时回源拉取），用于导出等场景。 */
+  getFileBlob(key: string): Promise<Blob | undefined>;
   getLivePhotoVideoUrl(attachment: ImageAttachmentRecord): Promise<string | undefined>;
 }
 
@@ -216,6 +218,7 @@ export class FileAssetService implements IFileAssetService {
       height: dimensions.height,
       livePhoto,
       identityId: options.identityId,
+      displayAt: options.displayAt,
       status: 'pending',
       queueSeq: await this.uploadStore.getNextQueueSeq(),
       createdAt,
@@ -249,6 +252,7 @@ export class FileAssetService implements IFileAssetService {
       duration,
       transcript,
       identityId: options.identityId,
+      displayAt: options.displayAt,
       status: 'pending',
       queueSeq: await this.uploadStore.getNextQueueSeq(),
       createdAt,
@@ -281,6 +285,7 @@ export class FileAssetService implements IFileAssetService {
       duration: options.durationMs ? Math.round(options.durationMs / 1000) : 0,
       previewThumbnail: options.previewThumbnail,
       identityId: options.identityId,
+      displayAt: options.displayAt,
       status: 'pending',
       queueSeq: await this.uploadStore.getNextQueueSeq(),
       createdAt,
@@ -418,6 +423,10 @@ export class FileAssetService implements IFileAssetService {
 
   async getFileUrl(key: string, options: FileUrlOptions): Promise<string | undefined> {
     return this.urlResolver.getFileUrl(key, options);
+  }
+
+  async getFileBlob(key: string): Promise<Blob | undefined> {
+    return this.urlResolver.getFileBlob(key);
   }
 
   async getLivePhotoVideoUrl(attachment: ImageAttachmentRecord): Promise<string | undefined> {

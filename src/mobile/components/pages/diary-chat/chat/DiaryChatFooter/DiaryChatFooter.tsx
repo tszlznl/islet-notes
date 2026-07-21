@@ -7,10 +7,14 @@ import { DiaryChat } from '@/mobile/test.id';
 import { styles, zIndex } from '@/mobile/styles/ui';
 import { useService } from '@/hooks/use-service';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
+import { useMembershipStatus } from '@/mobile/hooks/useMembershipStatus';
+import { useDateTimePicker } from '@/mobile/overlay/dateTimePicker/useDateTimePicker';
+import { useDialog } from '@/mobile/overlay/dialog/useDialog';
 import { useIdentityPicker } from '@/mobile/overlay/identityPicker/useIdentityPicker';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { localize } from '@/nls';
 import { IDiaryService } from '@/services/diary/common/diaryService';
+import { INavigationService } from '@/services/navigationService/common/navigationService';
 import {
   IDENTITY_CONFIG_KEY,
   IDENTITY_CONFIG_SWR_KEY,
@@ -25,9 +29,12 @@ import {
 } from '@/mobile/overlay/voiceRecording/voiceRecorderEngine';
 import React, { forwardRef, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
+import { useReplyDraft } from '@/mobile/components/pages/diary-chat/chat/replyDraftContext';
 import { AttachmentActionPanel } from './AttachmentActionPanel';
 import { ChatInputRow } from './ChatInputRow';
 import { IdentityTag } from './IdentityTag';
+import { ReplyQuoteTag } from './ReplyQuoteTag';
+import { TimeMachineTag } from './TimeMachineTag';
 import { useAutoResizeTextarea } from './useAutoResizeTextarea';
 import { useDiaryChatMediaActions } from './useDiaryChatMediaActions';
 
@@ -40,16 +47,29 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
     const diaryService = useService(IDiaryService);
     const fileAssetService = useService(IFileAssetService);
     const hostService = useService(IHostService);
+    const navigationService = useService(INavigationService);
     const trackService = useService(ITrackService);
     const showToast = useSuccessToast();
+    const showDialog = useDialog();
+    const showDateTimePicker = useDateTimePicker();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const model = useDiaryModel();
     const showIdentityPicker = useIdentityPicker();
+    const {
+      status: membershipStatus,
+      data: resolvedMembershipStatus,
+      isLoading: membershipLoading,
+    } = useMembershipStatus();
+    const membershipStatusPending = membershipLoading || !resolvedMembershipStatus;
+    // iOS 上未开通会员不展示时光机入口，避免引导到应用外购买；其它平台展示并弹会员引导。
+    const timeMachineVisible = hostService.platform !== 'ios' || membershipStatus.active;
     const [text, setText] = useState('');
     const [voiceMode, setVoiceMode] = useState(false);
     const [plusOpen, setPlusOpen] = useState(false);
     // 仅当次会话生效：只存 id，身份被归档或删除时自动视为未选择。
     const [identityId, setIdentityId] = useState<string>();
+    // 时光机选中的时间，仅当次会话生效；后续发送的消息 displayAt 都用它。
+    const [timeMachineAt, setTimeMachineAt] = useState<number>();
     const identityCandidate = identityId ? getIdentityById(model, identityId) : undefined;
     const selectedIdentity =
       identityCandidate && !identityCandidate.archivedAt ? identityCandidate : undefined;
@@ -59,11 +79,14 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
       hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
     );
     const identityEntryEnabled = identityConfig?.chatEntryEnabled ?? true;
+    const replyDraft = useReplyDraft();
+    const replyToEntryId = replyDraft?.replyToEntryId;
     const voiceSupported = useMemo(() => isVoiceRecordingSupported(), []);
     const { videoSupported, takePhoto, pickFromAlbum, startRecordVideo } = useDiaryChatMediaActions(
       {
         notebookId,
         identityId: selectedIdentity?.id,
+        displayAt: timeMachineAt,
         closePlusPanel: () => setPlusOpen(false),
         showError: (message) => showToast({ message, icon: 'none' }),
       },
@@ -77,9 +100,48 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
         notebookId,
         text: content,
         identityId: selectedIdentity?.id,
+        displayAt: timeMachineAt,
+        replyToEntryId,
       });
+      replyDraft?.setReplyToEntryId(undefined);
+      // 未来消息不会出现在聊天列表，用 toast 告知用户已保存，避免误以为发送失败。
+      if (timeMachineAt !== undefined && timeMachineAt > Date.now()) {
+        showToast({
+          message: localize('diary.timeMachine.futureSaved', 'Saved to future messages'),
+        });
+      }
       setText('');
       setPlusOpen(false);
+    };
+
+    // 时光机：会员专属。选定时间后，后续消息按该时间展示与排序。
+    const openTimeMachine = () => {
+      if (membershipStatusPending) return;
+      setPlusOpen(false);
+      if (!membershipStatus.active) {
+        showDialog({
+          title: localize('diary.timeMachine', 'Time machine'),
+          message: localize(
+            'diary.timeMachine.memberOnly',
+            'Time machine is a membership feature. Get membership to send entries to the past or future.',
+          ),
+          confirmLabel: localize('diary.timeMachine.goPurchase', 'Get membership'),
+          cancelLabel: localize('common.cancel', 'Cancel'),
+          rootTestId: DiaryChat.timeMachineVipDialog,
+          confirmTestId: DiaryChat.timeMachineVipConfirm,
+          cancelTestId: DiaryChat.timeMachineVipCancel,
+          onConfirm: () => navigationService.navigate({ path: '/settings/membership' }),
+        });
+        return;
+      }
+      showDateTimePicker({
+        title: localize('diary.timeMachine.pickerTitle', 'Choose a time'),
+        value: new Date(timeMachineAt ?? Date.now()),
+        rootTestId: DiaryChat.timeMachinePicker,
+        confirmTestId: DiaryChat.timeMachinePickerConfirm,
+        cancelTestId: DiaryChat.timeMachinePickerCancel,
+        onConfirm: (date) => setTimeMachineAt(date.getTime()),
+      });
     };
 
     const openIdentityPicker = () => {
@@ -125,6 +187,7 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
           file: result.blob,
           duration: Math.round(result.duration * 10) / 10,
           identityId: selectedIdentity?.id,
+          displayAt: timeMachineAt,
         });
       } catch (event) {
         showVoiceError(event instanceof Error ? event.message : String(event));
@@ -143,6 +206,16 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
             model={model}
             identity={selectedIdentity}
             onRemove={() => setIdentityId(undefined)}
+          />
+        )}
+        {timeMachineAt !== undefined && (
+          <TimeMachineTag timestamp={timeMachineAt} onRemove={() => setTimeMachineAt(undefined)} />
+        )}
+        {replyToEntryId && (
+          <ReplyQuoteTag
+            model={model}
+            replyToEntryId={replyToEntryId}
+            onRemove={() => replyDraft?.setReplyToEntryId(undefined)}
           />
         )}
         <div className={styles.DiaryChatFooter.InputArea}>
@@ -166,6 +239,8 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
           {plusOpen && (
             <AttachmentActionPanel
               videoSupported={videoSupported}
+              timeMachineVisible={timeMachineVisible}
+              timeMachineDisabled={membershipStatusPending}
               onPickFromAlbum={() => {
                 trackService.trackEvent('diary_chat_album_click');
                 void pickFromAlbum();
@@ -177,6 +252,10 @@ export const DiaryChatFooter = forwardRef<HTMLElement, DiaryChatFooterProps>(
               onStartRecordVideo={() => {
                 trackService.trackEvent('diary_chat_video_click');
                 void startRecordVideo();
+              }}
+              onOpenTimeMachine={() => {
+                trackService.trackEvent('diary_chat_time_machine_click');
+                openTimeMachine();
               }}
             />
           )}

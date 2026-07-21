@@ -13,6 +13,8 @@ import {
   HostGenerateThumbnailOptions,
   HostGenerateThumbnailResult,
   HostGalleryPick,
+  HostExportBlobFileOptions,
+  HostExportTextFileOptions,
   HostRouterType,
   HostMediaPickOptions,
   HostRequestOptions,
@@ -30,6 +32,10 @@ import {
 import type { ITestInjectionService } from '@/services/e2e/common/testInjectionService';
 import { blobToDataUrl } from '@/base/just-vibes/binary-codec';
 import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
+import {
+  downloadBrowserBlobFile,
+  downloadBrowserTextFile,
+} from '@/base/just-vibes/browser-file-download';
 import {
   assertSupportedImage,
   isPickCancellation,
@@ -53,6 +59,7 @@ const BROWSER_PREFERENCE_STORAGE_PREFIX = 'CapacitorStorage.';
 export class BrowserHostService implements IHostService {
   readonly _serviceBrand: undefined;
   readonly isNative = false;
+  readonly platform = 'web' as const;
   readonly onBackButton = Event.None;
   readonly routerType: HostRouterType = 'browser';
   private readonly filesystem: BrowserHostFilesystem;
@@ -96,6 +103,16 @@ export class BrowserHostService implements IHostService {
     await writeBrowserClipboardText(text);
   }
 
+  async exportTextFile(options: HostExportTextFileOptions): Promise<void> {
+    if (await this.tryInjectedTextFileExport(options)) return;
+    downloadBrowserTextFile(options);
+  }
+
+  async exportBlobFile(options: HostExportBlobFileOptions): Promise<void> {
+    if (await this.tryInjectedBlobFileExport(options)) return;
+    downloadBrowserBlobFile(options);
+  }
+
   async setBarStyle(_theme: HostSystemBarStyle): Promise<void> {}
 
   async pickImageBlob(source: ImagePickSource): Promise<Blob | undefined> {
@@ -112,37 +129,55 @@ export class BrowserHostService implements IHostService {
     }
   }
 
-  async pickMediaFromGallery(options?: HostMediaPickOptions): Promise<HostGalleryPick | undefined> {
+  async pickMediaFromGallery(
+    options?: HostMediaPickOptions,
+  ): Promise<HostGalleryPick[] | undefined> {
     try {
-      const injectedMedia = await this.testInjectionService?.get<HostGalleryPick>(
-        'host.pickMediaFromGallery',
-      );
-      if (injectedMedia) return this.normalizeGalleryPick(injectedMedia);
+      const injectedMedia = await this.testInjectionService?.get<
+        HostGalleryPick | HostGalleryPick[]
+      >('host.pickMediaFromGallery');
+      if (injectedMedia) {
+        const list = Array.isArray(injectedMedia) ? injectedMedia : [injectedMedia];
+        return Promise.all(list.map((item) => this.normalizeGalleryPick(item)));
+      }
 
       // Existing browser/e2e image upload tests inject this point. Keep it working after
       // enabling the richer media picker.
       const injectedImage = await this.testInjectionService?.get<Blob>('host.pickImageBlob');
       if (injectedImage) {
         assertSupportedImage(injectedImage);
-        return { kind: 'image', blob: injectedImage };
+        return [{ kind: 'image', blob: injectedImage }];
       }
 
       const injectedVideo = await this.testInjectionService?.get<Blob>('host.pickVideoBlob');
       if (injectedVideo) {
-        return {
-          kind: 'video',
-          video: await this.createHostVideoPick(injectedVideo, getCacheScope(options)),
-        };
+        return [
+          {
+            kind: 'video',
+            video: await this.createHostVideoPick(injectedVideo, getCacheScope(options)),
+          },
+        ];
       }
 
-      const file = await pickBrowserFile({ accept: 'image/*,video/mp4' });
-      if (!file) return undefined;
-      if (file.type.startsWith('image/')) {
-        assertSupportedImage(file);
-        return { kind: 'image', blob: file };
+      const files = await pickBrowserFiles({
+        accept: 'image/*,video/mp4',
+        multiple: (options?.limit ?? 1) > 1,
+      });
+      if (files.length === 0) return undefined;
+      const picks: HostGalleryPick[] = [];
+      for (const file of files.slice(0, Math.max(options?.limit ?? 1, 1))) {
+        if (file.type.startsWith('image/')) {
+          assertSupportedImage(file);
+          picks.push({ kind: 'image', blob: file });
+          continue;
+        }
+        normalizeAndCheckMime('video', file.type);
+        picks.push({
+          kind: 'video',
+          video: await this.createHostVideoPick(file, getCacheScope(options)),
+        });
       }
-      normalizeAndCheckMime('video', file.type);
-      return { kind: 'video', video: await this.createHostVideoPick(file, getCacheScope(options)) };
+      return picks;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (isPickCancellation(message)) return undefined;
@@ -323,6 +358,42 @@ export class BrowserHostService implements IHostService {
     this.videoObjectUrls.set(sourcePath, next);
     return next;
   }
+
+  private async tryInjectedTextFileExport(options: HostExportTextFileOptions): Promise<boolean> {
+    const injected = this.testInjectionService?.list()['host.exportTextFile'];
+    if (!injected) return false;
+    if (injected.action === 'delay') {
+      await new Promise((resolve) => setTimeout(resolve, injected.delayMs));
+      return true;
+    }
+    if (injected.action === 'throw') {
+      throw new Error(injected.message ?? 'Injected test error: host.exportTextFile');
+    }
+    if (typeof injected.value === 'function') {
+      await (injected.value as (options: HostExportTextFileOptions) => void | Promise<void>)(
+        options,
+      );
+    }
+    return true;
+  }
+
+  private async tryInjectedBlobFileExport(options: HostExportBlobFileOptions): Promise<boolean> {
+    const injected = this.testInjectionService?.list()['host.exportBlobFile'];
+    if (!injected) return false;
+    if (injected.action === 'delay') {
+      await new Promise((resolve) => setTimeout(resolve, injected.delayMs));
+      return true;
+    }
+    if (injected.action === 'throw') {
+      throw new Error(injected.message ?? 'Injected test error: host.exportBlobFile');
+    }
+    if (typeof injected.value === 'function') {
+      await (injected.value as (options: HostExportBlobFileOptions) => void | Promise<void>)(
+        options,
+      );
+    }
+    return true;
+  }
 }
 
 function getCacheScope(options?: { cacheScope?: string }): string {
@@ -340,15 +411,24 @@ function pickBrowserImageFile(source: ImagePickSource): Promise<File | undefined
   });
 }
 
-function pickBrowserFile(options: {
+async function pickBrowserFile(options: {
   accept: string;
   capture?: boolean;
 }): Promise<File | undefined> {
+  const files = await pickBrowserFiles(options);
+  return files[0];
+}
+
+function pickBrowserFiles(options: {
+  accept: string;
+  capture?: boolean;
+  multiple?: boolean;
+}): Promise<File[]> {
   return new Promise((resolve) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = options.accept;
-    input.multiple = false;
+    input.multiple = options.multiple ?? false;
     if (options.capture) {
       input.setAttribute('capture', 'environment');
     }
@@ -370,18 +450,18 @@ function pickBrowserFile(options: {
       input.remove();
     };
 
-    const settle = (file?: File) => {
+    const settle = (files: File[]) => {
       if (settled) return;
       settled = true;
       cleanup();
-      resolve(file);
+      resolve(files);
     };
 
     const onChange = () => {
-      settle(input.files?.item(0) ?? undefined);
+      settle(Array.from(input.files ?? []));
     };
     const onCancel = () => {
-      settle(undefined);
+      settle([]);
     };
     const onBlur = () => {
       pickerWasOpened = true;
@@ -389,7 +469,7 @@ function pickBrowserFile(options: {
     const onFocus = () => {
       if (!pickerWasOpened) return;
       focusTimer = window.setTimeout(() => {
-        if (!input.files?.length) settle(undefined);
+        if (!input.files?.length) settle([]);
       }, 300);
     };
 

@@ -47,6 +47,7 @@ export const DiaryCreate = {
   page: 'diary-create.page',
   content: 'diary-create.content',
   nameInput: 'diary-create.name-input',
+  duplicateToast: 'diary-create.duplicate-toast',
   save: 'diary-create.save',
 } as const;
 
@@ -55,6 +56,7 @@ export const DiarySettings = {
   content: 'diary-settings.content',
   name: 'diary-settings.name',
   avatar: 'diary-settings.avatar',
+  export: 'diary-settings.export',
   search: 'diary-settings.search',
   chatBackground: 'diary-settings.chat-background',
   chatBackgroundPage: 'diary-settings.chat-background-page',
@@ -67,10 +69,19 @@ export const DiarySettings = {
   deleteConfirmAction: 'diary-settings.delete-confirm-action',
 } as const;
 
+export const DiaryExport = {
+  page: 'diary-export.page',
+  content: 'diary-export.content',
+  allText: 'diary-export.all-text',
+  successToast: 'diary-export.success-toast',
+  failureToast: 'diary-export.failure-toast',
+} as const;
+
 export const DiaryName = {
   page: 'diary-name.page',
   content: 'diary-name.content',
   nameInput: 'diary-name.name-input',
+  duplicateToast: 'diary-name.duplicate-toast',
   save: 'diary-name.save',
 } as const;
 
@@ -147,11 +158,23 @@ export const DiaryChat = {
   identityButton: 'diary-chat.identity-button',
   identityTag: 'diary-chat.identity-tag',
   identityTagRemove: 'diary-chat.identity-tag-remove',
+  replyTag: 'diary-chat.reply-tag',
+  replyTagRemove: 'diary-chat.reply-tag-remove',
+  textMessageQuote: 'diary-chat.text-message-quote',
   identityPickerSheet: 'diary-chat.identity-picker-sheet',
   identityPickerList: 'diary-chat.identity-picker-list',
   identityPickerOption: 'diary-chat.identity-picker-option',
   identityPickerCancel: 'diary-chat.identity-picker-cancel',
   identityAvatar: 'diary-chat.identity-avatar',
+  timeMachine: 'diary-chat.time-machine',
+  timeMachineTag: 'diary-chat.time-machine-tag',
+  timeMachineTagRemove: 'diary-chat.time-machine-tag-remove',
+  timeMachinePicker: 'diary-chat.time-machine-picker',
+  timeMachinePickerConfirm: 'diary-chat.time-machine-picker-confirm',
+  timeMachinePickerCancel: 'diary-chat.time-machine-picker-cancel',
+  timeMachineVipDialog: 'diary-chat.time-machine-vip-dialog',
+  timeMachineVipConfirm: 'diary-chat.time-machine-vip-confirm',
+  timeMachineVipCancel: 'diary-chat.time-machine-vip-cancel',
 } as const;
 
 export const DiarySearch = {
@@ -208,6 +231,16 @@ export const MembershipSettings = {
   memberId: 'membership-settings.member-id',
   status: 'membership-settings.status',
   featureChatBackground: 'membership-settings.feature-chat-background',
+  featureTimeMachine: 'membership-settings.feature-time-machine',
+  futureMessagesEntry: 'membership-settings.future-messages-entry',
+  futureMessagesPage: 'membership-settings.future-messages-page',
+  futureMessagesContent: 'membership-settings.future-messages-content',
+  futureMessagesItem: 'membership-settings.future-messages-item',
+  futureMessagesEmpty: 'membership-settings.future-messages-empty',
+  futureMessagesDelete: 'membership-settings.future-messages-delete',
+  futureMessagesDeleteDialog: 'membership-settings.future-messages-delete-dialog',
+  futureMessagesDeleteConfirm: 'membership-settings.future-messages-delete-confirm',
+  futureMessagesDeleteCancel: 'membership-settings.future-messages-delete-cancel',
   purchaseEntry: 'membership-settings.purchase-entry',
   mbdChannel: 'membership-settings.mbd-channel',
   mbdPurchaseLink: 'membership-settings.mbd-purchase-link',

@@ -46,6 +46,8 @@ export interface DiaryEntryRecord {
   text?: string;
   attachmentId?: string;
   identityId?: string;
+  /** 被引用消息的 entry id；被引用消息删除后引用块降级为占位文案。 */
+  replyToEntryId?: string;
   createdAt: number;
   /** 用户手动设置的展示/排序时间；缺失时使用 createdAt。 */
   displayAt?: number;
@@ -157,7 +159,11 @@ export interface CreateTextEntryOptions {
   notebookId: string;
   text: string;
   createdAt?: number;
+  /** 创建时即指定展示/排序时间（时光机）；与 createdAt 相同时不落库。 */
+  displayAt?: number;
   identityId?: string;
+  /** 引用的消息 entry id。 */
+  replyToEntryId?: string;
   externalSource?: string;
   externalId?: string;
 }
@@ -165,6 +171,8 @@ export interface CreateTextEntryOptions {
 export interface CreateAttachmentEntryOptions {
   attachment: AttachmentRecord;
   createdAt: number;
+  /** 创建时即指定展示/排序时间（时光机）；与 createdAt 相同时不落库。 */
+  displayAt?: number;
   text?: string;
   identityId?: string;
   externalSource?: string;

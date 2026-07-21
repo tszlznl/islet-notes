@@ -239,7 +239,7 @@ export const styles = {
       'absolute left-1/2 max-w-[50%] -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold leading-6 text-ink',
     CancelButton: cx('px-1 py-2 text-muted transition active:opacity-60', font.Body),
     ConfirmButton: cx(
-      'px-1 py-2 font-semibold text-accent transition active:opacity-60',
+      'px-1 py-2 font-semibold text-accent transition active:opacity-60 disabled:opacity-40 disabled:active:opacity-40',
       font.Body,
     ),
     Wheels:
@@ -744,8 +744,9 @@ export const styles = {
     SendSize: 'h-10 min-w-[58px] rounded',
     PlusButton:
       'grid h-10 w-9 flex-none place-items-center text-muted transition active:opacity-60',
-    PlusPanel: 'flex flex-wrap gap-x-9 gap-y-5 px-1 pb-4 pt-7',
-    PlusAction: 'flex flex-col items-center gap-2 active:opacity-70',
+    PlusPanel: 'grid grid-cols-4 justify-items-center gap-y-5 px-1 pb-4 pt-7',
+    PlusAction:
+      'flex flex-col items-center gap-2 active:opacity-70 disabled:opacity-40 disabled:active:opacity-40',
     PlusTile: 'grid h-16 w-16 place-items-center rounded-2xl bg-surface text-ink',
     PlusLabel: cx(font.Footnote, 'text-muted'),
     IdentityTagRow:
@@ -774,6 +775,15 @@ export const styles = {
       'relative max-w-[min(72vw,340px)] min-h-10 px-3 py-2 rounded bg-surface text-ink text-left whitespace-pre-wrap [overflow-wrap:anywhere]',
       font.Body,
       "after:absolute after:-left-1 after:top-[15px] after:h-2 after:w-2 after:rotate-45 after:rounded-[1px] after:bg-surface after:content-['']",
+    ),
+    // 气泡内引用块：单行截断，高度需与 text/height.ts 的 TEXT_MESSAGE_QUOTE_HEIGHT 保持一致。
+    Quote: cx(
+      'mb-1 block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded bg-black/10 px-2 py-1 text-left text-onbubble/80 transition active:opacity-70',
+      font.Footnote,
+    ),
+    QuoteLeft: cx(
+      'mb-1 block max-w-full overflow-hidden text-ellipsis whitespace-nowrap rounded bg-black/5 px-2 py-1 text-left text-muted transition active:opacity-70',
+      font.Footnote,
     ),
   },
   ImageMessage: {
@@ -874,6 +884,15 @@ export const styles = {
     FeatureDesc: cx('m-0 mt-0.5 text-muted', font.Footnote),
     FeatureBadge: cx('flex-none text-muted', font.Desc),
     FeatureCheck: 'flex-none text-accent',
+    FutureMessagesGroup: 'mt-4 rounded-[10px]',
+    FutureMessageList: 'mt-2 flex flex-col gap-2',
+    FutureMessageItem: 'flex items-start gap-3 rounded-[10px] bg-surface px-4 py-3 text-left',
+    FutureMessageBody: 'flex min-w-0 flex-1 flex-col gap-1',
+    FutureMessageSummary: cx('m-0 text-ink [overflow-wrap:anywhere]', font.Body),
+    FutureMessageMeta: cx('m-0 flex items-center gap-2 text-muted', font.Footnote),
+    FutureMessageDeleteButton:
+      'grid h-8 w-8 flex-none place-items-center rounded text-danger transition active:bg-danger/10',
+    FutureMessagesEmpty: cx('mt-10 text-center text-muted', font.Desc),
     PurchaseActions: 'px-0 py-5',
     PurchaseButton: cx(
       'block h-12 w-full rounded-lg bg-accent text-center text-onaccent transition active:brightness-90 disabled:opacity-40',

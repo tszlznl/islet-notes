@@ -3,6 +3,7 @@ import {
   getAttachmentById,
   getEntryDisplayTime,
   getNotebookById,
+  isFutureEntry,
 } from '@/core/diary/selectors';
 import type {
   DiaryEntryRecord,
@@ -33,12 +34,13 @@ export interface NotebookMediaMonthGroup {
 export function groupNotebookMediaByMonth(
   model: DiaryModelData,
   notebookId: string,
+  now = Date.now(),
 ): NotebookMediaMonthGroup[] {
   if (!getNotebookById(model, notebookId)) return [];
 
   const buckets = new Map<string, NotebookMediaItem[]>();
   for (const entry of model.entries) {
-    if (entry.deletedAt) continue;
+    if (entry.deletedAt || isFutureEntry(entry, now)) continue;
     if (entry.notebookId !== notebookId) continue;
     if (entry.type !== 'attachment' || !entry.attachmentId) continue;
 

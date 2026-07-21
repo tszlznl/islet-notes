@@ -112,6 +112,12 @@ export const routes: PageRoute[] = [
     fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/settings` : '/diaries'),
   },
   {
+    url: '/diary/:notebookId/export',
+    file: './pages/diary/chat/export/export',
+    component: 'DiaryChatExportPage',
+    fallback: ({ notebookId }) => (notebookId ? `/diary/${notebookId}/settings` : '/diaries'),
+  },
+  {
     url: '/diary/:notebookId/media',
     file: './pages/diary/chat/media/media',
     component: 'DiaryChatMediaPage',
@@ -169,6 +175,12 @@ export const routes: PageRoute[] = [
     file: './pages/settings/membership/membership',
     component: 'SettingsMembershipPage',
     fallback: '/settings',
+  },
+  {
+    url: '/settings/membership/future-messages',
+    file: './pages/settings/membership/future-messages',
+    component: 'SettingsMembershipFutureMessagesPage',
+    fallback: '/settings/membership',
   },
   {
     url: '/settings/membership/purchase',

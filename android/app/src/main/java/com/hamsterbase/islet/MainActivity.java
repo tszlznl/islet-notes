@@ -23,6 +23,7 @@ public class MainActivity extends BridgeActivity {
     registerPlugin(WebDavHttpPlugin.class);
     registerPlugin(VideoToolsPlugin.class);
     registerPlugin(MediaPickerPlugin.class);
+    registerPlugin(FileSharePlugin.class);
     SplashScreen.installSplashScreen(this);
     super.onCreate(savedInstanceState);
     configureWebViewDebugging();

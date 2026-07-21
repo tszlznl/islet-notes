@@ -8,9 +8,14 @@ import {
 } from '@/services/native/common/hostService';
 import { useMemo } from 'react';
 
+/** 相册单次最多可选的媒体数量。 */
+const MAX_ALBUM_PICK_COUNT = 9;
+
 interface UseDiaryChatMediaActionsOptions {
   notebookId: string;
   identityId?: string;
+  /** 时光机选中的时间，落库为 entry.displayAt。 */
+  displayAt?: number;
   closePlusPanel: () => void;
   showError: (message: string) => void;
 }
@@ -18,6 +23,7 @@ interface UseDiaryChatMediaActionsOptions {
 export function useDiaryChatMediaActions({
   notebookId,
   identityId,
+  displayAt,
   closePlusPanel,
   showError,
 }: UseDiaryChatMediaActionsOptions) {
@@ -37,6 +43,7 @@ export function useDiaryChatMediaActions({
       file,
       livePhotoOriginal,
       identityId,
+      displayAt,
     });
   };
 
@@ -53,7 +60,7 @@ export function useDiaryChatMediaActions({
     }
   };
 
-  // 相册：Android 上可选照片或视频；照片直接进日记，视频弹预览半屏。
+  // 相册：支持一次多选（图片直接进日记，视频逐个弹预览半屏）。
   const pickFromAlbum = async () => {
     try {
       closePlusPanel();
@@ -62,13 +69,20 @@ export function useDiaryChatMediaActions({
         if (file) await uploadImage(file);
         return;
       }
-      const media = await hostService.pickMediaFromGallery({ cacheScope: getVideoCacheScope() });
-      if (!media) return;
-      if (media.kind === 'image') {
-        await uploadImage(media.blob, media.livePhoto);
-        return;
+      const picks = await hostService.pickMediaFromGallery({
+        cacheScope: getVideoCacheScope(),
+        limit: MAX_ALBUM_PICK_COUNT,
+      });
+      if (!picks || picks.length === 0) return;
+      const videos: HostVideoPick[] = [];
+      for (const media of picks) {
+        if (media.kind === 'image') {
+          await uploadImage(media.blob, media.livePhoto);
+        } else {
+          videos.push(media.video);
+        }
       }
-      openVideoPreview(media.video);
+      openVideoPreviewQueue(videos);
     } catch (event) {
       showError(event instanceof Error ? event.message : String(event));
     }
@@ -87,13 +101,25 @@ export function useDiaryChatMediaActions({
 
   // 弹出视频预览 overlay（选是否原画质）；确定后进入后台处理。
   const openVideoPreview = (video: HostVideoPick) => {
+    openVideoPreviewQueue([video]);
+  };
+
+  // 多选含多个视频时逐个弹预览，确认或取消后继续处理下一个。
+  const openVideoPreviewQueue = (videos: HostVideoPick[]) => {
+    const [current, ...rest] = videos;
+    if (!current) return;
     showVideoPreview({
-      video,
-      onConfirm: (originalQuality) => void confirmVideo(video, originalQuality),
-      onCancel: () =>
+      video: current,
+      onConfirm: (originalQuality) => {
+        void confirmVideo(current, originalQuality);
+        openVideoPreviewQueue(rest);
+      },
+      onCancel: () => {
         void hostService
-          .cleanVideoRecord({ sourcePath: video.sourcePath, cacheScope: getVideoCacheScope() })
-          .catch(() => undefined),
+          .cleanVideoRecord({ sourcePath: current.sourcePath, cacheScope: getVideoCacheScope() })
+          .catch(() => undefined);
+        openVideoPreviewQueue(rest);
+      },
     });
   };
 
@@ -115,6 +141,7 @@ export function useDiaryChatMediaActions({
       await fileAssetService.uploadVideoAttachment({
         notebookId,
         identityId,
+        displayAt,
         sourcePath: video.sourcePath,
         originalQuality,
         size: video.size,

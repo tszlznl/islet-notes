@@ -3,6 +3,7 @@ import { localize } from '@/nls';
 import { HeaderPage } from '@/mobile/components/layout/HeaderPage';
 import { TextInputRow } from '@/mobile/components/TextInputRow';
 import { useDiaryModel } from '@/mobile/hooks/useDiaryModel';
+import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { DiaryName } from '@/mobile/test.id';
 import { useService } from '@/hooks/use-service';
 import { IDiaryService } from '@/services/diary/common/diaryService';
@@ -15,9 +16,11 @@ export function DiaryChatNamePage() {
   const model = useDiaryModel();
   const diaryService = useService(IDiaryService);
   const navigationService = useService(INavigationService);
+  const showSuccessToast = useSuccessToast();
   const notebook = notebookId ? getNotebookById(model, notebookId) : undefined;
   const [name, setName] = useState(notebook?.name ?? '');
-  const canSave = name.trim().length > 0 && notebookId;
+  const trimmedName = name.trim();
+  const canSave = trimmedName.length > 0 && notebookId;
 
   if (!notebook || !notebookId) return <Navigate to='/diaries' replace />;
 
@@ -34,7 +37,19 @@ export function DiaryChatNamePage() {
           disabled: !canSave,
           testId: DiaryName.save,
           onClick: () => {
-            diaryService.updateNotebookName(notebookId, name.trim());
+            try {
+              diaryService.updateNotebookName(notebookId, trimmedName);
+            } catch {
+              showSuccessToast({
+                message: localize(
+                  'diary.name.duplicate',
+                  'A notebook with this name already exists',
+                ),
+                icon: 'none',
+                testId: DiaryName.duplicateToast,
+              });
+              return;
+            }
             navigationService.goBack();
           },
         },

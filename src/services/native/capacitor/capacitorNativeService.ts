@@ -1,4 +1,8 @@
-import { base64ToBlob, blobToBase64 } from '@/base/just-vibes/binary-codec';
+import { base64ToBlob, blobToBase64, bytesToBase64 } from '@/base/just-vibes/binary-codec';
+import {
+  downloadBrowserBlobFile,
+  downloadBrowserTextFile,
+} from '@/base/just-vibes/browser-file-download';
 import { livePhotoVideoExt } from '@/base/just-vibes/media-mime';
 import { writeBrowserClipboardText } from '@/base/just-vibes/browser-clipboard';
 import {
@@ -28,6 +32,8 @@ import {
   HostGenerateThumbnailOptions,
   HostGenerateThumbnailResult,
   HostGalleryPick,
+  HostExportBlobFileOptions,
+  HostExportTextFileOptions,
   HostMediaPickOptions,
   HostRequestOptions,
   HostResponse,
@@ -39,6 +45,7 @@ import {
   HostVideoPrepareResult,
   ImagePickSource,
   IHostService,
+  HostPlatform,
   HostRouterType,
   HostWriteAttachmentFileOptions,
   HostLivePhotoVideoPreviewOptions,
@@ -53,9 +60,14 @@ import {
 } from '@/base/just-vibes/browser-attachment-blob-store';
 import { NativeImageTools } from './plugins/imageTools';
 import { NativeAttachmentFileCache } from './plugins/attachmentFileCache';
-import { NativeMediaPicker, type NativeMediaPickerPickResult } from './plugins/mediaPicker';
+import {
+  NativeMediaPicker,
+  normalizeNativeMediaPickerResponse,
+  type NativeMediaPickerPickItem,
+} from './plugins/mediaPicker';
 import { NativeVideoTools } from './plugins/videoTools';
 import { NativeWebDavHttp } from './plugins/webDavHttp';
+import { NativeFileShare } from './plugins/fileShare';
 
 type ImagePickResult = MediaResult;
 
@@ -87,6 +99,11 @@ export class CapacitorNativeService implements IHostService {
     return Capacitor.isNativePlatform();
   }
 
+  get platform(): HostPlatform {
+    const platform = Capacitor.getPlatform();
+    return platform === 'ios' || platform === 'android' ? platform : 'web';
+  }
+
   exitApp(): void {
     if (!this.isNative) return;
     void import('@capacitor/app').then(({ App }) => App.exitApp());
@@ -109,6 +126,30 @@ export class CapacitorNativeService implements IHostService {
       return;
     }
     await writeBrowserClipboardText(text);
+  }
+
+  async exportTextFile(options: HostExportTextFileOptions): Promise<void> {
+    if (!this.isNative) {
+      downloadBrowserTextFile(options);
+      return;
+    }
+    await NativeFileShare.shareFile({
+      filename: options.filename,
+      mimeType: options.mimeType,
+      data: bytesToBase64(new TextEncoder().encode(options.text)),
+    });
+  }
+
+  async exportBlobFile(options: HostExportBlobFileOptions): Promise<void> {
+    if (!this.isNative) {
+      downloadBrowserBlobFile(options);
+      return;
+    }
+    await NativeFileShare.shareFile({
+      filename: options.filename,
+      mimeType: options.blob.type || undefined,
+      data: bytesToBase64(new Uint8Array(await options.blob.arrayBuffer())),
+    });
   }
 
   async setBarStyle(theme: HostSystemBarStyle): Promise<void> {
@@ -134,18 +175,25 @@ export class CapacitorNativeService implements IHostService {
     }
   }
 
-  async pickMediaFromGallery(options?: HostMediaPickOptions): Promise<HostGalleryPick | undefined> {
+  async pickMediaFromGallery(
+    options?: HostMediaPickOptions,
+  ): Promise<HostGalleryPick[] | undefined> {
     if (!this.caniuse('videoUpload')) {
       throw new Error('Gallery media picking is not supported on this platform.');
     }
     try {
-      return this.nativeGalleryPickToHostPick(
+      const items = normalizeNativeMediaPickerResponse(
         await NativeMediaPicker.pick({
           mediaTypes: 'images-and-videos',
           cacheScope: options?.cacheScope,
+          limit: options?.limit,
         }),
-        options?.cacheScope,
       );
+      const picks: HostGalleryPick[] = [];
+      for (const item of items.slice(0, Math.max(options?.limit ?? 1, 1))) {
+        picks.push(await this.nativeGalleryPickToHostPick(item, options?.cacheScope));
+      }
+      return picks;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (isPickCancellation(message)) {
@@ -392,8 +440,11 @@ export class CapacitorNativeService implements IHostService {
       });
       return readPickedImageBlob(photo);
     }
-    const result = await NativeMediaPicker.pick({ mediaTypes: 'images' });
-    if (result.kind !== 'image') return undefined;
+    const items = normalizeNativeMediaPickerResponse(
+      await NativeMediaPicker.pick({ mediaTypes: 'images' }),
+    );
+    const result = items[0];
+    if (result?.kind !== 'image') return undefined;
     return fillMissingBlobType(
       await readNativeFileBlob(result.photoPath),
       result.mimeType || 'image/jpeg',
@@ -410,7 +461,7 @@ export class CapacitorNativeService implements IHostService {
   }
 
   private async nativeGalleryPickToHostPick(
-    result: NativeMediaPickerPickResult,
+    result: NativeMediaPickerPickItem,
     cacheScope: string | undefined,
   ): Promise<HostGalleryPick> {
     if (result.kind === 'video') {

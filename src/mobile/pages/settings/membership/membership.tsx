@@ -1,4 +1,5 @@
 import { useService } from '@/hooks/use-service';
+import { CellListGroup } from '@/mobile/components/CellList';
 import { HeaderLayoutPage } from '@/mobile/components/layout/HeaderLayoutPage';
 import { useMembershipStatus } from '@/mobile/hooks/useMembershipStatus';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
@@ -8,7 +9,7 @@ import { cx, styles } from '@/mobile/styles/ui';
 import { localize } from '@/nls';
 import { IHostService } from '@/services/native/common/hostService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
-import { BadgeCheck, Check, Copy, Crown, Image } from 'lucide-react';
+import { BadgeCheck, Check, Copy, Crown, Hourglass, Image } from 'lucide-react';
 import React, { useState } from 'react';
 
 export function SettingsMembershipPage() {
@@ -119,7 +120,46 @@ export function SettingsMembershipPage() {
             <Check size={18} className={styles.Membership.FeatureCheck} aria-hidden='true' />
           )}
         </div>
+        <div
+          className={styles.Membership.FeatureRow}
+          data-test-id={MembershipSettings.featureTimeMachine}
+        >
+          <div className={styles.Membership.FeatureIcon}>
+            <Hourglass aria-hidden='true' />
+          </div>
+          <div className={styles.Membership.FeatureBody}>
+            <p className={styles.Membership.FeatureTitle}>
+              {localize('settings.membership.feature.timeMachine', 'Time machine')}
+            </p>
+            <p className={styles.Membership.FeatureDesc}>
+              {localize(
+                'settings.membership.feature.timeMachineDesc',
+                'Send entries to the past or future.',
+              )}
+            </p>
+          </div>
+          {status.active ? (
+            <span className={styles.Membership.FeatureBadge}>
+              {localize('settings.membership.unlocked', 'Unlocked')}
+            </span>
+          ) : (
+            <Check size={18} className={styles.Membership.FeatureCheck} aria-hidden='true' />
+          )}
+        </div>
       </section>
+
+      {/* 未来消息入口不区分会员：非会员也可能有历史未来消息，需要能查看和删除。 */}
+      <CellListGroup
+        className={styles.Membership.FutureMessagesGroup}
+        items={[
+          {
+            label: localize('settings.membership.futureMessages', 'Future messages'),
+            testId: MembershipSettings.futureMessagesEntry,
+            onClick: () =>
+              navigationService.navigate({ path: '/settings/membership/future-messages' }),
+          },
+        ]}
+      />
 
       {!status.active && (
         <div className={styles.Membership.PurchaseActions}>

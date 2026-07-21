@@ -26,7 +26,8 @@ import {
   IdentityConfigSchema,
 } from '@/services/diary/common/identityConfig';
 import { IHostService } from '@/services/native/common/hostService';
-import { CircleUserRound, Clock3, Copy, Edit3, MoveRight, Trash2 } from 'lucide-react';
+import { useReplyDraft } from '@/mobile/components/pages/diary-chat/chat/replyDraftContext';
+import { CircleUserRound, Clock3, Copy, Edit3, MoveRight, Quote, Trash2 } from 'lucide-react';
 import { useRef } from 'react';
 import useSWR from 'swr';
 
@@ -70,6 +71,8 @@ export function useEntryLongPressActions<T extends HTMLElement>(
   const showDateTimePicker = useDateTimePicker();
   const showIdentityPicker = useIdentityPicker();
   const triggerEntryHighlight = useTriggerEntryHighlight();
+  // 引用草稿只在聊天页提供;日历页等无 Provider 时不显示"引用"入口。
+  const replyDraft = useReplyDraft();
   // 身份开关(身份管理页顶部)关闭时,长按菜单也不提供切换身份入口。
   const { data: identityConfig } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
     hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
@@ -157,14 +160,17 @@ export function useEntryLongPressActions<T extends HTMLElement>(
     const entry = diaryService.modelState.entryMap.get(entryId);
     if (!entry || entry.deletedAt) return;
     const currentDisplayAt = getEntryDisplayTime(entry);
+    const maxDisplayAt = new Date();
+    maxDisplayAt.setSeconds(59, 999);
     showDateTimePicker({
       title: localize('diary.editTime.title', 'Edit time'),
       value: new Date(currentDisplayAt),
+      max: maxDisplayAt,
       rootTestId: DiaryChat.editTimeDialog,
       confirmTestId: DiaryChat.editTimeSave,
       cancelTestId: DiaryChat.editTimeCancel,
       onConfirm: (date) => {
-        const nextDisplayAt = date.getTime();
+        const nextDisplayAt = Math.min(date.getTime(), Date.now());
         if (nextDisplayAt !== currentDisplayAt) {
           diaryService.updateEntryDisplayAt(entryId, nextDisplayAt);
           triggerEntryHighlight?.(entryId);
@@ -246,6 +252,14 @@ export function useEntryLongPressActions<T extends HTMLElement>(
       });
     }
     if (extraActions) actions.push(...extraActions);
+    if (replyDraft && entry && !entry.deletedAt) {
+      actions.push({
+        id: 'reply',
+        label: localize('diary.reply.action', 'Quote'),
+        icon: Quote,
+        run: () => replyDraft.setReplyToEntryId(entryId),
+      });
+    }
     if (entry) {
       actions.push({
         id: 'edit-time',

@@ -1,6 +1,7 @@
 import { localize } from '@/nls';
 import { HeaderPage } from '@/mobile/components/layout/HeaderPage';
 import { TextInputRow } from '@/mobile/components/TextInputRow';
+import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { DiaryCreate } from '@/mobile/test.id';
 import { useService } from '@/hooks/use-service';
 import { IDiaryService } from '@/services/diary/common/diaryService';
@@ -10,12 +11,24 @@ import React, { useState } from 'react';
 export function DiariesNewPage() {
   const diaryService = useService(IDiaryService);
   const navigationService = useService(INavigationService);
+  const showSuccessToast = useSuccessToast();
   const [name, setName] = useState('');
-  const canSave = name.trim().length > 0;
+  const trimmedName = name.trim();
+  const canSave = trimmedName.length > 0;
 
   const save = () => {
     if (!canSave) return;
-    const id = diaryService.addNotebook(name.trim());
+    let id: string;
+    try {
+      id = diaryService.addNotebook(trimmedName);
+    } catch {
+      showSuccessToast({
+        message: localize('diary.name.duplicate', 'A notebook with this name already exists'),
+        icon: 'none',
+        testId: DiaryCreate.duplicateToast,
+      });
+      return;
+    }
     navigationService.navigate({ path: `/diary/${id}`, replace: true });
   };
 

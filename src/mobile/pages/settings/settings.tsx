@@ -14,7 +14,6 @@ import { IDiaryService } from '@/services/diary/common/diaryService';
 import { IFileAssetService } from '@/services/fileAsset/common/fileAssetService';
 import { IHostService } from '@/services/native/common/hostService';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
-import { Capacitor } from '@capacitor/core';
 import React from 'react';
 import { clearExperienceSeedMarker, writeExperienceTestData } from './experienceSeedData';
 
@@ -29,7 +28,7 @@ export function SettingsPage() {
   const experienceMode = isExperienceMode();
   // 会员依赖云同步身份（recovery key）：未配置同步时隐藏入口，避免进入后是禁用购买的死胡同页。
   const hasCloudSync = hasRecoveryKey(fileAssetService.getSyncConfig());
-  const showMembership = !experienceMode && !isIosNative(hostService) && hasCloudSync;
+  const showMembership = !experienceMode && hostService.platform !== 'ios' && hasCloudSync;
 
   const seedExperienceData = async () => {
     const loadingToast = showLoadingToast({
@@ -141,10 +140,6 @@ export function SettingsPage() {
       )}
     </HeaderPage>
   );
-}
-
-function isIosNative(hostService: IHostService): boolean {
-  return hostService.isNative && Capacitor.getPlatform() === 'ios';
 }
 
 function hasRecoveryKey(config: SyncConfigRecord | undefined): boolean {

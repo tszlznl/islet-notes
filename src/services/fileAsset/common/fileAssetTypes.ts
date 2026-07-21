@@ -42,6 +42,7 @@ export interface CreateImageAttachmentUploadTaskOptions {
     videoMimeType: string;
   };
   identityId?: string;
+  displayAt?: number;
 }
 
 export interface CreateAudioAttachmentUploadTaskOptions {
@@ -50,6 +51,7 @@ export interface CreateAudioAttachmentUploadTaskOptions {
   duration: number;
   transcript?: string;
   identityId?: string;
+  displayAt?: number;
 }
 
 export interface CreateVideoAttachmentUploadTaskOptions {
@@ -69,6 +71,7 @@ export interface CreateVideoAttachmentUploadTaskOptions {
   /** 视频封面（data URL）。创建任务时用于处理中占位；转码完成后更新为处理后的封面，并用于上传重试。 */
   previewThumbnail?: string;
   identityId?: string;
+  displayAt?: number;
 }
 
 export interface FileUrlOptions {

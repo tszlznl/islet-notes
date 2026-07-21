@@ -2,6 +2,7 @@ import { EntryHighlightOverlay, useIsEntryHighlighted } from '@/base/just-vibes/
 import { useService } from '@/hooks/use-service';
 import { ImageLoadFailedPlaceholder } from '@/mobile/components/image/ImageLoadFailedPlaceholder';
 import { ImageLoadingPlaceholder } from '@/mobile/components/image/ImageLoadingPlaceholder';
+import { useAttachmentExportAction } from '@/mobile/hooks/useAttachmentExportAction';
 import { useEntryLongPressActions } from '@/mobile/hooks/useEntryLongPressActions';
 import { useImagePreview } from '@/mobile/overlay/imagePreview/useImagePreview';
 import { useVideoPlayer } from '@/mobile/overlay/videoPlayer/useVideoPlayer';
@@ -20,7 +21,10 @@ export function AttachmentImage({ entryId, attachment, previewAttachments }: Ima
   const showImagePreview = useImagePreview();
   const showVideoPlayer = useVideoPlayer();
   const highlighted = useIsEntryHighlighted(entryId);
-  const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLButtonElement>(entryId);
+  const exportAction = useAttachmentExportAction(attachment);
+  const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLButtonElement>(entryId, {
+    extraActions: exportAction ? [exportAction] : undefined,
+  });
   const [thumbUrl, setThumbUrl] = useState<string>();
   const [thumbLoaded, setThumbLoaded] = useState(false);
   const [thumbFailed, setThumbFailed] = useState(false);

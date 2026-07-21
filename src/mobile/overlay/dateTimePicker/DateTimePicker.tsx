@@ -91,21 +91,27 @@ export function DateTimePicker() {
     });
   }, []);
 
+  const selectedValue = useMemo(() => {
+    if (!controller) return undefined;
+    const source = controller.value;
+    return new Date(
+      parts.year,
+      parts.month - 1,
+      parts.day,
+      parts.hour,
+      parts.minute,
+      source.getSeconds(),
+      source.getMilliseconds(),
+    );
+  }, [controller, parts]);
+  const exceedsMax =
+    !!selectedValue && !!controller?.max && selectedValue.getTime() > controller.max.getTime();
+
   if (!controller) return null;
 
   const confirm = () => {
-    const source = controller.value;
-    controller.confirm(
-      new Date(
-        parts.year,
-        parts.month - 1,
-        parts.day,
-        parts.hour,
-        parts.minute,
-        source.getSeconds(),
-        source.getMilliseconds(),
-      ),
-    );
+    if (!selectedValue || exceedsMax) return;
+    controller.confirm(selectedValue);
   };
 
   return (
@@ -135,6 +141,7 @@ export function DateTimePicker() {
             type='button'
             className={styles.DateTimePicker.ConfirmButton}
             data-test-id={controller.confirmTestId}
+            disabled={exceedsMax}
             onClick={confirm}
           >
             {localize('diary.timePicker.confirm', 'Done')}

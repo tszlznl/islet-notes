@@ -2,6 +2,7 @@ import { EntryHighlightOverlay, useIsEntryHighlighted } from '@/base/just-vibes/
 import type { VideoAttachmentRecord } from '@/core/diary/type';
 import { useService } from '@/hooks/use-service';
 import { ImageLoadingPlaceholder } from '@/mobile/components/image/ImageLoadingPlaceholder';
+import { useAttachmentExportAction } from '@/mobile/hooks/useAttachmentExportAction';
 import { useEntryLongPressActions } from '@/mobile/hooks/useEntryLongPressActions';
 import { useSuccessToast } from '@/mobile/overlay/successToast/useSuccessToast';
 import { useVideoPlayer } from '@/mobile/overlay/videoPlayer/useVideoPlayer';
@@ -23,7 +24,10 @@ export function VideoMessage({ entryId, attachment }: VideoMessageProps) {
   const fileAssetService = useService(IFileAssetService);
   const showToast = useSuccessToast();
   const showVideoPlayer = useVideoPlayer();
-  const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLButtonElement>(entryId);
+  const exportAction = useAttachmentExportAction(attachment);
+  const { anchorRef, longPressEvents } = useEntryLongPressActions<HTMLButtonElement>(entryId, {
+    extraActions: exportAction ? [exportAction] : undefined,
+  });
   const highlighted = useIsEntryHighlighted(entryId);
   const [thumbUrl, setThumbUrl] = useState<string>();
   const imageStyle = getImageMessageStyle(attachment.width, attachment.height);

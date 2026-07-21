@@ -10,6 +10,7 @@ import { IInstantiationService } from 'vscf/platform/instantiation/common';
 export interface DateTimePickerOptions {
   title: string;
   value: Date;
+  max?: Date;
   rootTestId?: string;
   confirmTestId?: string;
   cancelTestId?: string;
@@ -50,6 +51,10 @@ export class DateTimePickerController implements IDisposable {
 
   get value(): Date {
     return this.options.value;
+  }
+
+  get max(): Date | undefined {
+    return this.options.max;
   }
 
   get rootTestId(): string | undefined {

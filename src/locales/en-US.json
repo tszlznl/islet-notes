@@ -188,6 +188,30 @@
     "defaultMessage": "Time updated",
     "content": "Time updated"
   },
+  "diary.export.allText": {
+    "defaultMessage": "Export all text",
+    "content": "Export all text"
+  },
+  "diary.export.done": {
+    "defaultMessage": "Export ready",
+    "content": "Export ready"
+  },
+  "diary.export.empty": {
+    "defaultMessage": "No text to export",
+    "content": "No text to export"
+  },
+  "diary.export.exporting": {
+    "defaultMessage": "Preparing export...",
+    "content": "Preparing export..."
+  },
+  "diary.export.failed": {
+    "defaultMessage": "Could not export text",
+    "content": "Could not export text"
+  },
+  "diary.export.title": {
+    "defaultMessage": "Export",
+    "content": "Export"
+  },
   "diary.image.loadFailed": {
     "defaultMessage": "Image failed to load",
     "content": "Image failed to load"
@@ -207,6 +231,14 @@
   "diary.media.empty": {
     "defaultMessage": "No images or videos yet",
     "content": "No images or videos yet"
+  },
+  "diary.media.exportAction": {
+    "defaultMessage": "Export",
+    "content": "Export"
+  },
+  "diary.media.exportMissing": {
+    "defaultMessage": "Original file is missing",
+    "content": "Original file is missing"
   },
   "diary.moveEntry.action": {
     "defaultMessage": "Move",
@@ -228,6 +260,10 @@
     "defaultMessage": "Notebook name",
     "content": "Notebook name"
   },
+  "diary.name.duplicate": {
+    "defaultMessage": "A notebook with this name already exists",
+    "content": "A notebook with this name already exists"
+  },
   "diary.notebook.emptySummary": {
     "defaultMessage": "No entries yet",
     "content": "No entries yet"
@@ -239,6 +275,18 @@
   "diary.recordVideo": {
     "defaultMessage": "Record video",
     "content": "Record video"
+  },
+  "diary.reply.action": {
+    "defaultMessage": "Quote",
+    "content": "Quote"
+  },
+  "diary.reply.tagRemove": {
+    "defaultMessage": "Clear quote",
+    "content": "Clear quote"
+  },
+  "diary.reply.unavailable": {
+    "defaultMessage": "Original message unavailable",
+    "content": "Original message unavailable"
   },
   "diary.search": {
     "defaultMessage": "Find diary content",
@@ -255,6 +303,30 @@
   "diary.settings": {
     "defaultMessage": "Notebook settings",
     "content": "Notebook settings"
+  },
+  "diary.timeMachine": {
+    "defaultMessage": "Time machine",
+    "content": "Time machine"
+  },
+  "diary.timeMachine.futureSaved": {
+    "defaultMessage": "Saved to future messages",
+    "content": "Saved to future messages"
+  },
+  "diary.timeMachine.goPurchase": {
+    "defaultMessage": "Get membership",
+    "content": "Get membership"
+  },
+  "diary.timeMachine.memberOnly": {
+    "defaultMessage": "Time machine is a membership feature. Get membership to send entries to the past or future.",
+    "content": "Time machine is a membership feature. Get membership to send entries to the past or future."
+  },
+  "diary.timeMachine.pickerTitle": {
+    "defaultMessage": "Choose a time",
+    "content": "Choose a time"
+  },
+  "diary.timeMachine.tagRemove": {
+    "defaultMessage": "Clear selected time",
+    "content": "Clear selected time"
   },
   "diary.timePicker.confirm": {
     "defaultMessage": "Done",
@@ -700,9 +772,33 @@
     "defaultMessage": "Set a chat background.",
     "content": "Set a chat background."
   },
+  "settings.membership.feature.timeMachine": {
+    "defaultMessage": "Time machine",
+    "content": "Time machine"
+  },
+  "settings.membership.feature.timeMachineDesc": {
+    "defaultMessage": "Send entries to the past or future.",
+    "content": "Send entries to the past or future."
+  },
   "settings.membership.features": {
     "defaultMessage": "Benefits",
     "content": "Benefits"
+  },
+  "settings.membership.futureMessages": {
+    "defaultMessage": "Future messages",
+    "content": "Future messages"
+  },
+  "settings.membership.futureMessages.delete": {
+    "defaultMessage": "Delete future message",
+    "content": "Delete future message"
+  },
+  "settings.membership.futureMessages.deleteConfirm": {
+    "defaultMessage": "Deleted messages cannot be restored.",
+    "content": "Deleted messages cannot be restored."
+  },
+  "settings.membership.futureMessages.empty": {
+    "defaultMessage": "No future messages yet",
+    "content": "No future messages yet"
   },
   "settings.membership.goPurchase": {
     "defaultMessage": "Purchase",

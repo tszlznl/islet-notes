@@ -217,3 +217,54 @@
 .islet-video-player .xgplayer .xgplayer-progress-btn.active:before {
   box-shadow: 0 0 3px rgba(7, 193, 96, 0.68);
 }
+
+/* 路由切换动画：ContentNavigation 触发 View Transition 时按方向在 html 上标注
+   data-page-transition；push 新页面自右滑入，pop 旧页面滑回右侧（仿 iOS 导航）。 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 0.9, 0.36, 1);
+}
+
+html[data-page-transition='push']::view-transition-new(root) {
+  animation-name: page-slide-in-from-right;
+}
+
+html[data-page-transition='push']::view-transition-old(root) {
+  animation-name: page-slide-out-to-left;
+}
+
+html[data-page-transition='pop']::view-transition-old(root) {
+  animation-name: page-slide-out-to-right;
+  z-index: 1;
+}
+
+html[data-page-transition='pop']::view-transition-new(root) {
+  animation-name: page-slide-in-from-left;
+}
+
+@keyframes page-slide-in-from-right {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes page-slide-out-to-left {
+  to {
+    transform: translateX(-28%);
+    opacity: 0.72;
+  }
+}
+
+@keyframes page-slide-out-to-right {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes page-slide-in-from-left {
+  from {
+    transform: translateX(-28%);
+    opacity: 0.72;
+  }
+}

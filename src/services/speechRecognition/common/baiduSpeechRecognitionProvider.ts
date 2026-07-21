@@ -1,7 +1,6 @@
 import { base64ToBytes, bytesToArrayBuffer, bytesToBase64 } from '@/base/just-vibes/binary-codec';
 import { IHostService } from '@/services/native/common/hostService';
 import type { SpeechRecognitionCredentials } from '@/services/speechRecognition/common/speechRecognitionConfig';
-import { Capacitor } from '@capacitor/core';
 
 // 百度短语音两个域名：鉴权(aip) 与识别(vop)。
 const BAIDU_AIP_HOST = 'https://aip.baidubce.com';
@@ -39,6 +38,7 @@ export class BaiduSpeechRecognitionProvider {
     const token = await this.ensureToken(apiKey, secretKey);
     const audio = await prepareBaiduAudio(blob);
     const url = buildBaiduUrl(
+      this.hostService,
       'vop',
       `/pro_api?dev_pid=${BAIDU_DEV_PID}&cuid=${encodeURIComponent(
         BAIDU_CUID,
@@ -92,8 +92,8 @@ function normalizeCredentials(config: SpeechRecognitionCredentials): SpeechRecog
 }
 
 // Web（本地开发）走 Vite 反向代理 `/api/baidu/*`；原生端直连百度域名并经 hostService.request 桥接。
-function buildBaiduUrl(host: BaiduHost, pathWithQuery: string): string {
-  if (!Capacitor.isNativePlatform()) {
+function buildBaiduUrl(hostService: IHostService, host: BaiduHost, pathWithQuery: string): string {
+  if (!hostService.isNative) {
     return `/api/baidu/${host}${pathWithQuery}`;
   }
   return `${host === 'aip' ? BAIDU_AIP_HOST : BAIDU_VOP_HOST}${pathWithQuery}`;
@@ -104,7 +104,7 @@ async function baiduRequest(
   url: string,
   init: { method: string; headers?: Record<string, string>; body?: Uint8Array },
 ): Promise<Response> {
-  if (!Capacitor.isNativePlatform()) {
+  if (!hostService.isNative) {
     return fetch(url, {
       method: init.method,
       headers: init.headers,
@@ -214,6 +214,7 @@ async function requestBaiduToken(
   secretKey: string,
 ): Promise<{ token: string; expiresIn: number }> {
   const url = buildBaiduUrl(
+    hostService,
     'aip',
     `/oauth/2.0/token?grant_type=client_credentials&client_id=${encodeURIComponent(
       apiKey,
