@@ -20,7 +20,7 @@ import { DiaryChat } from '@/mobile/test.id';
 import { localize } from '@/nls';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
 import { ISpeechRecognitionService } from '@/services/speechRecognition/common/speechRecognitionService';
-import React, { CSSProperties, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Navigate, useParams, useSearchParams } from 'react-router';
 import { VariableSizeList } from 'react-window';
 
@@ -74,15 +74,34 @@ export function DiaryChatPage() {
 
   // 定位到目标消息后将其点亮一次;状态会在动画结束后自动清除,可重复触发。
   const { highlightedEntryId, triggerHighlight } = useEntryHighlight();
+  const [entryFocusRequest, setEntryFocusRequest] = useState<{
+    entryId: string;
+    serial: number;
+  }>();
+  const focusEntry = useCallback(
+    (entryId: string) => {
+      triggerHighlight(entryId);
+      setEntryFocusRequest((current) => ({
+        entryId,
+        serial: (current?.serial ?? 0) + 1,
+      }));
+    },
+    [triggerHighlight],
+  );
   useEffect(() => {
-    if (targetEntryId) triggerHighlight(targetEntryId);
-  }, [targetEntryId, triggerHighlight]);
+    if (targetEntryId) focusEntry(targetEntryId);
+  }, [targetEntryId, focusEntry]);
+  const scrollTargetEntryId = entryFocusRequest?.entryId ?? targetEntryId;
+  const targetScrollKey = entryFocusRequest
+    ? `entry:${entryFocusRequest.entryId}:${entryFocusRequest.serial}`
+    : undefined;
   const listHeight = Math.max(1, Math.floor(size.height - chromeHeight));
   const { itemKey, itemSize, listRef } = useDiaryChatVirtualList({
     chatItems,
     model,
     notebookId,
-    targetEntryId,
+    targetEntryId: scrollTargetEntryId,
+    targetScrollKey,
     viewportWidth: size.width,
     isTranscribing,
     transcribingVersion,
@@ -117,7 +136,10 @@ export function DiaryChatPage() {
               {localize('diary.chat.empty', 'No entries yet')}
             </div>
           ) : (
-            <EntryHighlightProvider highlightedEntryId={highlightedEntryId}>
+            <EntryHighlightProvider
+              highlightedEntryId={highlightedEntryId}
+              triggerHighlight={focusEntry}
+            >
               <VariableSizeList
                 ref={listRef}
                 height={listHeight}

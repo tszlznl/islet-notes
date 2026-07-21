@@ -228,6 +228,29 @@ export const styles = {
       font.EmBody,
     ),
   },
+  DateTimePicker: {
+    Root: 'fixed inset-0 flex items-end bg-black/40',
+    Backdrop: 'absolute inset-0',
+    Sheet:
+      'relative w-full select-none rounded-t-xl bg-surface pb-[calc(var(--sab)+0px)] shadow-[0_-6px_24px_rgba(0,0,0,0.12)]',
+    Header:
+      'relative flex h-[52px] items-center justify-between px-[calc(16px+var(--sal))] pr-[calc(16px+var(--sar))]',
+    Title:
+      'absolute left-1/2 max-w-[50%] -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap text-[16px] font-semibold leading-6 text-ink',
+    CancelButton: cx('px-1 py-2 text-muted transition active:opacity-60', font.Body),
+    ConfirmButton: cx(
+      'px-1 py-2 font-semibold text-accent transition active:opacity-60',
+      font.Body,
+    ),
+    Wheels:
+      'relative flex h-[242px] overflow-hidden px-2 pb-4 pt-2 before:absolute before:left-3 before:right-3 before:top-[94px] before:z-0 before:h-11 before:rounded-lg before:bg-soft before:content-[""] after:pointer-events-none after:absolute after:inset-x-2 after:bottom-4 after:top-2 after:z-20 after:bg-[linear-gradient(#fff_0%,rgba(255,255,255,0)_34%,rgba(255,255,255,0)_66%,#fff_100%)] after:content-[""]',
+    Wheel:
+      'relative z-10 h-full flex-1 overflow-y-scroll overflow-x-hidden [perspective:900px] [scroll-snap-type:y_mandatory] [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+    WheelList: '[transform-style:preserve-3d]',
+    WheelItem:
+      'h-11 whitespace-nowrap text-center text-[19px] leading-[44px] text-ink [scroll-snap-align:center] [transform-origin:center_center] [will-change:transform,opacity]',
+    WheelSpacer: 'h-11 [scroll-snap-align:none]',
+  },
   NotebookPicker: {
     Root: 'fixed inset-0 flex items-end bg-black/40',
     Backdrop: 'absolute inset-0',

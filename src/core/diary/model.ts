@@ -320,6 +320,25 @@ export class DiaryModel {
     this.doc.commit();
   }
 
+  updateEntryDisplayAt(entryId: string, displayAt: number) {
+    const existing = this.getEntry(entryId);
+    if (!existing || existing.deletedAt || !Number.isFinite(displayAt)) return;
+    if ((existing.displayAt ?? existing.createdAt) === displayAt) return;
+    const now = Date.now();
+    const nextEntry: DiaryEntryRecord = {
+      ...existing,
+      updatedAt: now,
+    };
+    if (displayAt === existing.createdAt) {
+      delete nextEntry.displayAt;
+    } else {
+      nextEntry.displayAt = displayAt;
+    }
+    this.entriesMap.set(entryId, nextEntry);
+    this.touchNotebook(existing.notebookId, now);
+    this.doc.commit();
+  }
+
   moveEntryToNotebook(entryId: string, targetNotebookId: string) {
     const existing = this.getEntry(entryId);
     const targetNotebook = this.getNotebook(targetNotebookId);

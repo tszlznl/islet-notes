@@ -233,6 +233,10 @@ export class WorkbenchDiaryService implements IDiaryService {
     this.diaryModel.updateEntryIdentity(entryId, identityId);
   }
 
+  updateEntryDisplayAt(entryId: string, displayAt: number): void {
+    this.diaryModel.updateEntryDisplayAt(entryId, displayAt);
+  }
+
   addAttachment(attachment: AttachmentRecord): void {
     this.diaryModel.addAttachment(attachment);
   }

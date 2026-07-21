@@ -1,4 +1,9 @@
-import { compareEntries, getAttachmentById, getNotebookById } from '@/core/diary/selectors';
+import {
+  compareEntries,
+  getAttachmentById,
+  getEntryDisplayTime,
+  getNotebookById,
+} from '@/core/diary/selectors';
 import type {
   DiaryEntryRecord,
   DiaryModelData,
@@ -42,7 +47,7 @@ export function groupNotebookMediaByMonth(
     const video = attachment?.type === 'video' ? attachment : undefined;
     if (!image && !video) continue;
 
-    const monthKey = format(new Date(entry.createdAt), 'yyyy-MM');
+    const monthKey = format(new Date(getEntryDisplayTime(entry)), 'yyyy-MM');
     const items = buckets.get(monthKey) ?? [];
     items.push({ entry, image, video });
     buckets.set(monthKey, items);

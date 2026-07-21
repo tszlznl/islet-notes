@@ -1,4 +1,9 @@
-import { getAttachmentById, getEntriesByNotebook, getNotebookById } from '@/core/diary/selectors';
+import {
+  getAttachmentById,
+  getEntriesByNotebook,
+  getEntryDisplayTime,
+  getNotebookById,
+} from '@/core/diary/selectors';
 import {
   DiaryEntryRecord,
   DiaryModelData,
@@ -17,12 +22,14 @@ export type ChatMessageSource<TUploadTask extends ChatUploadTaskLike = ChatUploa
       kind: 'entry';
       id: string;
       createdAt: number;
+      timestamp: number;
       entry: DiaryEntryRecord;
     }
   | {
       kind: 'upload';
       id: string;
       createdAt: number;
+      timestamp: number;
       task: TUploadTask;
     };
 
@@ -77,24 +84,26 @@ export function buildChatItems<TUploadTask extends ChatUploadTaskLike>(
       kind: 'entry' as const,
       id: entry.id,
       createdAt: entry.createdAt,
+      timestamp: getEntryDisplayTime(entry),
       entry,
     })),
     ...pendingTasks.map((task) => ({
       kind: 'upload' as const,
       id: task.id,
       createdAt: task.createdAt,
+      timestamp: task.createdAt,
       task,
     })),
   ].sort(compareChatSources);
 
   const items: ChatItem<TUploadTask>[] = [];
-  let previous: { createdAt: number } | undefined;
+  let previous: { timestamp: number } | undefined;
   for (const message of messages) {
-    if (!previous || message.createdAt - previous.createdAt > 10 * 60 * 1000) {
-      items.push({ kind: 'divider', id: `divider-${message.id}`, timestamp: message.createdAt });
+    if (!previous || message.timestamp - previous.timestamp > 10 * 60 * 1000) {
+      items.push({ kind: 'divider', id: `divider-${message.id}`, timestamp: message.timestamp });
     }
     items.push(message);
-    previous = { createdAt: message.createdAt };
+    previous = { timestamp: message.timestamp };
   }
   return items;
 }
@@ -113,9 +122,10 @@ export function getChatPreviewAttachments<TUploadTask extends ChatUploadTaskLike
 }
 
 function compareChatSources(
-  left: { createdAt: number; id: string },
-  right: { createdAt: number; id: string },
+  left: { timestamp: number; createdAt: number; id: string },
+  right: { timestamp: number; createdAt: number; id: string },
 ) {
+  if (left.timestamp !== right.timestamp) return left.timestamp - right.timestamp;
   if (left.createdAt !== right.createdAt) return left.createdAt - right.createdAt;
   return left.id.localeCompare(right.id);
 }

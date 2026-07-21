@@ -4,6 +4,7 @@ export enum OverlayEnum {
   topTips = 'topTips',
   dialog = 'dialog',
   textInputDialog = 'textInputDialog',
+  dateTimePicker = 'dateTimePicker',
   actionSheet = 'actionSheet',
   notebookPicker = 'notebookPicker',
   identityPicker = 'identityPicker',

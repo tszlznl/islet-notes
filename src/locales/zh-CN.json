@@ -168,6 +168,14 @@
     "defaultMessage": "Edit text",
     "content": "编辑文字"
   },
+  "diary.editTime.action": {
+    "defaultMessage": "Time",
+    "content": "时间"
+  },
+  "diary.editTime.title": {
+    "defaultMessage": "Edit time",
+    "content": "修改时间"
+  },
   "diary.entryDeleted": {
     "content": "已删除",
     "defaultMessage": "Deleted"
@@ -175,6 +183,10 @@
   "diary.entryMoved": {
     "defaultMessage": "Moved",
     "content": "已移动"
+  },
+  "diary.entryTimeUpdated": {
+    "defaultMessage": "Time updated",
+    "content": "时间已更新"
   },
   "diary.image.loadFailed": {
     "content": "图片加载失败",
@@ -243,6 +255,50 @@
   "diary.settings": {
     "content": "日记本设置",
     "defaultMessage": "Notebook settings"
+  },
+  "diary.timePicker.confirm": {
+    "defaultMessage": "Done",
+    "content": "确定"
+  },
+  "diary.timePicker.day": {
+    "defaultMessage": "Day",
+    "content": "日"
+  },
+  "diary.timePicker.dayValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}日"
+  },
+  "diary.timePicker.hour": {
+    "defaultMessage": "Hour",
+    "content": "时"
+  },
+  "diary.timePicker.hourValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}时"
+  },
+  "diary.timePicker.minute": {
+    "defaultMessage": "Minute",
+    "content": "分"
+  },
+  "diary.timePicker.minuteValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}分"
+  },
+  "diary.timePicker.month": {
+    "defaultMessage": "Month",
+    "content": "月"
+  },
+  "diary.timePicker.monthValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}月"
+  },
+  "diary.timePicker.year": {
+    "defaultMessage": "Year",
+    "content": "年"
+  },
+  "diary.timePicker.yearValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}年"
   },
   "diary.unknownAttachment": {
     "content": "不支持的附件",

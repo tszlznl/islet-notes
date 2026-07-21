@@ -5,3 +5,4 @@ export { EntryHighlightProvider } from './EntryHighlightProvider';
 export { EntryHighlight } from './ui';
 export { ENTRY_HIGHLIGHT_DURATION_MS, useEntryHighlight } from './useEntryHighlight';
 export { useIsEntryHighlighted } from './useIsEntryHighlighted';
+export { useTriggerEntryHighlight } from './useTriggerEntryHighlight';

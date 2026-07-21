@@ -1,12 +1,15 @@
+import { useTriggerEntryHighlight } from '@/base/just-vibes/entry-highlight';
 import {
   getActiveIdentities,
   getAttachmentById,
+  getEntryDisplayTime,
   getIdentityAvatarAttachment,
   getProfileAvatarAttachment,
   getSortedNotebooks,
 } from '@/core/diary/selectors';
 import { useService } from '@/hooks/use-service';
 import { useLongPress } from '@/mobile/hooks/useLongPress';
+import { useDateTimePicker } from '@/mobile/overlay/dateTimePicker/useDateTimePicker';
 import { useDialog } from '@/mobile/overlay/dialog/useDialog';
 import { useIdentityPicker } from '@/mobile/overlay/identityPicker/useIdentityPicker';
 import type { LongPressMenuAction } from '@/mobile/overlay/longPressMenu/LongPressMenuController';
@@ -23,7 +26,7 @@ import {
   IdentityConfigSchema,
 } from '@/services/diary/common/identityConfig';
 import { IHostService } from '@/services/native/common/hostService';
-import { CircleUserRound, Copy, Edit3, MoveRight, Trash2 } from 'lucide-react';
+import { CircleUserRound, Clock3, Copy, Edit3, MoveRight, Trash2 } from 'lucide-react';
 import { useRef } from 'react';
 import useSWR from 'swr';
 
@@ -64,7 +67,9 @@ export function useEntryLongPressActions<T extends HTMLElement>(
   const showLongPressMenu = useLongPressMenu();
   const showNotebookPicker = useNotebookPicker();
   const showTextInputDialog = useTextInputDialog();
+  const showDateTimePicker = useDateTimePicker();
   const showIdentityPicker = useIdentityPicker();
+  const triggerEntryHighlight = useTriggerEntryHighlight();
   // 身份开关(身份管理页顶部)关闭时,长按菜单也不提供切换身份入口。
   const { data: identityConfig } = useSWR(IDENTITY_CONFIG_SWR_KEY, async () =>
     hostService.getPreference(IDENTITY_CONFIG_KEY, IdentityConfigSchema),
@@ -148,6 +153,27 @@ export function useEntryLongPressActions<T extends HTMLElement>(
     });
   };
 
+  const openTimePicker = () => {
+    const entry = diaryService.modelState.entryMap.get(entryId);
+    if (!entry || entry.deletedAt) return;
+    const currentDisplayAt = getEntryDisplayTime(entry);
+    showDateTimePicker({
+      title: localize('diary.editTime.title', 'Edit time'),
+      value: new Date(currentDisplayAt),
+      rootTestId: DiaryChat.editTimeDialog,
+      confirmTestId: DiaryChat.editTimeSave,
+      cancelTestId: DiaryChat.editTimeCancel,
+      onConfirm: (date) => {
+        const nextDisplayAt = date.getTime();
+        if (nextDisplayAt !== currentDisplayAt) {
+          diaryService.updateEntryDisplayAt(entryId, nextDisplayAt);
+          triggerEntryHighlight?.(entryId);
+          showSuccessToast({ message: localize('diary.entryTimeUpdated', 'Time updated') });
+        }
+      },
+    });
+  };
+
   const openIdentitySwitcher = () => {
     const model = diaryService.modelState;
     const entry = model.entryMap.get(entryId);
@@ -220,6 +246,14 @@ export function useEntryLongPressActions<T extends HTMLElement>(
       });
     }
     if (extraActions) actions.push(...extraActions);
+    if (entry) {
+      actions.push({
+        id: 'edit-time',
+        label: localize('diary.editTime.action', 'Time'),
+        icon: Clock3,
+        run: openTimePicker,
+      });
+    }
     if (movable) {
       actions.push({
         id: 'move',

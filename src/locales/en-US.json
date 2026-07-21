@@ -168,6 +168,14 @@
     "defaultMessage": "Edit text",
     "content": "Edit text"
   },
+  "diary.editTime.action": {
+    "defaultMessage": "Time",
+    "content": "Time"
+  },
+  "diary.editTime.title": {
+    "defaultMessage": "Edit time",
+    "content": "Edit time"
+  },
   "diary.entryDeleted": {
     "defaultMessage": "Deleted",
     "content": "Deleted"
@@ -175,6 +183,10 @@
   "diary.entryMoved": {
     "defaultMessage": "Moved",
     "content": "Moved"
+  },
+  "diary.entryTimeUpdated": {
+    "defaultMessage": "Time updated",
+    "content": "Time updated"
   },
   "diary.image.loadFailed": {
     "defaultMessage": "Image failed to load",
@@ -243,6 +255,50 @@
   "diary.settings": {
     "defaultMessage": "Notebook settings",
     "content": "Notebook settings"
+  },
+  "diary.timePicker.confirm": {
+    "defaultMessage": "Done",
+    "content": "Done"
+  },
+  "diary.timePicker.day": {
+    "defaultMessage": "Day",
+    "content": "Day"
+  },
+  "diary.timePicker.dayValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}"
+  },
+  "diary.timePicker.hour": {
+    "defaultMessage": "Hour",
+    "content": "Hour"
+  },
+  "diary.timePicker.hourValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}"
+  },
+  "diary.timePicker.minute": {
+    "defaultMessage": "Minute",
+    "content": "Minute"
+  },
+  "diary.timePicker.minuteValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}"
+  },
+  "diary.timePicker.month": {
+    "defaultMessage": "Month",
+    "content": "Month"
+  },
+  "diary.timePicker.monthValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}"
+  },
+  "diary.timePicker.year": {
+    "defaultMessage": "Year",
+    "content": "Year"
+  },
+  "diary.timePicker.yearValue": {
+    "defaultMessage": "{0}",
+    "content": "{0}"
   },
   "diary.unknownAttachment": {
     "defaultMessage": "Unsupported attachment",

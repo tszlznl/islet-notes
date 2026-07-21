@@ -45,6 +45,7 @@ export interface IDiaryService {
   updateAttachmentEntryText(entryId: string, text: string | undefined): void;
   moveEntryToNotebook(entryId: string, targetNotebookId: string): void;
   updateEntryIdentity(entryId: string, identityId: string | undefined): void;
+  updateEntryDisplayAt(entryId: string, displayAt: number): void;
   addAttachment(attachment: AttachmentRecord): void;
   softDeleteEntry(entryId: string): void;
 }

@@ -11,6 +11,7 @@ interface UseDiaryChatVirtualListParams {
   model: DiaryModelData;
   notebookId: string | undefined;
   targetEntryId: string | undefined;
+  targetScrollKey?: string;
   viewportWidth: number;
   isTranscribing?: (entryId: string) => boolean;
   transcribingVersion?: number;
@@ -21,6 +22,7 @@ export function useDiaryChatVirtualList({
   model,
   notebookId,
   targetEntryId,
+  targetScrollKey,
   viewportWidth,
   isTranscribing,
   transcribingVersion = 0,
@@ -30,6 +32,7 @@ export function useDiaryChatVirtualList({
     itemCount: 0,
     latestRenderKey: null as string | null,
     scrollKey: null as string | null,
+    targetIndex: -1,
     width: 0,
     version: null as DiaryModelData['version'] | null,
     transcribingVersion: 0,
@@ -42,7 +45,7 @@ export function useDiaryChatVirtualList({
     () => getDiaryChatLatestRenderKey(chatItems, isTranscribing, transcribingVersion),
     [chatItems, isTranscribing, transcribingVersion],
   );
-  const scrollKey = `${notebookId ?? ''}:${targetEntryId ?? 'latest'}`;
+  const scrollKey = `${notebookId ?? ''}:${targetScrollKey ?? targetEntryId ?? 'latest'}`;
 
   const itemSize = useCallback(
     (index: number) => {
@@ -70,8 +73,10 @@ export function useDiaryChatVirtualList({
     const hasNewItems = chatItems.length > previous.itemCount;
     const latestItemChanged =
       previous.latestRenderKey !== null && previous.latestRenderKey !== latestRenderKey;
+    const targetIndexChanged =
+      !!targetEntryId && targetIndex >= 0 && previous.targetIndex !== targetIndex;
 
-    if (contextChanged || itemSizeContextChanged) {
+    if (contextChanged || itemSizeContextChanged || targetIndexChanged) {
       listRef.current?.resetAfterIndex(0, itemSizeContextChanged);
     } else if (hasNewItems) {
       listRef.current?.resetAfterIndex(previous.itemCount, false);
@@ -79,7 +84,7 @@ export function useDiaryChatVirtualList({
       listRef.current?.resetAfterIndex(Math.max(0, chatItems.length - 1), false);
     }
 
-    if (contextChanged && targetIndex >= 0) {
+    if ((contextChanged || targetIndexChanged) && targetIndex >= 0) {
       listRef.current?.scrollToItem(targetIndex, 'center');
     } else if ((contextChanged || hasNewItems || latestItemChanged) && chatItems.length > 0) {
       listRef.current?.scrollToItem(chatItems.length - 1, 'end');
@@ -89,6 +94,7 @@ export function useDiaryChatVirtualList({
       itemCount: chatItems.length,
       latestRenderKey,
       scrollKey,
+      targetIndex,
       width: viewportWidth,
       version: model.version,
       transcribingVersion,
@@ -99,6 +105,7 @@ export function useDiaryChatVirtualList({
     model.version,
     scrollKey,
     targetIndex,
+    targetEntryId,
     viewportWidth,
     transcribingVersion,
   ]);

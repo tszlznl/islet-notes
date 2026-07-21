@@ -64,11 +64,20 @@ export function getEntriesByNotebook(
 }
 
 export function compareEntries(
-  a: Pick<DiaryEntryRecord, 'createdAt' | 'id'>,
-  b: Pick<DiaryEntryRecord, 'createdAt' | 'id'>,
+  a: Pick<DiaryEntryRecord, 'createdAt' | 'displayAt' | 'id'>,
+  b: Pick<DiaryEntryRecord, 'createdAt' | 'displayAt' | 'id'>,
 ) {
+  const aTime = getEntryDisplayTime(a);
+  const bTime = getEntryDisplayTime(b);
+  if (aTime !== bTime) return aTime - bTime;
   if (a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
   return a.id.localeCompare(b.id);
+}
+
+export function getEntryDisplayTime(entry: Pick<DiaryEntryRecord, 'createdAt' | 'displayAt'>) {
+  return typeof entry.displayAt === 'number' && Number.isFinite(entry.displayAt)
+    ? entry.displayAt
+    : entry.createdAt;
 }
 
 export function getLastEntry(
@@ -80,29 +89,32 @@ export function getLastEntry(
 }
 
 export function getNotebookListTime(model: DiaryModelData, notebook: NotebookRecord): number {
-  return getLastEntry(model, notebook.id)?.createdAt ?? notebook.createdAt;
+  const lastEntry = getLastEntry(model, notebook.id);
+  return lastEntry ? getEntryDisplayTime(lastEntry) : notebook.createdAt;
 }
 
 export function getSortedNotebooks(model: DiaryModelData): NotebookRecord[] {
   const orderIndex = new Map(model.notebooks.map((notebook, index) => [notebook.id, index]));
-  const lastEntryCreatedAtByNotebook = new Map<string, number>();
+  const lastEntryByNotebook = new Map<string, DiaryEntryRecord>();
 
   for (const entry of model.entries) {
     if (entry.deletedAt) continue;
-    const current = lastEntryCreatedAtByNotebook.get(entry.notebookId);
-    if (current === undefined || entry.createdAt > current) {
-      lastEntryCreatedAtByNotebook.set(entry.notebookId, entry.createdAt);
+    const current = lastEntryByNotebook.get(entry.notebookId);
+    if (!current || compareEntries(current, entry) < 0) {
+      lastEntryByNotebook.set(entry.notebookId, entry);
     }
   }
 
   return [...model.notebooks].sort((a, b) => {
-    const aLastEntryAt = lastEntryCreatedAtByNotebook.get(a.id);
-    const bLastEntryAt = lastEntryCreatedAtByNotebook.get(b.id);
-    const aHasEntry = aLastEntryAt !== undefined;
-    const bHasEntry = bLastEntryAt !== undefined;
+    const aLastEntry = lastEntryByNotebook.get(a.id);
+    const bLastEntry = lastEntryByNotebook.get(b.id);
+    const aHasEntry = aLastEntry !== undefined;
+    const bHasEntry = bLastEntry !== undefined;
 
-    if (aLastEntryAt !== undefined && bLastEntryAt !== undefined && aLastEntryAt !== bLastEntryAt)
-      return bLastEntryAt - aLastEntryAt;
+    if (aLastEntry && bLastEntry) {
+      const entryCompare = compareEntries(bLastEntry, aLastEntry);
+      if (entryCompare !== 0) return entryCompare;
+    }
     if (aHasEntry !== bHasEntry) return aHasEntry ? -1 : 1;
     if (!aHasEntry && !bHasEntry && a.createdAt !== b.createdAt) return a.createdAt - b.createdAt;
 
@@ -129,7 +141,7 @@ export function shouldShowTimeDivider(
   current: DiaryEntryRecord,
 ): boolean {
   if (!previous) return true;
-  return current.createdAt - previous.createdAt > 10 * 60 * 1000;
+  return getEntryDisplayTime(current) - getEntryDisplayTime(previous) > 10 * 60 * 1000;
 }
 
 export function formatEntryTime(timestamp: number): string {

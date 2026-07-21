@@ -47,6 +47,8 @@ export interface DiaryEntryRecord {
   attachmentId?: string;
   identityId?: string;
   createdAt: number;
+  /** 用户手动设置的展示/排序时间；缺失时使用 createdAt。 */
+  displayAt?: number;
   updatedAt: number;
   deletedAt?: number;
   externalSource?: string;

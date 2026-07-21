@@ -1,3 +1,4 @@
+import { getEntryDisplayTime } from '@/core/diary/selectors';
 import type { CalendarDayRecord } from '@/core/state/calendar';
 import { styles } from '@/mobile/styles/ui';
 import { Calendar } from '@/mobile/test.id';
@@ -41,7 +42,7 @@ export function DayRecordItem({ record, imagePreviewAttachments, onOpen }: DayRe
   return (
     <article className={styles.DayRecordItem.Root} data-test-id={Calendar.recordItem}>
       <time className={styles.DayRecordItem.Time} data-test-id={Calendar.recordTime}>
-        {format(record.entry.createdAt, 'HH:mm')}
+        {format(getEntryDisplayTime(record.entry), 'HH:mm')}
       </time>
       <span className={styles.DayRecordItem.Point} aria-hidden='true' />
       {record.image || record.video || record.audio ? (

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ActionSheet } from './actionSheet/ActionSheet';
+import { DateTimePicker } from './dateTimePicker/DateTimePicker';
 import { Dialog } from './dialog/Dialog';
 import { ImagePreview } from './imagePreview/ImagePreview';
 import { LoadingToast } from './loadingToast/LoadingToast';
@@ -21,6 +22,7 @@ export function OverlayHost() {
       <VideoPreview />
       <Dialog />
       <TextInputDialog />
+      <DateTimePicker />
       <NotebookPicker />
       <IdentityPicker />
       <ActionSheet />

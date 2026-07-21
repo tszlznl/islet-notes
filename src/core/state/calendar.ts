@@ -1,4 +1,9 @@
-import { compareEntries, getAttachmentById, getNotebookById } from '@/core/diary/selectors';
+import {
+  compareEntries,
+  getAttachmentById,
+  getEntryDisplayTime,
+  getNotebookById,
+} from '@/core/diary/selectors';
 import type {
   AudioAttachmentRecord,
   DiaryEntryRecord,
@@ -46,7 +51,7 @@ export function groupEntriesByDate(
     if (entry.type === 'attachment' && !image && !audio && !video) continue;
 
     const identity = entry.identityId ? model.identityMap.get(entry.identityId) : undefined;
-    const key = dateKey(new Date(entry.createdAt));
+    const key = dateKey(new Date(getEntryDisplayTime(entry)));
     const records = result.get(key) ?? [];
     records.push({
       entry,
