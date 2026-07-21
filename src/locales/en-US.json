@@ -776,6 +776,10 @@
     "defaultMessage": "Benefits are active.",
     "content": "Benefits are active."
   },
+  "settings.membership.error.loadFailed": {
+    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
+    "content": "Membership information is temporarily unavailable. Try again later."
+  },
   "settings.membership.appStore.buyPrice": {
     "defaultMessage": "Buy with App Store · {0}",
     "content": "Buy with App Store · {0}"

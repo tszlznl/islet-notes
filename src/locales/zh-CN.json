@@ -776,6 +776,10 @@
     "defaultMessage": "Benefits are active.",
     "content": "权益已生效"
   },
+  "settings.membership.error.loadFailed": {
+    "defaultMessage": "Membership information is temporarily unavailable. Try again later.",
+    "content": "暂时无法加载会员信息，请稍后重试。"
+  },
   "settings.membership.appStore.buyPrice": {
     "defaultMessage": "Buy with App Store · {0}",
     "content": "通过 App Store 购买 · {0}"

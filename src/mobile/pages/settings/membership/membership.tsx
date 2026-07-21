@@ -32,7 +32,13 @@ export function SettingsMembershipPage() {
   const [appStoreProductLoading, setAppStoreProductLoading] = useState(false);
   const [appStoreBusy, setAppStoreBusy] = useState<'purchase' | 'restore'>();
   const { status, isLoading } = useMembershipStatus({
-    onError: (error) => showError(showTopTips, error),
+    onError: () =>
+      showTopTips({
+        message: localize(
+          'settings.membership.error.loadFailed',
+          'Membership information is temporarily unavailable. Try again later.',
+        ),
+      }),
   });
   const isIos = hostService.platform === 'ios';
 

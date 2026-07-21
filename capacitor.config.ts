@@ -8,6 +8,9 @@ const config: CapacitorConfig = {
   android: {
     backgroundColor: '#ededed',
   },
+  ios: {
+    webContentsDebuggingEnabled: true,
+  },
   plugins: {
     SystemBars: {
       insetsHandling: 'disable',

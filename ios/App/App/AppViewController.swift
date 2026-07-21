@@ -11,5 +11,6 @@ class AppViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(VideoToolsPlugin())
         bridge?.registerPluginInstance(MediaPickerPlugin())
         bridge?.registerPluginInstance(FileSharePlugin())
+        bridge?.registerPluginInstance(AppStoreMembershipPlugin())
     }
 }
