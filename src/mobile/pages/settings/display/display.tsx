@@ -5,7 +5,10 @@ import { usePreference } from '@/mobile/hooks/usePreference';
 import { DisplaySettings } from '@/mobile/test.id';
 import { localize } from '@/nls';
 import { INavigationService } from '@/services/navigationService/common/navigationService';
-import { MessageLinkDetectionPreference } from '@/services/preferences/common/appPreferences';
+import {
+  MessageLinkDetectionPreference,
+  PageTransitionPreference,
+} from '@/services/preferences/common/appPreferences';
 import React from 'react';
 
 export function SettingsDisplayPage() {
@@ -13,6 +16,7 @@ export function SettingsDisplayPage() {
   const [messageLinkDetection, setMessageLinkDetection] = usePreference(
     MessageLinkDetectionPreference,
   );
+  const [pageTransition, setPageTransition] = usePreference(PageTransitionPreference);
 
   return (
     <HeaderPage
@@ -38,6 +42,13 @@ export function SettingsDisplayPage() {
             checked: messageLinkDetection,
             testId: DisplaySettings.messageLinks,
             onChange: (checked) => void setMessageLinkDetection(checked),
+          },
+          {
+            type: 'switch',
+            label: localize('settings.pageTransition', 'Page transition animation'),
+            checked: pageTransition,
+            testId: DisplaySettings.pageTransition,
+            onChange: (checked) => void setPageTransition(checked),
           },
         ]}
       />

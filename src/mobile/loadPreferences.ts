@@ -5,6 +5,7 @@ import type { IHostService } from '@/services/native/common/hostService';
 import {
   CalendarDisplayOrderPreference,
   MessageLinkDetectionPreference,
+  PageTransitionPreference,
   SyncConfigPreference,
 } from '@/services/preferences/common/appPreferences';
 import { SpeechRecognitionConfigPreference } from '@/services/speechRecognition/common/speechRecognitionConfig';
@@ -15,6 +16,7 @@ const hostPreferences = [
   IdentityConfigPreference,
   CalendarDisplayOrderPreference,
   MessageLinkDetectionPreference,
+  PageTransitionPreference,
   SpeechRecognitionConfigPreference,
   MembershipPurchasedCachePreference,
 ] as const;

@@ -5,6 +5,7 @@ import {
   INavigationService,
   type NavigateTransition,
 } from '@/services/navigationService/common/navigationService';
+import { PageTransitionPreference } from '@/services/preferences/common/appPreferences';
 import React, { useEffect } from 'react';
 import { flushSync } from 'react-dom';
 import { Outlet, useLocation, useNavigate } from 'react-router';
@@ -41,14 +42,18 @@ export function ContentNavigation() {
   const hostService = useService(IHostService);
 
   useEffect(() => {
+    const resolveTransition = (direction: NavigateTransition): NavigateTransition =>
+      hostService.getPreference(PageTransitionPreference) ? direction : 'none';
     const listener = navigationService.listenBackButton(() => {
       if (window.history.state && window.history.state.idx > 0) {
-        runWithPageTransition('pop', () => navigate(-1));
+        runWithPageTransition(resolveTransition('pop'), () => navigate(-1));
         return;
       }
       const fallbackPath = getBackFallbackPath(location.pathname, location.search);
       if (fallbackPath) {
-        runWithPageTransition('pop', () => navigate(fallbackPath, { replace: true }));
+        runWithPageTransition(resolveTransition('pop'), () =>
+          navigate(fallbackPath, { replace: true }),
+        );
         return;
       }
       if (hostService.isNative) hostService.exitApp();
@@ -57,18 +62,20 @@ export function ContentNavigation() {
   }, [location.pathname, location.search, hostService, navigate, navigationService]);
 
   useEffect(() => {
+    const resolveTransition = (direction: NavigateTransition): NavigateTransition =>
+      hostService.getPreference(PageTransitionPreference) ? direction : 'none';
     const navigateListener = navigationService.onNavigate((event) => {
-      runWithPageTransition(event.transition ?? 'push', () =>
+      runWithPageTransition(resolveTransition(event.transition ?? 'push'), () =>
         navigate(event.path, { replace: event.replace, state: event.state }),
       );
     });
     const backListener = navigationService.onGoBack((event) => {
       if (window.history.state && window.history.state.idx > 0) {
-        runWithPageTransition('pop', () => navigate(-1));
+        runWithPageTransition(resolveTransition('pop'), () => navigate(-1));
         return;
       }
       if (event?.fallbackPath) {
-        runWithPageTransition('pop', () =>
+        runWithPageTransition(resolveTransition('pop'), () =>
           navigate(event.fallbackPath!, { replace: event.replaceFallback ?? true }),
         );
       }
@@ -77,7 +84,7 @@ export function ContentNavigation() {
       navigateListener.dispose();
       backListener.dispose();
     };
-  }, [navigate, navigationService]);
+  }, [hostService, navigate, navigationService]);
 
   return <Outlet />;
 }

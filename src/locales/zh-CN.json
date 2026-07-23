@@ -1120,6 +1120,10 @@
     "content": "我的日记本",
     "defaultMessage": "My notebook"
   },
+  "settings.pageTransition": {
+    "defaultMessage": "Page transition animation",
+    "content": "页面切换动画"
+  },
   "settings.s3": {
     "content": "云同步",
     "defaultMessage": "Cloud Sync"

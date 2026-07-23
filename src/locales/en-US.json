@@ -1120,6 +1120,10 @@
     "defaultMessage": "My notebook",
     "content": "My notebook"
   },
+  "settings.pageTransition": {
+    "defaultMessage": "Page transition animation",
+    "content": "Page transition animation"
+  },
   "settings.s3": {
     "defaultMessage": "Cloud Sync",
     "content": "Cloud Sync"

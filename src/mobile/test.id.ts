@@ -428,6 +428,7 @@ export const DisplaySettings = {
   theme: 'display-settings.theme',
   calendar: 'display-settings.calendar',
   messageLinks: 'display-settings.message-links',
+  pageTransition: 'display-settings.page-transition',
 } as const;
 
 export const CalendarDisplaySettings = {

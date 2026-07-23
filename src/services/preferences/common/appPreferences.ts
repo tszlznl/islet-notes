@@ -23,6 +23,13 @@ export const MessageLinkDetectionPreference = definePreference({
   defaultValue: true,
 });
 
+export const PageTransitionPreference = definePreference({
+  channel: 'host',
+  key: 'page-transition',
+  schema: z.boolean(),
+  defaultValue: !globalThis.__ISLET_ANDROID_ENVIRONMENT__?.isInstalledByZhuoyi(),
+});
+
 export type AppStorageMode = 'persistent' | 'memory';
 
 export const SyncConfigSchema = z.discriminatedUnion('provider', [

@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
@@ -27,9 +28,20 @@ public class MainActivity extends BridgeActivity {
     registerPlugin(FileSharePlugin.class);
     SplashScreen.installSplashScreen(this);
     super.onCreate(savedInstanceState);
+    configureWebViewTextZoom();
     configureWebViewDebugging();
     configureEdgeToEdge();
     configureSafeAreaInsets();
+  }
+
+  @Override
+  protected void load() {
+    WebView webView = findViewById(com.getcapacitor.android.R.id.webview);
+    webView.addJavascriptInterface(
+      new AndroidEnvironmentVariable(AppEnvironment.isInstalledByZhuoyi(this)),
+      "__ISLET_ANDROID_ENVIRONMENT__"
+    );
+    super.load();
   }
 
   @Override
@@ -42,6 +54,10 @@ public class MainActivity extends BridgeActivity {
 
   private void configureWebViewDebugging() {
     WebView.setWebContentsDebuggingEnabled(true);
+  }
+
+  private void configureWebViewTextZoom() {
+    getBridge().getWebView().getSettings().setTextZoom(100);
   }
 
   private void configureEdgeToEdge() {
@@ -113,5 +129,18 @@ public class MainActivity extends BridgeActivity {
     );
 
     getBridge().getWebView().evaluateJavascript(script, null);
+  }
+
+  private static final class AndroidEnvironmentVariable {
+    private final boolean installedByZhuoyi;
+
+    private AndroidEnvironmentVariable(boolean installedByZhuoyi) {
+      this.installedByZhuoyi = installedByZhuoyi;
+    }
+
+    @JavascriptInterface
+    public boolean isInstalledByZhuoyi() {
+      return installedByZhuoyi;
+    }
   }
 }
